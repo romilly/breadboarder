@@ -14,4 +14,7 @@ class DrawingTest(TestCase):
     def test_builds_svg(self):
         drawing = Drawing()
         svg = drawing.svg()
+        self.check_svg_tag(svg)
+
+    def check_svg_tag(self, svg):
         self.assertTrue('<svg' in svg)
