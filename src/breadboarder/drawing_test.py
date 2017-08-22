@@ -1,6 +1,6 @@
 from unittest import TestCase
 from xml.etree.ElementTree import Element, tostring
-
+from bs4 import BeautifulSoup
 
 class Drawing(object):
     def __init__(self):
@@ -17,4 +17,7 @@ class DrawingTest(TestCase):
         self.check_svg_tag(svg)
 
     def check_svg_tag(self, svg):
-        self.assertTrue('<svg' in svg)
+        # self.assertTrue('<svg' in svg)
+        soup = BeautifulSoup(svg,'xml')
+        svg_tags = soup.find_all('svg')
+        self.assertEqual(1, len(svg_tags))
