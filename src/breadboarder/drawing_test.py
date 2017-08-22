@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 class Drawing(object):
     def __init__(self):
-        self._svg = Element('svg')
+        self._svg = Element('svg', height='480', width='640')
 
     def svg(self):
         return tostring(self._svg)
@@ -21,3 +21,6 @@ class DrawingTest(TestCase):
         soup = BeautifulSoup(svg,'xml')
         svg_tags = soup.find_all('svg')
         self.assertEqual(1, len(svg_tags))
+        svg_root = svg_tags[0]
+        self.assertEqual('480',svg_root['height'])
+        self.assertEqual('640',svg_root['width'])
