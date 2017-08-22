@@ -9,10 +9,10 @@ class DrawingTest(TestCase):
         drawing = Drawing()
         drawing.add(Breadboard())
         svg = drawing.svg()
-        svg_root = self.check_svg_tag(svg)
+        svg_root = self.check_svg_root(svg)
         self.check_breadboard(svg_root)
 
-    def check_svg_tag(self, svg):
+    def check_svg_root(self, svg):
         # self.assertTrue('<svg' in svg)
         soup = BeautifulSoup(svg,'xml')
         svg_tags = soup.find_all('svg')
