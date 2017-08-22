@@ -26,7 +26,8 @@ class DrawingTest(TestCase):
         drawing = Drawing()
         drawing.add(Breadboard())
         svg = drawing.svg()
-        self.check_svg_tag(svg)
+        svg_root = self.check_svg_tag(svg)
+        self.check_breadboard(svg_root)
 
     def check_svg_tag(self, svg):
         # self.assertTrue('<svg' in svg)
@@ -36,5 +37,8 @@ class DrawingTest(TestCase):
         svg_root = svg_tags[0]
         self.assertEqual('480',svg_root['height'])
         self.assertEqual('640',svg_root['width'])
-        bb = svg_root.find('g',id='breadboard')
+        return svg_root
+
+    def check_breadboard(self, svg_root):
+        bb = svg_root.find('g', id='breadboard')
         self.assertTrue(bb is not None)
