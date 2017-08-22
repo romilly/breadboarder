@@ -1,9 +1,13 @@
 from unittest import TestCase
+from xml.etree.ElementTree import Element, tostring
 
 
 class Drawing(object):
+    def __init__(self):
+        self._svg = Element('svg')
+
     def svg(self):
-        pass
+        return tostring(self._svg)
 
 
 class DrawingTest(TestCase):
