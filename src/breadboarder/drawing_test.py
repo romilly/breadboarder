@@ -8,12 +8,11 @@ class DrawingTest(TestCase):
     def test_builds_svg(self):
         drawing = Drawing()
         drawing.add(Breadboard())
-        svg = drawing.svg()
+        svg = drawing.tostring()
         svg_root = self.check_svg_root(svg)
         self.check_breadboard(svg_root)
 
     def check_svg_root(self, svg):
-        # self.assertTrue('<svg' in svg)
         soup = BeautifulSoup(svg,'xml')
         svg_tags = soup.find_all('svg')
         self.assertEqual(1, len(svg_tags))
@@ -24,4 +23,10 @@ class DrawingTest(TestCase):
 
     def check_breadboard(self, svg_root):
         bb = svg_root.find('g', id='breadboard')
-        self.assertTrue(bb is not None)
+        self.assertTrue(bb is not None,'drawing should contain breadboard group')
+        r = bb.find('rect')
+        self.assertTrue(r is not None, 'breadboard should contain a rectangle')
+        # self.assertEqual('10', r['x'])
+        lines = bb.find_all('line')
+        self.assertEqual(4,len(lines))
+
