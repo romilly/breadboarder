@@ -12,14 +12,29 @@ BODY_SOCKET_V_2ND_OFFSET = 82.17
 H_TEXT_OFFSET = 10
 BODY_SOCKET_H_OFFSET = 15.2
 GRID_SPACING = 9
-SOCKET_SIZE = 2.88
+# SOCKET_SIZE = 2.88
+
+
+class SocketGroup(CompositeItem):
+    def __init__(self, x, y, rows, cols, id='sockets'):
+        CompositeItem.__init__(self)
+        self.socket_size = 2.88
+        self.id = id
+        for i in range(cols):
+            for j in range(rows):
+                self.add(Rectangle(self.socket_size, self.socket_size, fill='black').
+                         center(x + GRID_SPACING * i,
+                                y + GRID_SPACING * j))
+
+    def container(self):
+        return Element('g', id=self.id)
 
 
 class Breadboard(CompositeItem):
     def __init__(self, width = 291.7, height= 192.2):
+        CompositeItem.__init__(self)
         self.width = width
         self.height = height
-        CompositeItem.__init__(self)
         self.add_top_power()
         self.add_body_sockets(BODY_SOCKET_V_OFFSET)
         self.add_body_sockets(self.height - BODY_SOCKET_V_2ND_OFFSET)
@@ -43,16 +58,18 @@ class Breadboard(CompositeItem):
 
     def add_power_sockets(self, top_centre):
         for group in range(5):
-            for i in range(5):
-                for j in (0, 1):
-                    self.add(Rectangle(SOCKET_SIZE, SOCKET_SIZE, fill='black').
-                             center(LEFT_POWER_SOCKET_H_OFFSET + GRID_SPACING * i + 53.5 * group, top_centre + GRID_SPACING * j))
+            self.add(SocketGroup(LEFT_POWER_SOCKET_H_OFFSET + 53.5* group, top_centre, 2, 5))
+            # for i in range(5):
+            #     for j in (0, 1):
+            #         self.add(Rectangle(SOCKET_SIZE, SOCKET_SIZE, fill='black').
+            #                  center(LEFT_POWER_SOCKET_H_OFFSET + GRID_SPACING * i + 53.5 * group, top_centre + GRID_SPACING * j))
 
     def add_body_sockets(self, top_centre):
-        for i in range(30):
-            for j in range(5):
-                    self.add(Rectangle(SOCKET_SIZE, SOCKET_SIZE, fill='black').
-                             center(BODY_SOCKET_H_OFFSET + GRID_SPACING * i, top_centre + GRID_SPACING * j))
+        self.add(SocketGroup(BODY_SOCKET_H_OFFSET, top_centre, 5, 30))
+        # for i in range(30):
+        #     for j in range(5):
+        #             self.add(Rectangle(SOCKET_SIZE, SOCKET_SIZE, fill='black').
+        #                      center(BODY_SOCKET_H_OFFSET + GRID_SPACING * i, top_centre + GRID_SPACING * j))
 
     def container(self):
         return Element('g', id='breadboard')
