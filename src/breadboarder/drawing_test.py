@@ -1,7 +1,9 @@
 from unittest import TestCase
 from bs4 import BeautifulSoup
 
-from breadboarder.drawing import Drawing, Breadboard
+from breadboarder.breadboard import Breadboard
+from breadboarder.drawing import Drawing
+
 
 
 class DrawingTest(TestCase):

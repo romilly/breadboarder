@@ -1,4 +1,5 @@
-from breadboarder.drawing import Drawing, Breadboard, write
+from breadboarder.breadboard import Breadboard
+from breadboarder.drawing import Drawing, write
 
 
 def test_breadboard():
