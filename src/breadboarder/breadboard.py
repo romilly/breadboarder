@@ -2,14 +2,10 @@ from xml.etree.ElementTree import Element
 
 from breadboarder.drawing import CompositeItem, Rectangle, horizontal_line, Text, Point
 
-H_LINE_OFFSET = 14
 V_LINE_OFFSET = 4
 V_LINE_SPACING = 24.4
 LEFT_POWER_SOCKET_V_OFFSET = 12.06
-BODY_SOCKET_V_OFFSET = 47.4
-BODY_SOCKET_V_2ND_OFFSET = 82.17
 H_TEXT_OFFSET = 10
-BODY_SOCKET_H_OFFSET = 15.2
 GRID_SPACING = 9
 
 
@@ -48,16 +44,17 @@ class Breadboard(CompositeItem):
         self.add_bottom_power()
 
     def add_bottom_power(self):
+        self.add_power_line(self.height - (V_LINE_OFFSET + V_LINE_SPACING), u'\u2014', 'blue')
+        self.add_power_line(self.height - V_LINE_OFFSET, '+', 'red')
         self.add_power_sockets(self.height - (LEFT_POWER_SOCKET_V_OFFSET + GRID_SPACING))
-        self.add_power_line(LineOffset(H_TEXT_OFFSET, self.height - (V_LINE_OFFSET + V_LINE_SPACING)), u'\u2014', 'blue')
-        self.add_power_line(LineOffset(H_TEXT_OFFSET, self.height - V_LINE_OFFSET), '+', 'red')
 
     def add_top_power(self):
-        self.add_power_line(LineOffset(H_TEXT_OFFSET, V_LINE_OFFSET), u'\u2014', 'blue')
-        self.add_power_line(LineOffset(H_TEXT_OFFSET, V_LINE_OFFSET + V_LINE_SPACING), '+', 'red')
+        self.add_power_line(V_LINE_OFFSET, u'\u2014', 'blue')
+        self.add_power_line(V_LINE_OFFSET + V_LINE_SPACING, '+', 'red')
         self.add_power_sockets(LEFT_POWER_SOCKET_V_OFFSET)
 
-    def add_power_line(self, line_offset, text, color):
+    def add_power_line(self, vertical_location, text, color):
+        line_offset = LineOffset(10, vertical_location)
         char_offset = CharOffset(8,-3)
         self.add(horizontal_line(line_offset, self.width - 2 * line_offset.x, color=color))
         self.add(Text(text, line_offset+char_offset.v_flip(), color=color, align='middle', size=7).rotate(90))
