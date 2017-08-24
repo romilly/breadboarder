@@ -1,6 +1,18 @@
 from xml.etree.ElementTree import Element, tostring, ElementTree
 
 
+class Point():
+    def __init__(self,x ,y):
+        self.x = x
+        self.y = y
+
+    def __add__(self, other):
+        return Point(self.x+other.x, self.y+other.y)
+
+    def v_flip(self):
+        # flip about vertical axis
+        return Point(-self.x, self.y)
+
 
 class CompositeItem():
     def __init__(self):
@@ -53,27 +65,24 @@ class Rectangle(object):
 
 
 class Line():
-    def __init__(self, x1, x2, y1, y2, color='black', **attributes):
-        self.x1 = x1
-        self.x2 = x2
-        self.y1 = y1
-        self.y2 = y2
+    def __init__(self, start, end, color='black', **attributes):
+        self.start = start
+        self.end = end
         self.color = color
         self._attributes = attributes
 
     def svg(self):
-        return Element('line', x1=str(self.x1), y1=str(self.y1), x2=str(self.x2), y2=str(self.y2),
+        return Element('line', x1=str(self.start.x), y1=str(self.start.y), x2=str(self.end.x), y2=str(self.end.y),
                        style='stroke:%s' % self.color, **self._attributes)
 
 
-def hline(x, y, length, color='black'):
-    return Line(x, x+length, y, y, color=color)
+def horizontal_line(start, length, color='black'):
+    return Line(start, start+Point(length,0),color=color)
 
 
 class Text():
-    def __init__(self, text, x, y, color='black', anchor='start', size=8, **attributes):
-        self.x = x
-        self.y = y
+    def __init__(self, text, start, color='black', anchor='start', size=8, **attributes):
+        self.start = start
         self.text = text
         self.color = color
         self.anchor = anchor
@@ -82,11 +91,11 @@ class Text():
         self.angle = 0
 
     def svg(self):
-        text = Element('text', x=str(self.x), y=str(self.y), style= 'fill:%s;text-anchor:%s;font-size: %dpt' %
-                                                                    (self.color, self.anchor, self.size))
+        text = Element('text', x=str(self.start.x), y=str(self.start.y),
+            style= 'fill:%s;text-anchor:%s;font-size: %dpt' % (self.color, self.anchor, self.size))
         text.text = self.text
         if self.angle != 0:
-            text.set('transform','rotate(%d,%d,%d)' % (self.angle, self.x, self.y))
+            text.set('transform','rotate(%d,%d,%d)' % (self.angle, self.start.x, self.start.y))
         return text
 
     def rotate(self, angle):
