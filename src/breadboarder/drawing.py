@@ -58,22 +58,26 @@ class Rectangle(object):
         return Element('rect', x=str(self.x), y=str(self.y), width=str(self.width), height=str(self.height),
                        style= 'stroke-width:%d;stroke:black' % self.stroke_width,**self._attributes)
 
-    def center(self, x, y):
+    def set_center(self, x, y):
         self.x = x-0.5*self.width
         self.y = y-0.5*self.height
         return self
 
+    def center(self):
+        return Point(self.x + 0.5*self.width, self.y + 0.5*self.width)
+
 
 class Line():
-    def __init__(self, start, end, color='black', **attributes):
+    def __init__(self, start, end, color='black', stroke_width=1,**attributes):
         self.start = start
         self.end = end
         self.color = color
+        self.stroke_width = stroke_width
         self._attributes = attributes
 
     def svg(self):
         return Element('line', x1=str(self.start.x), y1=str(self.start.y), x2=str(self.end.x), y2=str(self.end.y),
-                       style='stroke:%s' % self.color, **self._attributes)
+                       style='stroke:%s;stroke-width:%d' % (self.color, self.stroke_width), **self._attributes)
 
 
 def horizontal_line(start, length, color='black'):
@@ -102,6 +106,10 @@ class Text():
         self.angle  = angle
         return self
 
+
+class Wire(Line):
+    def __init__(self, color):
+        Line.__init__(self, Point(0,0),Point(0,0), color, stroke_width=3)
 
 
 

@@ -10,7 +10,7 @@ class SocketGroup(CompositeItem):
         self.id = id
         for i in range(cols):
             for j in range(rows):
-                socket = self.socket().center(center.x + Breadboard.PITCH * i, center.y + Breadboard.PITCH * j)
+                socket = self.socket().set_center(center.x + Breadboard.PITCH * i, center.y + Breadboard.PITCH * j)
                 parent.add_connector(socket, alpha_labels[j]+str(i+start_number))
                 self.add(socket)
 
@@ -97,3 +97,8 @@ class Breadboard(CompositeItem):
     def add_alpha_labels(self, drop_to_letters, letters):
         for i in range(len(letters)):
             self.add(Text(letters[i], Point(self.inset_to_letters, drop_to_letters + self.PITCH*i), size=6 ).rotate(-90))
+
+    def connect(self, component, start, end):
+        component.start = self.connectors[start].center()
+        component.end = self.connectors[end].center()
+        self.add(component)
