@@ -51,6 +51,7 @@ class Breadboard(CompositeItem):
         self.gap_between_power_lines = 24.4
         self.gap_to_left_of_power_line = 10
         self.offset_from_line_start_to_text = Point(-8, 1)
+        self.inset_to_letters = 8
         self.add_components()
 
     def add_components(self):
@@ -61,6 +62,8 @@ class Breadboard(CompositeItem):
         self.add_body_sockets(Point(self.gap_from_left_to_body_sockets, self.drop_to_lower_body_sockets))
         self.add_numeric_labels(self.drop_to_lower_numeric_labels, self.columns, 'end')
         self.add_power_group(self.drop_to_lower_power_group)
+        self.add_alpha_labels(self.drop_to_top_body_sockets + 2,'jihgf')
+        self.add_alpha_labels(self.drop_to_lower_body_sockets + 2,'edcba')
 
     def add_power_group(self, vertical_location):
         EM_DASH = u'\u2014'
@@ -88,3 +91,7 @@ class Breadboard(CompositeItem):
     def add_numeric_labels(self, vertical_location, count, anchor):
         for i in range(count):
             self.add(Text(str(i+1), Point(self.inset - 1 + self.PITCH * i, vertical_location), anchor=anchor, size=6).rotate(-90))
+
+    def add_alpha_labels(self, drop_to_letters, letters):
+        for i in range(len(letters)):
+            self.add(Text(letters[i], Point(self.inset_to_letters, drop_to_letters + self.PITCH*i), size=6 ).rotate(-90))
