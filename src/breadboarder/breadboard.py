@@ -3,18 +3,20 @@ from xml.etree.ElementTree import Element
 from breadboarder.drawing import CompositeItem, Rectangle, horizontal_line, Text, Point
 
 
-
 class SocketGroup(CompositeItem):
-    def __init__(self, center, rows, cols, id='sockets'):
+    def __init__(self, center, rows, cols, alpha_labels, parent, start_number=1, id='sockets'):
         CompositeItem.__init__(self)
         self.socket_size = 2.88
         self.id = id
         for i in range(cols):
             for j in range(rows):
-                self.add(self.socket().center(center.x + Breadboard.PITCH * i, center.y + Breadboard.PITCH * j))
+                socket = self.socket().center(center.x + Breadboard.PITCH * i, center.y + Breadboard.PITCH * j)
+                parent.add_connector(socket, alpha_labels[j]+str(i+start_number))
+                self.add(socket)
 
     def socket(self):
-        return Rectangle(self.socket_size, self.socket_size, fill='black')
+        rectangle = Rectangle(self.socket_size, self.socket_size, fill='black')
+        return rectangle
 
     def container(self):
         return Element('g', id=self.id)
@@ -24,17 +26,14 @@ class LineOffset(Point):
     pass
 
 
-
-# TODO: add breadboard_config
-# TODO: use group/move to locate things
-
-# Breadboard measurements documented in docs/BREADBOARD_LAYOUT.md
+# TODO: document Breadboard measurements in docs/BREADBOARD_LAYOUT.md
 
 
 class Breadboard(CompositeItem):
     PITCH = 0.1*90 # 0.1", 90 DPI
     def __init__(self):
         CompositeItem.__init__(self)
+        self.connectors = {}
         self.width = 291.7
         self.height = 192.2
         self.inset = 19.08
@@ -54,21 +53,22 @@ class Breadboard(CompositeItem):
         self.inset_to_letters = 8
         self.add_components()
 
+    def add_connector(self, connector, key):
+        self.connectors[key] = connector
+
     def add_components(self):
         self.add(Rectangle(self.width, self.height, fill='none'))
-        self.add_power_group(self.drop_to_top_power_group)
+        self.add_power_group(self.drop_to_top_power_group,'T')
         self.add_numeric_labels(self.drop_to_top_numeric_labels, self.columns, 'start')
-        self.add_body_sockets(Point(self.gap_from_left_to_body_sockets, self.drop_to_top_body_sockets))
-        self.add_body_sockets(Point(self.gap_from_left_to_body_sockets, self.drop_to_lower_body_sockets))
+        self.add_body_sockets(Point(self.gap_from_left_to_body_sockets, self.drop_to_top_body_sockets), 'jihgf')
+        self.add_body_sockets(Point(self.gap_from_left_to_body_sockets, self.drop_to_lower_body_sockets), 'edcba')
         self.add_numeric_labels(self.drop_to_lower_numeric_labels, self.columns, 'end')
-        self.add_power_group(self.drop_to_lower_power_group)
-        self.add_alpha_labels(self.drop_to_top_body_sockets + 2,'jihgf')
-        self.add_alpha_labels(self.drop_to_lower_body_sockets + 2,'edcba')
+        self.add_power_group(self.drop_to_lower_power_group,'B')
 
-    def add_power_group(self, vertical_location):
+    def add_power_group(self, vertical_location, prefix):
         EM_DASH = u'\u2014'
         self.add_power_line(vertical_location, EM_DASH, 'blue')
-        self.add_power_sockets(vertical_location + self.drop_from_line_to_power_sockets)
+        self.add_power_sockets(vertical_location + self.drop_from_line_to_power_sockets, prefix)
         self.add_power_line(vertical_location + self.gap_between_power_lines, '+', 'red')
 
     def add_power_line(self, vertical_location, text, color):
@@ -78,12 +78,14 @@ class Breadboard(CompositeItem):
         self.add(Text(text, self.offset_from_line_start_to_text + line_offset + Point(self.width - 8, -1),
                       color=color, anchor='middle', size=7).rotate(90))
 
-    def add_power_sockets(self, top_centre):
+    def add_power_sockets(self, top_centre, prefix):
         for group in range(self.power_socket_group_count):
-            self.add(SocketGroup(Point(self.inset + 53.5* group, top_centre), 2, 5))
+            self.inter_power_group_spacing = 53.5
+            self.add(SocketGroup(Point(self.inset + self.inter_power_group_spacing * group, top_centre), 2, 5, (prefix+'M',prefix+'P'), self))
 
-    def add_body_sockets(self, center):
-        self.add(SocketGroup(center, 5, self.columns))
+    def add_body_sockets(self, center, alpha_labels):
+        self.add_alpha_labels(center.y + 2, alpha_labels)
+        self.add(SocketGroup(center, 5, self.columns, alpha_labels, self))
 
     def container(self):
         return Element('g', id='breadboard')
