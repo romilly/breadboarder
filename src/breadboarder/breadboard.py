@@ -24,9 +24,6 @@ class LineOffset(Point):
     pass
 
 
-class CharOffset(Point):
-    pass
-
 
 # TODO: add breadboard_config
 # TODO: use group/move to locate things
@@ -49,27 +46,33 @@ class Breadboard(CompositeItem):
         self.drop_to_lower_body_sockets = 108
         self.drop_to_lower_numeric_labels = 90 * 1.66
         self.drop_to_top_power_group = 5
-        self.drop_to_lower_numeric_labels = 1.81 * 90
+        self.drop_to_lower_power_group = 1.81 * 90
+        self.drop_from_line_to_power_sockets = 8.06
+        self.gap_between_power_lines = 24.4
+        self.gap_to_left_of_power_line = 10
+        self.offset_from_line_start_to_text = Point(-8, 1)
+        self.add_components()
+
+    def add_components(self):
         self.add(Rectangle(self.width, self.height, fill='none'))
         self.add_power_group(self.drop_to_top_power_group)
         self.add_numeric_labels(self.drop_to_top_numeric_labels, self.columns, 'start')
         self.add_body_sockets(Point(self.gap_from_left_to_body_sockets, self.drop_to_top_body_sockets))
         self.add_body_sockets(Point(self.gap_from_left_to_body_sockets, self.drop_to_lower_body_sockets))
         self.add_numeric_labels(self.drop_to_lower_numeric_labels, self.columns, 'end')
-        self.add_power_group(self.drop_to_lower_numeric_labels)
+        self.add_power_group(self.drop_to_lower_power_group)
 
     def add_power_group(self, vertical_location):
         EM_DASH = u'\u2014'
         self.add_power_line(vertical_location, EM_DASH, 'blue')
-        self.add_power_sockets(vertical_location + 8.06)
-        self.add_power_line(vertical_location + 24.4, '+', 'red')
+        self.add_power_sockets(vertical_location + self.drop_from_line_to_power_sockets)
+        self.add_power_line(vertical_location + self.gap_between_power_lines, '+', 'red')
 
     def add_power_line(self, vertical_location, text, color):
-        line_offset = LineOffset(10, vertical_location)
-        char_offset = CharOffset(-8, 1)
+        line_offset = LineOffset(self.gap_to_left_of_power_line, vertical_location)
         self.add(horizontal_line(line_offset, self.width - 2 * line_offset.x, color=color))
-        self.add(Text(text, line_offset+char_offset, color=color, anchor='middle', size=7).rotate(90))
-        self.add(Text(text, char_offset + line_offset + Point(self.width - 8,-1),
+        self.add(Text(text, line_offset + self.offset_from_line_start_to_text, color=color, anchor='middle', size=7).rotate(90))
+        self.add(Text(text, self.offset_from_line_start_to_text + line_offset + Point(self.width - 8, -1),
                       color=color, anchor='middle', size=7).rotate(90))
 
     def add_power_sockets(self, top_centre):
