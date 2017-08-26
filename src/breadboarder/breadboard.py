@@ -50,7 +50,8 @@ class Breadboard(CompositeItem):
         self.gap_between_power_lines = 24.4
         self.gap_to_left_of_power_line = 10
         self.offset_from_line_start_to_text = Point(-8, 1)
-        self.inset_to_letters = 8
+        self.inset_to_left_letters = 8
+        self.inset_to_right_letters = 90 * 3.18
         self.add_components()
 
     def add_connector(self, connector, key):
@@ -83,9 +84,11 @@ class Breadboard(CompositeItem):
             self.inter_power_group_spacing = 53.5
             self.add(SocketGroup(Point(self.inset + self.inter_power_group_spacing * group, top_centre), 2, 5, (prefix+'M',prefix+'P'), self))
 
+    # TODO: add right-hand labels
     def add_body_sockets(self, center, alpha_labels):
-        self.add_alpha_labels(center.y + 2, alpha_labels)
+        self.add_alpha_labels(Point(self.inset_to_left_letters, center.y + 2), alpha_labels)
         self.add(SocketGroup(center, 5, self.columns, alpha_labels, self))
+        self.add_alpha_labels(Point(self.inset_to_right_letters, center.y + 2), alpha_labels)
 
     def container(self):
         return Element('g', id='breadboard')
@@ -94,9 +97,10 @@ class Breadboard(CompositeItem):
         for i in range(count):
             self.add(Text(str(i+1), Point(self.inset - 1 + self.PITCH * i, vertical_location), anchor=anchor, size=6).rotate(-90))
 
-    def add_alpha_labels(self, drop_to_letters, letters):
+    # TODO: refactor to take Point(inset,drop) as parameter
+    def add_alpha_labels(self, offset_to_letters, letters):
         for i in range(len(letters)):
-            self.add(Text(letters[i], Point(self.inset_to_letters, drop_to_letters + self.PITCH*i), size=6 ).rotate(-90))
+            self.add(Text(letters[i], offset_to_letters +Point(0,self.PITCH*i), size=6 ).rotate(-90))
 
     def connect(self, component, start, end):
         component.start = self.connectors[start].center()

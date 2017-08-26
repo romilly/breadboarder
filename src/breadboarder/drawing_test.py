@@ -1,3 +1,5 @@
+# coding=UTF-8
+from collections import defaultdict
 from unittest import TestCase
 from bs4 import BeautifulSoup
 
@@ -28,7 +30,24 @@ class DrawingTest(TestCase):
         self.assertTrue(bb is not None,'drawing should contain breadboard group')
         r = bb.find('rect')
         self.assertTrue(r is not None, 'breadboard should contain a rectangle')
-        # self.assertEqual('10', r['x'])
+        self.check_four_lines(bb)
+        self.check_labels(bb)
+
+    def check_four_lines(self, bb):
         lines = bb.find_all('line')
-        self.assertEqual(4,len(lines))
+        self.assertEqual(4, len(lines),'should have 4 power lines')
+
+    def check_labels(self, bb):
+        labels = bb.find_all('text')
+        ld = defaultdict(int)
+        for label in labels:
+            ld[label.text] += 1
+        self.assertEqual(4, ld['+'])
+        self.assertEqual(4, ld[u'—'])
+        for letter in 'abcdefghij':
+            self.assertEqual(2, ld[letter])
+        for i in range(30):
+            self.assertEqual(2, ld[str(i+1)])
+
+
 
