@@ -94,11 +94,11 @@ class Breadboard(CompositeItem):
 
     def add_numeric_labels(self, vertical_location, count, anchor):
         for i in range(count):
-            self.add(Text(str(i+1), Point(self.inset - 1 + self.PITCH * i, vertical_location), anchor=anchor, size=6).rotate(-90))
+            self.add(Text(str(i+1), Point(self.inset - 1 + self.PITCH * i, vertical_location), anchor=anchor, color='grey', size=6).rotate(-90))
 
     def add_alpha_labels(self, offset_to_letters, letters):
         for i in range(len(letters)):
-            self.add(Text(letters[i], offset_to_letters +Point(0,self.PITCH*i), size=6 ).rotate(-90))
+            self.add(Text(letters[i], offset_to_letters +Point(0,self.PITCH*i), color='grey', size=6 ).rotate(-90))
 
     def connect(self, component, start, end):
         component.start = self.connectors[start].center()
