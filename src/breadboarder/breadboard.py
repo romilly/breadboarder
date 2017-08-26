@@ -82,7 +82,7 @@ class Breadboard(CompositeItem):
 
     def add_power_sockets(self, top_centre, prefix):
         for group in range(self.power_socket_group_count):
-            self.add(SocketGroup(Point(self.inset + self.inter_power_group_spacing * group, top_centre), 2, 5, (prefix+'M',prefix+'P'), self))
+            self.add(SocketGroup(Point(self.inset + self.inter_power_group_spacing * group, top_centre), 2, 5, (prefix+'M',prefix+'P'), self, start_number=1 + 5*group))
 
     def add_body_sockets(self, center, alpha_labels):
         self.add_alpha_labels(Point(self.inset_to_left_letters, center.y + 2), alpha_labels)
