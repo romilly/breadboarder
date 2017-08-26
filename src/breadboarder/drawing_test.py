@@ -1,11 +1,11 @@
 # coding=UTF-8
 from collections import defaultdict
 from unittest import TestCase
-from bs4 import BeautifulSoup
+from xml.etree.ElementTree import tostring
 
+from bs4 import BeautifulSoup
 from breadboarder.breadboard import Breadboard
 from breadboarder.drawing import Drawing
-
 
 
 class DrawingTest(TestCase):
@@ -28,6 +28,11 @@ class DrawingTest(TestCase):
     def check_breadboard(self, svg_root):
         bb = svg_root.find('g', id='breadboard')
         self.assertTrue(bb is not None,'drawing should contain breadboard group')
+
+class BreadboardTest(TestCase):
+    def test_breadboard_rendering(self):
+        svg = tostring(Breadboard().svg())
+        bb = BeautifulSoup(svg, 'xml')
         r = bb.find('rect')
         self.assertTrue(r is not None, 'breadboard should contain a rectangle')
         self.check_four_lines(bb)

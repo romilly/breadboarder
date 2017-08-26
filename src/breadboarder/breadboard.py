@@ -52,6 +52,7 @@ class Breadboard(CompositeItem):
         self.offset_from_line_start_to_text = Point(-8, 1)
         self.inset_to_left_letters = 8
         self.inset_to_right_letters = 90 * 3.18
+        self.inter_power_group_spacing = 53.5
         self.add_components()
 
     def add_connector(self, connector, key):
@@ -81,7 +82,6 @@ class Breadboard(CompositeItem):
 
     def add_power_sockets(self, top_centre, prefix):
         for group in range(self.power_socket_group_count):
-            self.inter_power_group_spacing = 53.5
             self.add(SocketGroup(Point(self.inset + self.inter_power_group_spacing * group, top_centre), 2, 5, (prefix+'M',prefix+'P'), self))
 
     def add_body_sockets(self, center, alpha_labels):
