@@ -84,7 +84,6 @@ class Breadboard(CompositeItem):
             self.inter_power_group_spacing = 53.5
             self.add(SocketGroup(Point(self.inset + self.inter_power_group_spacing * group, top_centre), 2, 5, (prefix+'M',prefix+'P'), self))
 
-    # TODO: add right-hand labels
     def add_body_sockets(self, center, alpha_labels):
         self.add_alpha_labels(Point(self.inset_to_left_letters, center.y + 2), alpha_labels)
         self.add(SocketGroup(center, 5, self.columns, alpha_labels, self))
