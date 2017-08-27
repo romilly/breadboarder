@@ -2,7 +2,7 @@
 from xml.etree.ElementTree import Element
 
 from breadboarder.breadboard import Breadboard
-from breadboarder.drawing import CompositeItem, Point, Rectangle, GroupedDrawable, Text
+from breadboarder.drawing import CompositeItem, Point, Rectangle, GroupedDrawable, Text, Drawable
 
 
 class DIL(GroupedDrawable):
@@ -36,10 +36,21 @@ class DIL(GroupedDrawable):
             self.add(Rectangle(4, 2,fill='white').move_to(Point(x,self.height()+1)))
             self.add(Text(self.labels[i], Point(x+3,self.height()-1),size=2, anchor='start').rotate(-90))
             self.add(Text(self.labels[self.pins-(i+1)], Point(x+3, 1),size=2,anchor='end').rotate(-90))
-            #             g.append(text(36, y + 4, labels[max_pin_index-i]))
+            self.add(Dimple(Point(0, self.center().y), 2))
 
     def extent(self):
         return Point(self.width(), self.height())
+
+
+class Dimple(Drawable):
+    def __init__(self, center, radius):
+        Drawable.__init__(self, center)
+        self.radius = radius
+
+    def svg(self):
+        return Element("path", {'d': 'M %d %d A %d %d 0 1 1 %d %d' % (self.start.x, self.start.y-self.radius,
+                                            self.radius, self.radius, self.start.x, self.start.y+self.radius)})
+
 
 #     pins_per_side = int(pins/2)
 #     max_pin_index = pins - 1
