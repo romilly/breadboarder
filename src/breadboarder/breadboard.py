@@ -31,6 +31,7 @@ class LineOffset(Point):
 
 class Breadboard(CompositeItem):
     PITCH = 0.1*90 # 0.1", 90 DPI
+
     def __init__(self):
         CompositeItem.__init__(self)
         self.connectors = {}
@@ -104,3 +105,11 @@ class Breadboard(CompositeItem):
         component.start = self.connectors[start].center()
         component.end = self.connectors[end].center()
         self.add(component)
+
+    def insert(self, dil, pin1):
+        if not ('e' in pin1 or 'f' in pin1):
+            raise Exception('DIL must be inserted along rows e and f')
+        # if'f' in pin1:
+        #     dil.flipped = True
+        dil.move_to(self.connectors[pin1])
+        self.add(dil)

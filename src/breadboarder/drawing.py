@@ -13,6 +13,9 @@ class Point():
         # flip about vertical axis
         return Point(-self.x, self.y)
 
+    def scale(self, factor):
+        return Point(self.x * factor, self.y * factor)
+
 
 class CompositeItem():
     def __init__(self):
@@ -26,6 +29,10 @@ class CompositeItem():
         for child in self._children:
             svg.append(child.svg())
         return svg
+
+    def move_to(self, point):
+        for child in self._children:
+            child.move_to(point)
 
     def container(self):
         raise Exception('My Subclass should have implemented this method')
@@ -49,9 +56,9 @@ class Rectangle(object):
         self.stroke_width = stroke_width
         self._attributes = attributes
 
-    def at(self, x ,y):
-        self.x = x
-        self.y = y
+    def move_to(self, point):
+        self.x = point.x
+        self.y = point.y
         return self
 
     def svg(self):
