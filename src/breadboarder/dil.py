@@ -2,7 +2,13 @@
 from xml.etree.ElementTree import Element
 
 from breadboarder.breadboard import Breadboard
-from breadboarder.drawing import CompositeItem, Point, Rectangle, GroupedDrawable, Text, Drawable
+from breadboarder.drawing import Point, Rectangle, GroupedDrawable, Text, Drawable
+
+
+def atMega328():
+    labels = ('~RST','RXD','TXD','PD2','PD3','PD4','VCC','GND','XTAL1','XTAL2','PD5','PD6','PD7','PB0',
+            'PB1','PB2','PB3','PB4','PB5','AVCC','AREF','GND','PC0','PC1','PC2','PC3','PC4','PC5')
+    return DIL(28,'ATmega328',labels)
 
 
 class DIL(GroupedDrawable):
@@ -51,34 +57,3 @@ class Dimple(Drawable):
         return Element("path", {'d': 'M %d %d A %d %d 0 1 1 %d %d' % (self.start.x, self.start.y-self.radius,
                                             self.radius, self.radius, self.start.x, self.start.y+self.radius)})
 
-
-#     pins_per_side = int(pins/2)
-#     max_pin_index = pins - 1
-#     pins_wanted, labels_wanted = ((False, False), (True, False), (False, True), (True, True))[style]
-#     g = Element("g", style='fill:none;stroke:black;stroke-width:2;font-size:3pt')
-#     g.append(rect(0,-5,30,10 * pins_per_side,2))
-#     g.append(dimple(15,-5,4,2))
-#     if name:
-#         cx = 15
-#         cy = -5 + 5 * pins_per_side
-#         g.append(rotate(-90, cx, cy, text(cx, cy, name, 'middle', 'lightgray')))
-#     for i in range (0, pins_per_side):
-#         y = -2 + 10*i
-#         g.append(rect(-4, y, 4, 4, 1, fill='white'))
-#         g.append(rect(30, y, 4, 4, 1, fill='white'))
-#         if labels_wanted and pins_wanted:
-#             g.append(text(-10, y + 4, labels[i],'end'))
-#             g.append(text(36, y + 4, labels[max_pin_index-i]))
-#         if pins_wanted:
-#             g.append(text(2, y + 4, str(i+1)))
-#             g.append(text(28, y + 4, str(pins-i),'end'))
-#         if labels_wanted and not pins_wanted:
-#             g.append(text(2, y + 4, labels[i]))
-#             g.append(text(28, y + 4, labels[max_pin_index-i],'end'))
-#     return g
-
-# def dimple(cx, cy, radius, stroke_width=1):
-#     return Element("path", {'d': 'M %d %d A %d %d 0 1 0 %d %d' % (cx-radius, cy, radius, radius, cx+radius, cy)})
-
-labels = ('~RST','RXD','TXD','PD2','PD3','PD4','VCC','GND','XTAL1','XTAL2','PD5','PD6','PD7','PB0',
-            'PB1','PB2','PB3','PB4','PB5','AVCC','AREF','GND','PC0','PC1','PC2','PC3','PC4','PC5')

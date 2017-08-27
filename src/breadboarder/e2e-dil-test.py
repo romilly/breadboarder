@@ -1,10 +1,6 @@
 from breadboarder.breadboard import Breadboard
-from breadboarder.dil import DIL, labels
+from breadboarder.dil import atMega328
 from breadboarder.drawing import Drawing, write
-
-
-def atMega328():
-    return DIL(28,'ATmega328',labels)
 
 
 def test_dil():
