@@ -2,9 +2,6 @@ from breadboarder.breadboard import Breadboard
 from breadboarder.drawing import Drawing, write, Wire
 
 
-# TODO: add drawable class?
-
-
 
 def test_breadboard():
     drawing = Drawing()

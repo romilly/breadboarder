@@ -28,7 +28,8 @@ class BreadboardTest(TestCase):
         self.bb = Breadboard()
 
     def test_breadboard_rendering(self):
-        svg = tostring(self.bb.svg())
+        bb_svg = self.bb.svg()
+        svg = tostring(bb_svg)
         soup = BeautifulSoup(svg, 'xml')
         self.assertTrue(soup.find('rect') is not None, 'breadboard should contain a rectangle')
         self.check_four_lines(soup)

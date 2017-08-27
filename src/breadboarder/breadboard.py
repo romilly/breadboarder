@@ -1,11 +1,11 @@
 from xml.etree.ElementTree import Element
 
-from breadboarder.drawing import CompositeItem, Rectangle, horizontal_line, Text, Point
+from breadboarder.drawing import Rectangle, horizontal_line, Text, Point, GroupedDrawable
 
 
-class SocketGroup(CompositeItem):
+class SocketGroup(GroupedDrawable):
     def __init__(self, center, rows, cols, alpha_labels, parent, start_number=1, id='sockets'):
-        CompositeItem.__init__(self)
+        GroupedDrawable.__init__(self)
         self.socket_size = 2.88
         self.id = id
         for i in range(cols):
@@ -29,11 +29,11 @@ class LineOffset(Point):
 # TODO: document Breadboard measurements in docs/BREADBOARD_LAYOUT.md
 
 
-class Breadboard(CompositeItem):
+class Breadboard(GroupedDrawable):
     PITCH = 0.1*90 # 0.1", 90 DPI
 
     def __init__(self):
-        CompositeItem.__init__(self)
+        GroupedDrawable.__init__(self, svg_id='breadboard')
         self.connectors = {}
         self.width = 291.7
         self.height = 192.2
@@ -90,8 +90,6 @@ class Breadboard(CompositeItem):
         self.add(SocketGroup(center, 5, self.columns, alpha_labels, self))
         self.add_alpha_labels(Point(self.inset_to_right_letters, center.y + 2), alpha_labels)
 
-    def container(self):
-        return Element('g', id='breadboard')
 
     def add_numeric_labels(self, vertical_location, count, anchor):
         for i in range(count):
@@ -102,8 +100,8 @@ class Breadboard(CompositeItem):
             self.add(Text(letters[i], offset_to_letters +Point(0,self.PITCH*i), color='grey', size=6 ).rotate(-90))
 
     def connect(self, component, start, end):
-        component.start = self.connectors[start].center()
-        component.end = self.connectors[end].center()
+        component.move_to(self.connectors[start].center())
+        component.end(self.connectors[end].center())
         self.add(component)
 
     def insert(self, dil, pin1):
@@ -111,5 +109,5 @@ class Breadboard(CompositeItem):
             raise Exception('DIL must be inserted along rows e and f')
         # if'f' in pin1:
         #     dil.flipped = True
-        dil.move_to(self.connectors[pin1])
+        dil.move_to(self.connectors[pin1].center())
         self.add(dil)

@@ -2,22 +2,18 @@
 from xml.etree.ElementTree import Element
 
 from breadboarder.breadboard import Breadboard
-from breadboarder.drawing import CompositeItem, Point, Rectangle
+from breadboarder.drawing import CompositeItem, Point, Rectangle, GroupedDrawable
 
 
-class DIL(CompositeItem):
+class DIL(GroupedDrawable):
     def __init__(self, pins, name, labels):
-        CompositeItem.__init__(self)
+        GroupedDrawable.__init__(self,svg_id='IC')
         self.pin1 = Point(0,0)
         self.pins = pins
         self.name = name
         self.labels = labels
-        self.start = Point(0,0)
         self.flipped = False
         self.add_parts()
-
-    def container(self):
-        return Element('g', id='DIL')
 
     def pins_per_side(self):
         return int(self.pins/2)
@@ -30,13 +26,6 @@ class DIL(CompositeItem):
 
     def height(self):
         return self.start.y + Breadboard.PITCH * 3
-
-    def move_to(self, point):
-        self.start = point
-    #   temporary, until I fix moving composite items
-        CompositeItem.move_to(self, point)
-
-
 
     def add_parts(self):
         self.add(Rectangle(self.width(), self.height(), fill='grey'))

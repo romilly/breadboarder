@@ -9,6 +9,10 @@ class Point():
     def __add__(self, other):
         return Point(self.x+other.x, self.y+other.y)
 
+    def __sub__(self, other):
+        return Point(self.x-other.x, self.y-other.y)
+
+
     def v_flip(self):
         # flip about vertical axis
         return Point(-self.x, self.y)
@@ -17,8 +21,21 @@ class Point():
         return Point(self.x * factor, self.y * factor)
 
 
-class CompositeItem():
-    def __init__(self):
+class Drawable():
+    def __init__(self, start):
+        self.start = start
+
+    def svg(self):
+        raise Exception('my subclass should have implemented this method')
+
+    def move_to(self, point):
+        self.start = point
+        return self
+
+
+class CompositeItem(Drawable):
+    def __init__(self,start = Point(0,0)):
+        Drawable.__init__(self, start)
         self._children = []
 
     def add(self, item):
@@ -29,10 +46,6 @@ class CompositeItem():
         for child in self._children:
             svg.append(child.svg())
         return svg
-
-    def move_to(self, point):
-        for child in self._children:
-            child.move_to(point)
 
     def container(self):
         raise Exception('My Subclass should have implemented this method')
@@ -47,53 +60,62 @@ class Drawing(CompositeItem):
         return tostring(self.svg())
 
 
-class Rectangle(object):
+class GroupedDrawable(CompositeItem):
+    def __init__(self, svg_id=None):
+        CompositeItem.__init__(self)
+        self.svg_id = svg_id
+
+    def container(self):
+            group = Element('g', transform='translate(%f,%f)' % (self.start.x, self.start.y))
+            if self.svg_id is not None:
+                group.set('id',self.svg_id)
+            return group
+
+
+class Rectangle(Drawable):
     def __init__(self, width, height, stroke_width=1,**attributes):
-        self.x = 0
-        self.y = 0
+        Drawable.__init__(self, Point(0,0))
         self.width = width
         self.height = height
         self.stroke_width = stroke_width
         self._attributes = attributes
 
-    def move_to(self, point):
-        self.x = point.x
-        self.y = point.y
-        return self
-
     def svg(self):
-        return Element('rect', x=str(self.x), y=str(self.y), width=str(self.width), height=str(self.height),
+        return Element('rect', x=str(self.start.x), y=str(self.start.y), width=str(self.width), height=str(self.height),
                        style= 'stroke-width:%d;stroke:black' % self.stroke_width,**self._attributes)
 
     def set_center(self, x, y):
-        self.x = x-0.5*self.width
-        self.y = y-0.5*self.height
+        self.move_to(Point(x-0.5*self.width, y-0.5*self.height))
         return self
 
     def center(self):
-        return Point(self.x + 0.5*self.width, self.y + 0.5*self.width)
+        return self.start + Point(self.width, self.height).scale(0.5)
 
 
-class Line():
+class Line(Drawable):
     def __init__(self, start, end, color='black', stroke_width=1,**attributes):
-        self.start = start
-        self.end = end
+        Drawable.__init__(self, start)
+        self.vector = end-start
         self.color = color
         self.stroke_width = stroke_width
         self._attributes = attributes
 
+    def end(self, point):
+        self.vector = point-self.start
+
     def svg(self):
-        return Element('line', x1=str(self.start.x), y1=str(self.start.y), x2=str(self.end.x), y2=str(self.end.y),
+        end = self.start + self.vector
+        return Element('line', x1=str(self.start.x), y1=str(self.start.y), x2=str(end.x), y2=str(end.y),
                        style='stroke:%s;stroke-width:%d' % (self.color, self.stroke_width), **self._attributes)
 
 
 def horizontal_line(start, length, color='black'):
-    return Line(start, start+Point(length,0),color=color)
+    return Line(start, start+Point(length,0), color=color)
 
 
-class Text():
+class Text(Drawable):
     def __init__(self, text, start, color='black', anchor='start', size=8, **attributes):
-        self.start = start
+        Drawable.__init__(self, start)
         self.text = text
         self.color = color
         self.anchor = anchor
