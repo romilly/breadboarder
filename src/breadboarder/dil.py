@@ -2,13 +2,13 @@
 from xml.etree.ElementTree import Element
 
 from breadboarder.breadboard import Breadboard
-from breadboarder.drawing import CompositeItem, Point, Rectangle, GroupedDrawable
+from breadboarder.drawing import CompositeItem, Point, Rectangle, GroupedDrawable, Text
 
 
 class DIL(GroupedDrawable):
     def __init__(self, pins, name, labels):
         GroupedDrawable.__init__(self,svg_id='IC')
-        self.pin1 = Point(0,0)
+        self.pin1 = Point(0, 0)
         self.pins = pins
         self.name = name
         self.labels = labels
@@ -18,17 +18,25 @@ class DIL(GroupedDrawable):
     def pins_per_side(self):
         return int(self.pins/2)
 
-    def centre(self):
+    def center(self):
         return self.start + self.extent().scale(0.5)
 
     def width(self):
-        return Breadboard.PITCH * (self.pins_per_side() - 1)
+        return 4 + Breadboard.PITCH * (self.pins_per_side()-1)
 
     def height(self):
-        return self.start.y + Breadboard.PITCH * 3
+        return self.start.y + 3 * (Breadboard.PITCH - 1) -2
 
     def add_parts(self):
-        self.add(Rectangle(self.width(), self.height(), fill='grey'))
+        self.add(Rectangle(self.width(), self.height(), fill='grey', stroke='grey'))
+        self.add(Text(self.name,(self.center()+ Point(0, 2)), color='lightgrey', anchor='middle',size=4))
+        for i in range(0, self.pins_per_side()):
+            x = Breadboard.PITCH*i
+            self.add(Rectangle(4, 2,fill='white').move_to(Point(x,-2.5)))
+            self.add(Rectangle(4, 2,fill='white').move_to(Point(x,self.height()+1)))
+            self.add(Text(self.labels[i], Point(x+3,self.height()-1),size=2, anchor='start').rotate(-90))
+            self.add(Text(self.labels[self.pins-(i+1)], Point(x+3, 1),size=2,anchor='end').rotate(-90))
+            #             g.append(text(36, y + 4, labels[max_pin_index-i]))
 
     def extent(self):
         return Point(self.width(), self.height())

@@ -73,16 +73,17 @@ class GroupedDrawable(CompositeItem):
 
 
 class Rectangle(Drawable):
-    def __init__(self, width, height, stroke_width=1,**attributes):
+    def __init__(self, width, height, stroke_width=1, stroke='black',**attributes):
         Drawable.__init__(self, Point(0,0))
         self.width = width
         self.height = height
         self.stroke_width = stroke_width
+        self.stroke = stroke
         self._attributes = attributes
 
     def svg(self):
         return Element('rect', x=str(self.start.x), y=str(self.start.y), width=str(self.width), height=str(self.height),
-                       style= 'stroke-width:%d;stroke:black' % self.stroke_width,**self._attributes)
+                       style= 'stroke-width:%d;stroke:%s' % (self.stroke_width,self.stroke), **self._attributes)
 
     def set_center(self, x, y):
         self.move_to(Point(x-0.5*self.width, y-0.5*self.height))

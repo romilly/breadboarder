@@ -109,5 +109,5 @@ class Breadboard(GroupedDrawable):
             raise Exception('DIL must be inserted along rows e and f')
         # if'f' in pin1:
         #     dil.flipped = True
-        dil.move_to(self.connectors[pin1].center())
+        dil.move_to(self.connectors[pin1].center() - Point(2, -1))
         self.add(dil)
