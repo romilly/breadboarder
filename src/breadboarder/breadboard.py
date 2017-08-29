@@ -60,7 +60,7 @@ class Breadboard(GroupedDrawable):
         self.connectors[key] = connector
 
     def add_components(self):
-        self.add(Rectangle(self.width, self.height, fill='none'))
+        self.add(Rectangle(self.width, self.height, fill='white'))
         self.add_power_group(self.drop_to_top_power_group,'T')
         self.add_numeric_labels(self.drop_to_top_numeric_labels, self.columns, 'start')
         self.add_body_sockets(Point(self.gap_from_left_to_body_sockets, self.drop_to_top_body_sockets), 'jihgf')
@@ -99,14 +99,16 @@ class Breadboard(GroupedDrawable):
         for i in range(len(letters)):
             self.add(Text(letters[i], offset_to_letters +Point(0,self.PITCH*i), color='grey', size=6 ).rotate(-90))
 
+    # TODO: make endpoints varargs and let the component locate itself and add the connecting elements
     def connect(self, component, start, end):
         component.move_to(self.connectors[start].center())
         component.end(self.connectors[end].center())
         self.add(component)
 
+    # TODO: see above!
     def insert(self, dil, pin1):
-        if not ('e' in pin1 or 'f' in pin1):
-            raise Exception('DIL must be inserted along rows e and f')
+        # if not ('e' in pin1 or 'f' in pin1):
+        #     raise Exception('DIL must be inserted along rows e and f')
         # if'f' in pin1:
         #     dil.flipped = True
         dil.move_to(self.connectors[pin1].center() - Point(2, -1))

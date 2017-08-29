@@ -139,8 +139,20 @@ class Text(Drawable):
 
 class Wire(Line):
     def __init__(self, color):
+        # TODO: improve wire, with outline if color is white
+        # better to use delegation rather than inheritance :)
         Line.__init__(self, Point(0,0),Point(0,0), color, stroke_width=3)
 
+
+class Circle(Drawable):
+    def __init__(self, start, radius, color='green', **attributes):
+        Drawable.__init__(self, start)
+        self.radius = radius
+        self.color = color
+        self._attributes = attributes
+
+    def svg(self):
+        return Element('circle', cx=str(self.start.x), cy=str(self.start.y), r=str(self.radius), **self._attributes)
 
 
 def write(diagram, filename):

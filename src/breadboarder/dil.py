@@ -2,14 +2,19 @@
 from xml.etree.ElementTree import Element
 
 from breadboarder.breadboard import Breadboard
-from breadboarder.drawing import Point, Rectangle, GroupedDrawable, Text, Drawable
+from breadboarder.drawing import Point, Rectangle, GroupedDrawable, Text, Drawable, Circle
 
+
+# TODO: similar defs of extend, center. Move to Drawable, which would need width() and height()?
 
 def atMega328():
     labels = ('~RST','RXD','TXD','PD2','PD3','PD4','VCC','GND','XTAL1','XTAL2','PD5','PD6','PD7','PB0',
             'PB1','PB2','PB3','PB4','PB5','AVCC','AREF','GND','PC0','PC1','PC2','PC3','PC4','PC5')
     return DIL(28,'ATmega328',labels)
 
+def pcf8574():
+    labels = ('A0', 'A1', 'A2', 'P0', 'P1', 'P2','P3','Vss','P4','P5','P6','P7','~INT','SCL','SDA','Vdd')
+    return DIL(16,'PCF8574',labels)
 
 class DIL(GroupedDrawable):
     def __init__(self, pins, name, labels):
@@ -31,6 +36,7 @@ class DIL(GroupedDrawable):
         return 4 + Breadboard.PITCH * (self.pins_per_side()-1)
 
     def height(self):
+        # TODO The height is fixed, and does not depend on start.y! Change this
         return self.start.y + 3 * (Breadboard.PITCH - 1) -2
 
     def add_parts(self):
@@ -56,4 +62,25 @@ class Dimple(Drawable):
     def svg(self):
         return Element("path", {'d': 'M %d %d A %d %d 0 1 1 %d %d' % (self.start.x, self.start.y-self.radius,
                                             self.radius, self.radius, self.start.x, self.start.y+self.radius)})
+
+
+class Button(GroupedDrawable):
+    def __init__(self):
+        GroupedDrawable.__init__(self, svg_id='Button')
+        self.add(Rectangle(self.width(), self.height()))
+        self.add(Circle(self.center(), 0.7*Breadboard.PITCH, fill='green'))
+
+    def width(self):
+        return 4 + Breadboard.PITCH * 2
+
+    def height(self):
+        return Breadboard.PITCH * 2
+
+    def extent(self):
+        return Point(self.width(), self.height())
+
+    def center(self):
+        return self.start + self.extent().scale(0.5)
+
+
 
