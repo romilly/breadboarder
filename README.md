@@ -43,4 +43,4 @@ difficulties.
         
        
 ### Output
-![Output](svg/dil.png)
+![Output](docs/images/dil.png)
