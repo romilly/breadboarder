@@ -1,9 +1,10 @@
 The goal is to create a simple, intuitive DSL that allows you to describe a
-breadboarded electronics project and then *automatically*
+breadboard-based electronics project and then *automatically*
 1. draw a diagram of the project, and
 2. generate step-by-step instructions in markdown ready for publication
 
-The design is based on earlier closed-source tools which worked needed improvement.
+The design is based on earlier closed-source tools which worked but needed
+improvement.
 
 # Using the DSL
 
