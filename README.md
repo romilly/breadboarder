@@ -5,7 +5,7 @@ breadboarded electronics project and then *automatically*
 
 The design is based on earlier closed-source tools which worked needed improvement.
 
-! Using the DSL
+# Using the DSL
 
 1. You typically start a project by creating a Drawing instance.
 1. Then you add a Breadboard instance, and maybe other things, like an Arduino or Pi.
