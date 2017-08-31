@@ -12,3 +12,4 @@ class WireTest(TestCase):
         self.assertEqual(wire.start.y, 2)
         self.assertEqual(wire.end().x, 3)
         self.assertEqual(wire.end().y, 4)
+        self.assertEqual(w, wire) # check self is returned
