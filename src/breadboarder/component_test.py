@@ -18,7 +18,9 @@ class WireTest(TestCase):
 class ButtonTest(TestCase):
     def test_inserts_itself(self):
         button = Button()
-        button.connect((Point(1,3),))
+        b = button.connect((Point(1,3),))
         self.assertEqual(button.start.x, 1)
         self.assertEqual(button.start.y, 3)
+        self.assertEqual(b, button) # check self is returned
+
 
