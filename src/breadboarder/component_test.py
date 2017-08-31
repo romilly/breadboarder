@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from breadboarder.components import Wire
+from breadboarder.components import Wire, Button
 from breadboarder.drawing import Point
 
 
@@ -13,3 +13,12 @@ class WireTest(TestCase):
         self.assertEqual(wire.end().x, 3)
         self.assertEqual(wire.end().y, 4)
         self.assertEqual(w, wire) # check self is returned
+
+
+class ButtonTest(TestCase):
+    def test_inserts_itself(self):
+        button = Button()
+        button.connect((Point(1,3),))
+        self.assertEqual(button.start.x, 1)
+        self.assertEqual(button.start.y, 3)
+
