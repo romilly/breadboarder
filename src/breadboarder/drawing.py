@@ -101,12 +101,14 @@ class Line(Drawable):
         self.stroke_width = stroke_width
         self._attributes = attributes
 
-    def end(self, point):
+    def set_end(self, point):
         self.vector = point-self.start
 
+    def end(self):
+        return self.start + self.vector
+
     def svg(self):
-        end = self.start + self.vector
-        return Element('line', x1=str(self.start.x), y1=str(self.start.y), x2=str(end.x), y2=str(end.y),
+        return Element('line', x1=str(self.start.x), y1=str(self.start.y), x2=str(self.end().x), y2=str(self.end().y),
                        style='stroke:%s;stroke-width:%d' % (self.color, self.stroke_width), **self._attributes)
 
 
@@ -135,13 +137,6 @@ class Text(Drawable):
     def rotate(self, angle):
         self.angle  = angle
         return self
-
-
-class Wire(Line):
-    def __init__(self, color):
-        # TODO: improve wire, with outline if color is white
-        # better to use delegation rather than inheritance :)
-        Line.__init__(self, Point(0,0),Point(0,0), color, stroke_width=3)
 
 
 class Circle(Drawable):

@@ -99,13 +99,11 @@ class Breadboard(GroupedDrawable):
         for i in range(len(letters)):
             self.add(Text(letters[i], offset_to_letters +Point(0,self.PITCH*i), color='grey', size=6 ).rotate(-90))
 
-    # TODO: make endpoints varargs and let the component locate itself and add the connecting elements
-    def connect(self, component, start, end):
-        component.move_to(self.connectors[start].center())
-        component.end(self.connectors[end].center())
-        self.add(component)
+    def connect(self, component, *labels):
+        # component.move_to(self.connectors[start].center())
+        # component.end(self.connectors[end].center())
+        self.add(component.connect([self.connectors[label].center() for label in labels]))
 
-    # TODO: see above!
     def insert(self, dil, pin1):
         # if not ('e' in pin1 or 'f' in pin1):
         #     raise Exception('DIL must be inserted along rows e and f')

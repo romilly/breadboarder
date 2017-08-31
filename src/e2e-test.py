@@ -1,5 +1,6 @@
 from breadboarder.breadboard import Breadboard
-from breadboarder.drawing import Drawing, write, Wire
+from breadboarder.components import Wire
+from breadboarder.drawing import Drawing, write
 
 
 

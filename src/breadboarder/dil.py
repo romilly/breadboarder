@@ -16,6 +16,7 @@ def pcf8574():
     labels = ('A0', 'A1', 'A2', 'P0', 'P1', 'P2','P3','Vss','P4','P5','P6','P7','~INT','SCL','SDA','Vdd')
     return DIL(16,'PCF8574',labels)
 
+
 class DIL(GroupedDrawable):
     def __init__(self, pins, name, labels):
         GroupedDrawable.__init__(self,svg_id='IC')
@@ -62,25 +63,6 @@ class Dimple(Drawable):
     def svg(self):
         return Element("path", {'d': 'M %d %d A %d %d 0 1 1 %d %d' % (self.start.x, self.start.y-self.radius,
                                             self.radius, self.radius, self.start.x, self.start.y+self.radius)})
-
-
-class Button(GroupedDrawable):
-    def __init__(self):
-        GroupedDrawable.__init__(self, svg_id='Button')
-        self.add(Rectangle(self.width(), self.height()))
-        self.add(Circle(self.center(), 0.7*Breadboard.PITCH, fill='green'))
-
-    def width(self):
-        return 4 + Breadboard.PITCH * 2
-
-    def height(self):
-        return Breadboard.PITCH * 2
-
-    def extent(self):
-        return Point(self.width(), self.height())
-
-    def center(self):
-        return self.start + self.extent().scale(0.5)
 
 
 
