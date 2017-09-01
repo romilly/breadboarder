@@ -63,3 +63,18 @@ class Wire(Line, Component):
         self.set_end(end)
         return self
 
+
+class Resistor(GroupedDrawable, Component):
+    def __init__(self, resistance):
+        GroupedDrawable.__init__(self, svg_id='Resistor')
+        self.resistance = resistance
+        self.end = Point(0,0)
+
+    def connect(self, positions):
+        start, end = positions
+        self.move_to(start)
+        self.set_end(end)
+        return self
+
+    def set_end(self, end):
+        self.end = end

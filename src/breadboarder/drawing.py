@@ -20,6 +20,9 @@ class Point():
     def scale(self, factor):
         return Point(self.x * factor, self.y * factor)
 
+    def __str__(self):
+        return 'a Point(%s,%s)' % (str(self.x),str(self.y))
+
 
 class Drawable():
     def __init__(self, start):
