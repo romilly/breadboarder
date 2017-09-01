@@ -2,6 +2,7 @@
 from xml.etree.ElementTree import Element
 
 from breadboarder.breadboard import Breadboard
+from breadboarder.components import Component
 from breadboarder.drawing import Point, Rectangle, GroupedDrawable, Text, Drawable, Circle
 
 
@@ -17,7 +18,7 @@ def pcf8574():
     return DIL(16,'PCF8574',labels)
 
 
-class DIL(GroupedDrawable):
+class DIL(GroupedDrawable, Component):
     def __init__(self, pins, name, labels):
         GroupedDrawable.__init__(self,svg_id='IC')
         self.pin1 = Point(0, 0)
@@ -53,6 +54,12 @@ class DIL(GroupedDrawable):
 
     def extent(self):
         return Point(self.width(), self.height())
+
+    def connect(self, positions):
+        if len(positions) is not 1:
+            raise Exception('DIL only needs one position for insertion')  # for now :)
+        self.move_to(positions[0] - Point(2, -1))
+        return self
 
 
 class Dimple(Drawable):

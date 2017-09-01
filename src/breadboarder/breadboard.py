@@ -22,10 +22,6 @@ class SocketGroup(GroupedDrawable):
         return Element('g', id=self.id)
 
 
-class LineOffset(Point):
-    pass
-
-
 # TODO: document Breadboard measurements in docs/BREADBOARD_LAYOUT.md
 
 
@@ -75,7 +71,7 @@ class Breadboard(GroupedDrawable):
         self.add_power_line(vertical_location + self.gap_between_power_lines, '+', 'red')
 
     def add_power_line(self, vertical_location, text, color):
-        line_offset = LineOffset(self.gap_to_left_of_power_line, vertical_location)
+        line_offset = Point(self.gap_to_left_of_power_line, vertical_location)
         self.add(horizontal_line(line_offset, self.width - 2 * line_offset.x, color=color))
         self.add(Text(text, line_offset + self.offset_from_line_start_to_text, color=color, anchor='middle', size=7).rotate(90))
         self.add(Text(text, self.offset_from_line_start_to_text + line_offset + Point(self.width - 8, -1),
@@ -90,7 +86,6 @@ class Breadboard(GroupedDrawable):
         self.add(SocketGroup(center, 5, self.columns, alpha_labels, self))
         self.add_alpha_labels(Point(self.inset_to_right_letters, center.y + 2), alpha_labels)
 
-
     def add_numeric_labels(self, vertical_location, count, anchor):
         for i in range(count):
             self.add(Text(str(i+1), Point(self.inset - 1 + self.PITCH * i, vertical_location), anchor=anchor, color='grey', size=6).rotate(-90))
@@ -100,14 +95,5 @@ class Breadboard(GroupedDrawable):
             self.add(Text(letters[i], offset_to_letters +Point(0,self.PITCH*i), color='grey', size=6 ).rotate(-90))
 
     def connect(self, component, *labels):
-        # component.move_to(self.connectors[start].center())
-        # component.end(self.connectors[end].center())
         self.add(component.connect([self.connectors[label].center() for label in labels]))
 
-    def insert(self, dil, pin1):
-        # if not ('e' in pin1 or 'f' in pin1):
-        #     raise Exception('DIL must be inserted along rows e and f')
-        # if'f' in pin1:
-        #     dil.flipped = True
-        dil.move_to(self.connectors[pin1].center() - Point(2, -1))
-        self.add(dil)

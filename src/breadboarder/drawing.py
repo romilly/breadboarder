@@ -32,6 +32,9 @@ class Drawable():
         self.start = point
         return self
 
+    def move_by(self, amount):
+        self.start = self.start + amount
+
 
 class CompositeItem(Drawable):
     def __init__(self,start = Point(0,0)):
