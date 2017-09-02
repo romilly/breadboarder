@@ -23,6 +23,9 @@ class Point():
     def __str__(self):
         return 'a Point(%s,%s)' % (str(self.x),str(self.y))
 
+    def cartesian_coords(self):
+        return (self.x, self.y)
+
 
 class Drawable():
     def __init__(self, start):
