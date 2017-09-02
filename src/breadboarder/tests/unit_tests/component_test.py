@@ -38,7 +38,7 @@ class DilTest(TestCase):
 
 class ResistorTest(TestCase):
     def setUp(self):
-        self.resistor = Resistor('330K')
+        self.resistor = Resistor('330k')
 
     def test_inserts_itself(self):
         r = self.resistor.connect((Point(1,2), Point(1,10)))

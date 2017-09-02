@@ -18,7 +18,7 @@ def test_dil():
     breadboard.connect(Wire('lightgrey'),'d2','BM2')
     breadboard.connect(Wire('lightgrey'),'d3','BM3')
     breadboard.connect(Button(), 'd8')
-    breadboard.connect(Resistor('330K'), 'g17','g22')
+    breadboard.connect(Resistor('330k'), 'g17','g22')
     svg = drawing.svg()
     write(svg, 'svg/dil.svg')
 

@@ -1,5 +1,6 @@
 from breadboarder.breadboard import Breadboard
 from breadboarder.drawing import Point, GroupedDrawable, Rectangle, Line, Circle, Text
+from breadboarder.helpers.color_codes import ColorCode
 
 """
 def button(left, right, y, label):
@@ -67,10 +68,13 @@ class Wire(Line, Component):
 class Resistor(GroupedDrawable, Component):
     def __init__(self, resistance):
         GroupedDrawable.__init__(self, svg_id='Resistor')
+        self.band_height = Breadboard.PITCH-1
+        self.band_width = 2
         self.body_width = 3 * Breadboard.PITCH
         self.body_height = Breadboard.PITCH
         self.resistance = resistance
         self.end = Point(0,0)
+        self.coder = ColorCode()
 
     def connect(self, positions):
         start, end = positions
@@ -91,5 +95,11 @@ class Resistor(GroupedDrawable, Component):
         body = GroupedDrawable(svg_id='resistor body')
         rectangle = Rectangle(self.body_width, self.body_height, fill='beige')
         body.add(rectangle)
-        body.add(Text(self.resistance, rectangle.center()+Point(0,1.5), anchor='middle', size=3))
+        self.add_bands(body)
+        body.add(Text(self.resistance, rectangle.center()+Point(0,1.5), anchor='middle', color='grey', size=3))
         self.add(body.move_to(offset))
+
+    def add_bands(self,body):
+        band_colors = self.coder.bands_for(self.coder.parse(self.resistance))
+        for (i, band) in enumerate(band_colors):
+            body.add(Rectangle(self.band_width, self.band_height, fill=band, stroke=None).move_to(Point(5 + 5*i,0.5)))
