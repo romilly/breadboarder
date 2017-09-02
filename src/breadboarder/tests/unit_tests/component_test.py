@@ -1,11 +1,14 @@
 from unittest import TestCase
+from xml.etree.ElementTree import tostring
 
+from bs4 import BeautifulSoup
 from hamcrest import assert_that, is_
+from hamcrest.core.base_matcher import BaseMatcher
 
 from breadboarder.components import Wire, Button, Resistor
 from breadboarder.dil import atMega328
 from breadboarder.drawing import Point
-from breadboarder.helpers.test_helpers import is_located_at
+from breadboarder.helpers.test_helpers import is_located_at, contains_svg_rectangle
 
 
 class WireTest(TestCase):
@@ -34,12 +37,22 @@ class DilTest(TestCase):
 
 
 class ResistorTest(TestCase):
+    def setUp(self):
+        self.resistor = Resistor('330K')
+
     def test_inserts_itself(self):
-        resistor = Resistor('330K')
-        r = resistor.connect((Point(1,2), Point(1,10)))
-        assert_that(resistor.start, is_located_at(Point(1,2)))
-        assert_that(resistor.end, is_located_at(Point(1,10)))
-        assert_that(r, is_(resistor))
+        r = self.resistor.connect((Point(1,2), Point(1,10)))
+        assert_that(r, is_(self.resistor), 'check self is returned')
+        assert_that(r.start, is_located_at(Point(1,2)))
+        assert_that(r.end, is_located_at(Point(1,10)))
+
+    def test_aligns_itself(self):
+        r = self.resistor.connect((Point(0,1), Point(40, 1)))
+        svg = tostring(r.svg())
+        soup = BeautifulSoup(svg, 'xml')
+        assert_that(soup, contains_svg_rectangle(0, 0, 27, 9)) # relative to resistor body start
+
+
 
 
 

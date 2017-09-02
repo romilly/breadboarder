@@ -1,5 +1,5 @@
 from breadboarder.breadboard import Breadboard
-from breadboarder.components import Wire, Button
+from breadboarder.components import Wire, Button, Resistor
 from breadboarder.dil import atMega328, pcf8574
 from breadboarder.drawing import Drawing, write
 
@@ -18,6 +18,7 @@ def test_dil():
     breadboard.connect(Wire('lightgrey'),'d2','BM2')
     breadboard.connect(Wire('lightgrey'),'d3','BM3')
     breadboard.connect(Button(), 'd8')
+    breadboard.connect(Resistor('330K'), 'g17','g22')
     svg = drawing.svg()
     write(svg, 'svg/dil.svg')
 

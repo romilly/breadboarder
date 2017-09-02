@@ -1,5 +1,7 @@
 from xml.etree.ElementTree import Element, tostring, ElementTree
 
+import math
+
 
 class Point():
     def __init__(self,x ,y):
@@ -25,6 +27,9 @@ class Point():
 
     def cartesian_coords(self):
         return (self.x, self.y)
+
+    def distance_to(self, other):
+        return math.sqrt(sum(map(lambda x: x*x,(self-other).cartesian_coords())))
 
 
 class Drawable():

@@ -1,5 +1,5 @@
 from breadboarder.breadboard import Breadboard
-from breadboarder.drawing import Point, GroupedDrawable, Rectangle, Line, Circle
+from breadboarder.drawing import Point, GroupedDrawable, Rectangle, Line, Circle, Text
 
 """
 def button(left, right, y, label):
@@ -67,6 +67,8 @@ class Wire(Line, Component):
 class Resistor(GroupedDrawable, Component):
     def __init__(self, resistance):
         GroupedDrawable.__init__(self, svg_id='Resistor')
+        self.body_width = 3 * Breadboard.PITCH
+        self.body_height = Breadboard.PITCH
         self.resistance = resistance
         self.end = Point(0,0)
 
@@ -74,7 +76,20 @@ class Resistor(GroupedDrawable, Component):
         start, end = positions
         self.move_to(start)
         self.set_end(end)
+        self.add_elements()
         return self
 
     def set_end(self, end):
         self.end = end
+
+    def add_elements(self):
+        # coordinates are relative to the Resistor's start
+        extent = self.end - self.start
+        self.add(Line(Point(0,0), extent, color='grey', stroke_width=2))
+        total_wire_length = self.start.distance_to(self.end)-self.body_width
+        offset = Point(total_wire_length, -self.body_height).scale(0.5)
+        body = GroupedDrawable(svg_id='resistor body')
+        rectangle = Rectangle(self.body_width, self.body_height, fill='white')
+        body.add(rectangle)
+        body.add(Text(self.resistance, rectangle.center()+Point(0,1.5), anchor='middle', size=3))
+        self.add(body.move_to(offset))
