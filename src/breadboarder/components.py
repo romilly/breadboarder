@@ -89,7 +89,7 @@ class Resistor(GroupedDrawable, Component):
         total_wire_length = self.start.distance_to(self.end)-self.body_width
         offset = Point(total_wire_length, -self.body_height).scale(0.5)
         body = GroupedDrawable(svg_id='resistor body')
-        rectangle = Rectangle(self.body_width, self.body_height, fill='white')
+        rectangle = Rectangle(self.body_width, self.body_height, fill='beige')
         body.add(rectangle)
         body.add(Text(self.resistance, rectangle.center()+Point(0,1.5), anchor='middle', size=3))
         self.add(body.move_to(offset))
