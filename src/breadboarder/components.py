@@ -30,10 +30,11 @@ class Component():
 class Button(GroupedDrawable, Component):
     def __init__(self):
         GroupedDrawable.__init__(self, svg_id='Button')
-        width = Breadboard.PITCH * 3
+        width = Breadboard.PITCH * 2
         height = Breadboard.PITCH * 3 - 6
-        self.add(Rectangle(width, height))
-        self.add(Circle(self.center(), Breadboard.PITCH, fill='green'))
+        rectangle = Rectangle(width, height)
+        self.add(rectangle)
+        self.add(Circle(rectangle.center(), Breadboard.PITCH, fill='green'))
 
     def connect(self, positions):
         if len(positions) is not 1:
