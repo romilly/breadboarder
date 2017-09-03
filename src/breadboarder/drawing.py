@@ -14,6 +14,10 @@ class Point():
     def __sub__(self, other):
         return Point(self.x-other.x, self.y-other.y)
 
+    def __mul__(self, other):
+        # Hademard (direct) product
+        return Point(self.x*other.x, self.y*other.y)
+
 
     def v_flip(self):
         # flip about vertical axis
@@ -28,8 +32,11 @@ class Point():
     def cartesian_coords(self):
         return (self.x, self.y)
 
-    def distance_to(self, other):
-        return math.sqrt(sum(map(lambda x: x*x,(self-other).cartesian_coords())))
+    def r(self):
+        return math.sqrt(sum((self*self).cartesian_coords()))
+
+    def theta(self):
+        return math.degrees(math.atan2(self.y, self.x))
 
 
 class Drawable():
@@ -78,12 +85,19 @@ class GroupedDrawable(CompositeItem):
     def __init__(self, svg_id=None):
         CompositeItem.__init__(self)
         self.svg_id = svg_id
+        self.angle = 0
+        self.origin = Point(0,0)
 
     def container(self):
-            group = Element('g', transform='translate(%f,%f)' % (self.start.x, self.start.y))
+            group = Element('g', transform='rotate(%f,%f,%f) translate(%f,%f)' % (self.angle, self.origin.x, self.origin.y, self.start.x, self.start.y))
             if self.svg_id is not None:
                 group.set('id',self.svg_id)
             return group
+
+    def rotate(self, theta, origin=Point(0,0)):
+        self.angle = theta
+        self.origin = origin
+        return self
 
 
 class Rectangle(Drawable):
@@ -126,8 +140,8 @@ class Line(Drawable):
                        style='stroke:%s;stroke-width:%d' % (self.color, self.stroke_width), **self._attributes)
 
 
-def horizontal_line(start, length, color='black'):
-    return Line(start, start+Point(length,0), color=color)
+def horizontal_line(start, length, color='black', stroke_width=1):
+    return Line(start, start+Point(length,0), color=color, stroke_width=stroke_width)
 
 
 class Text(Drawable):

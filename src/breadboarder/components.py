@@ -1,5 +1,5 @@
 from breadboarder.breadboard import Breadboard
-from breadboarder.drawing import Point, GroupedDrawable, Rectangle, Line, Circle, Text
+from breadboarder.drawing import Point, GroupedDrawable, Rectangle, Line, Circle, Text, horizontal_line
 from breadboarder.helpers.color_codes import ColorCode
 
 """
@@ -90,14 +90,17 @@ class Resistor(GroupedDrawable, Component):
     def add_elements(self):
         # coordinates are relative to the Resistor's start
         extent = self.end - self.start
-        self.add(Line(Point(0,0), extent, color='grey', stroke_width=4))
-        total_wire_length = self.start.distance_to(self.end)-self.body_width
+        length = extent.r()
+        theta = extent.theta()
+        total_wire_length = length - self.body_width
         offset = Point(total_wire_length, -self.body_height).scale(0.5)
+        self.add(horizontal_line(Point(0,0), length, color='grey', stroke_width=4))
         body = GroupedDrawable(svg_id='resistor body')
         rectangle = Rectangle(self.body_width, self.body_height, fill='beige')
         body.add(rectangle)
         self.add_bands(body)
         body.add(Text(self.resistance, rectangle.center()+Point(0,1.5), anchor='middle', color='grey', size=3))
+        self.rotate(theta, self.start)
         self.add(body.move_to(offset))
 
     def add_bands(self,body):

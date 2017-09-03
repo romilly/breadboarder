@@ -25,7 +25,6 @@ class DIL(GroupedDrawable, Component):
         self.pins = pins
         self.name = name
         self.labels = labels
-        self.flipped = False
         self.add_parts()
 
     def pins_per_side(self):
