@@ -90,7 +90,7 @@ class Resistor(GroupedDrawable, Component):
     def add_elements(self):
         # coordinates are relative to the Resistor's start
         extent = self.end - self.start
-        self.add(Line(Point(0,0), extent, color='grey', stroke_width=2))
+        self.add(Line(Point(0,0), extent, color='grey', stroke_width=4))
         total_wire_length = self.start.distance_to(self.end)-self.body_width
         offset = Point(total_wire_length, -self.body_height).scale(0.5)
         body = GroupedDrawable(svg_id='resistor body')
