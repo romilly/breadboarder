@@ -24,12 +24,13 @@ difficulties.
 
 ## Sample script and its output
 
+    
     def test_dil():
         drawing = Drawing()
         breadboard = Breadboard()
         drawing.add(breadboard)
-        breadboard.insert(atMega328(), 'f10')
-        breadboard.insert(pcf8574(), 'f1')
+        breadboard.connect(atMega328(), 'f10')
+        breadboard.connect(pcf8574(), 'f1')
         breadboard.connect(Wire('red'),'g1','TP1')
         breadboard.connect(Wire('black'),'a8','BM6')
         breadboard.connect(Wire('blue'),'g3','g10')
@@ -37,7 +38,10 @@ difficulties.
         breadboard.connect(Wire('lightgrey'),'d1','BM1')
         breadboard.connect(Wire('lightgrey'),'d2','BM2')
         breadboard.connect(Wire('lightgrey'),'d3','BM3')
-        breadboard.insert(Button(), 'd8')
+        breadboard.connect(Button(), 'd8')
+        breadboard.connect(Resistor('330k'), 'g17','g22')
+        breadboard.connect(Resistor('2R7'), 'g25','a25')
+        breadboard.connect(Resistor('1M2'), 'g27','a30')
         svg = drawing.svg()
         write(svg, 'svg/dil.svg')
         
