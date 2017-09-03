@@ -3,7 +3,6 @@ from xml.etree.ElementTree import tostring
 
 from bs4 import BeautifulSoup
 from hamcrest import assert_that, is_
-from hamcrest.core.base_matcher import BaseMatcher
 
 from breadboarder.components import Wire, Button, Resistor
 from breadboarder.dil import atMega328
