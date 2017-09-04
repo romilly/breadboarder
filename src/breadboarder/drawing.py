@@ -122,11 +122,12 @@ class Rectangle(Drawable):
 
 
 class Line(Drawable):
-    def __init__(self, start, end, color='black', stroke_width=1,**attributes):
+    def __init__(self, start, end, color='black', stroke_width=1, linecap='butt', **attributes):
         Drawable.__init__(self, start)
         self.vector = end-start
         self.color = color
         self.stroke_width = stroke_width
+        self.linecap = linecap
         self._attributes = attributes
 
     def set_end(self, point):
@@ -137,11 +138,11 @@ class Line(Drawable):
 
     def svg(self):
         return Element('line', x1=str(self.start.x), y1=str(self.start.y), x2=str(self.end().x), y2=str(self.end().y),
-                       style='stroke:%s;stroke-width:%d' % (self.color, self.stroke_width), **self._attributes)
+                       style='stroke:%s;stroke-width:%d;stroke-linecap:%s' % (self.color, self.stroke_width, self.linecap), **self._attributes)
 
 
-def horizontal_line(start, length, color='black', stroke_width=1):
-    return Line(start, start+Point(length,0), color=color, stroke_width=stroke_width)
+def horizontal_line(start, length, color='black', stroke_width=1, linecap='butt'):
+    return Line(start, start+Point(length,0), color=color, stroke_width=stroke_width, linecap=linecap)
 
 
 class Text(Drawable):

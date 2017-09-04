@@ -17,7 +17,7 @@ generate markdown for the project.
 ## Current status
 
 The core of the image generator is working but there's work to do adding
-components like capacitors, diodes and crystals.
+components like capacitors, diodes and transistors.
 
 I have not started on the text/markdown generator yet  but I do not anticipate any major
 difficulties.
