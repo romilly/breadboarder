@@ -14,6 +14,11 @@ for (index, color) in enumerate(colors):
     multiplier_color[index] = color
 multiplier_color[-1] = 'gold'
 multiplier_color[-2] = 'silver'
+tolerance_bands = {
+    '1%' : 'brown',
+    '5%' : 'gold',
+    '10%': 'silver'
+}
 
 class ColorCode:
     @staticmethod
@@ -33,3 +38,6 @@ class ColorCode:
         start = ([0]+significant_digits)[-2:]
         multiplier = zeros + exponent
         return list(colors[digit] for digit in start)+[multiplier_color[multiplier]]
+
+    def band_for_tolerance(self, tolerance):
+        return tolerance_bands[tolerance]

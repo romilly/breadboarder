@@ -86,7 +86,7 @@ class TwoPinComponent(GroupedDrawable, Component):
 
 
 class Resistor(TwoPinComponent):
-    def __init__(self, resistance):
+    def __init__(self, resistance, tolerance='5%'):
         TwoPinComponent.__init__(self, svg_id='Resistor')
         self.band_height = Breadboard.PITCH-1
         self.band_width = 2
@@ -94,6 +94,7 @@ class Resistor(TwoPinComponent):
         self.body_height = Breadboard.PITCH
         self.resistance = resistance
         self.coder = ColorCode()
+        self.tolerance = tolerance
 
     def add_elements(self):
         # coordinates are relative to the Resistor's start
@@ -107,7 +108,7 @@ class Resistor(TwoPinComponent):
         rectangle = Rectangle(self.body_width, self.body_height, fill='beige')
         body.add(rectangle)
         self.add_bands(body)
-        body.add(Text(self.resistance, rectangle.center()+Point(0,1.5), anchor='middle', color='grey', size=3))
+        body.add(Text(' '.join([self.resistance, self.tolerance]), rectangle.center()+Point(0,1.5), anchor='middle', color='grey', size=3))
         self.rotate(theta, self.start)
         self.add(body.move_to(offset))
 
@@ -115,6 +116,8 @@ class Resistor(TwoPinComponent):
         band_colors = self.coder.bands_for(self.coder.parse(self.resistance))
         for (i, band) in enumerate(band_colors):
             body.add(Rectangle(self.band_width, self.band_height, fill=band, stroke=None).move_to(Point(5 + 5*i,0.5)))
+        tolerance_band_color = self.coder.band_for_tolerance(self.tolerance)
+        body.add(Rectangle(self.band_width, self.band_height, fill=tolerance_band_color, stroke=None).move_to(Point(self.body_width-3, 0.5)))
 
 
 class Crystal(TwoPinComponent):
