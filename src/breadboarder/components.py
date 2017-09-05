@@ -66,7 +66,7 @@ class Wire(Line, Component):
         return self
 
 
-class TwoPinUnpolarised(GroupedDrawable, Component):
+class TwoPinComponent(GroupedDrawable, Component):
     def __init__(self, svg_id):
         GroupedDrawable.__init__(self, svg_id=svg_id)
         self.end = Point(0,0)
@@ -81,10 +81,13 @@ class TwoPinUnpolarised(GroupedDrawable, Component):
     def set_end(self, end):
         self.end = end
 
+    def add_elements(self):
+        raise Exception('My subclass should have implemented this message')
 
-class Resistor(TwoPinUnpolarised):
+
+class Resistor(TwoPinComponent):
     def __init__(self, resistance):
-        TwoPinUnpolarised.__init__(self, svg_id='Resistor')
+        TwoPinComponent.__init__(self, svg_id='Resistor')
         self.band_height = Breadboard.PITCH-1
         self.band_width = 2
         self.body_width = 3 * Breadboard.PITCH
@@ -114,9 +117,9 @@ class Resistor(TwoPinUnpolarised):
             body.add(Rectangle(self.band_width, self.band_height, fill=band, stroke=None).move_to(Point(5 + 5*i,0.5)))
 
 
-class Crystal(TwoPinUnpolarised):
+class Crystal(TwoPinComponent):
     def __init__(self, frequency):
-        TwoPinUnpolarised.__init__(self, svg_id='Crystal')
+        TwoPinComponent.__init__(self, svg_id='Crystal')
         self.frequency = frequency
         self.body_width = 2 * Breadboard.PITCH
         self.body_height = Breadboard.PITCH
