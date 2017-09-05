@@ -1,5 +1,6 @@
-from breadboarder.breadboard import Breadboard
-from breadboarder.drawing import Point, GroupedDrawable, Rectangle, Line, Circle, Text, horizontal_line
+from .drawing import Point, GroupedDrawable, Rectangle, Line, Circle, Text, horizontal_line
+
+from .breadboard import Breadboard
 from breadboarder.helpers.color_codes import ColorCode
 
 """

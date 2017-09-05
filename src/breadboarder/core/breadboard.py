@@ -1,6 +1,6 @@
 from xml.etree.ElementTree import Element
 
-from breadboarder.drawing import Rectangle, horizontal_line, Text, Point, GroupedDrawable
+from breadboarder.core.drawing import Rectangle, horizontal_line, Text, Point, GroupedDrawable
 
 
 class SocketGroup(GroupedDrawable):

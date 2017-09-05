@@ -1,9 +1,10 @@
 # draw Dual In Line IC chip (like ATMegas 328)
 from xml.etree.ElementTree import Element
 
-from breadboarder.breadboard import Breadboard
-from breadboarder.components import Component
-from breadboarder.drawing import Point, Rectangle, GroupedDrawable, Text, Drawable, Circle
+from .breadboard import Breadboard
+from .drawing import Point, Rectangle, GroupedDrawable, Text, Drawable
+
+from .components import Component
 
 
 # TODO: similar defs of extend, center. Move to Drawable, which would need width() and height()?

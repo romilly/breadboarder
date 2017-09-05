@@ -1,7 +1,7 @@
-from breadboarder.breadboard import Breadboard
-from breadboarder.components import Wire
-from breadboarder.drawing import Drawing, write
+from breadboarder.core.breadboard import Breadboard
+from breadboarder.core.drawing import Drawing, write
 
+from breadboarder.core.components import Wire
 
 
 def test_breadboard():

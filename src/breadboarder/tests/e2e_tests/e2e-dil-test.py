@@ -1,7 +1,8 @@
-from breadboarder.breadboard import Breadboard
-from breadboarder.components import Wire, Button, Resistor, Crystal
-from breadboarder.dil import atMega328, pcf8574
-from breadboarder.drawing import Drawing, write
+from breadboarder.core.breadboard import Breadboard
+from breadboarder.core.dil import atMega328, pcf8574
+from breadboarder.core.drawing import Drawing, write
+
+from breadboarder.core.components import Wire, Button, Resistor, Crystal
 
 
 def test_dil():

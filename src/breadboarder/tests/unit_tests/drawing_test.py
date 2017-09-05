@@ -3,9 +3,10 @@ from collections import defaultdict
 from unittest import TestCase
 from xml.etree.ElementTree import tostring
 
+from breadboarder.core.drawing import Drawing
 from bs4 import BeautifulSoup
-from breadboarder.breadboard import Breadboard
-from breadboarder.drawing import Drawing
+
+from breadboarder.core.breadboard import Breadboard
 
 
 class DrawingTest(TestCase):

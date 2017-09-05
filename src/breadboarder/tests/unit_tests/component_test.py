@@ -1,12 +1,12 @@
 from unittest import TestCase
 from xml.etree.ElementTree import tostring
 
+from breadboarder.core.dil import atMega328
+from breadboarder.core.drawing import Point
 from bs4 import BeautifulSoup
 from hamcrest import assert_that, is_
 
-from breadboarder.components import Wire, Button, Resistor
-from breadboarder.dil import atMega328
-from breadboarder.drawing import Point
+from breadboarder.core.components import Wire, Button, Resistor
 from breadboarder.helpers.test_helpers import is_located_at, contains_svg_rectangle
 
 
