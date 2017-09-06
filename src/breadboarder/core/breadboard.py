@@ -10,7 +10,7 @@ class Port():
         self.label = label
 
     def location(self):
-        return self.relative_location + self.host.start
+        return self.relative_location + self.host.origin
 
 
 class SocketGroup(GroupedDrawable):
@@ -106,5 +106,5 @@ class Breadboard(GroupedDrawable):
             self.add(Text(letters[i], offset_to_letters +Point(0,self.PITCH*i), color='grey', size=6 ).rotate(-90))
 
     def connect(self, component, *labels):
-        self.add(component.connect([self.ports[label].relative_location for label in labels]))
+        self.add(component.connect([self.ports[label].location() for label in labels]))
 

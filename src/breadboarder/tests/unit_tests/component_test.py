@@ -21,10 +21,8 @@ class WireTest(TestCase):
 
 class ButtonTest(TestCase):
     def test_inserts_itself(self):
-        button = Button()
-        b = button.connect((Point(1,3),))
+        button = Button(Point(1,3))
         assert_that(button.start, is_located_at(Point(1,3)))
-        self.assertEqual(b, button,'check self is returned')
 
 
 class DilTest(TestCase):
