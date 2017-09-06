@@ -55,7 +55,7 @@ class Drawable():
 
 
 class CompositeItem(Drawable):
-    def __init__(self,start = Point(0,0)):
+    def __init__(self,start=Point(0,0)):
         Drawable.__init__(self, start)
         self._children = []
 
@@ -82,7 +82,7 @@ class Project(CompositeItem):
 
 
 class GroupedDrawable(CompositeItem):
-    def __init__(self, svg_id=None, origin = Point(0,0)):
+    def __init__(self, svg_id=None, origin=Point(0,0)):
         CompositeItem.__init__(self)
         self.svg_id = svg_id
         self.angle = 0

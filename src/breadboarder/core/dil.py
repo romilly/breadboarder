@@ -53,12 +53,6 @@ class DIL(GroupedDrawable):
     def extent(self):
         return Point(self.width(), self.height())
 
-    def connect(self, positions):
-        if len(positions) is not 1:
-            raise Exception('DIL only needs one position for insertion')  # for now :)
-        self.move_to(positions[0] - Point(2, -1))
-        return self
-
 
 class Dimple(Drawable):
     def __init__(self, center, radius):
