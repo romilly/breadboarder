@@ -4,29 +4,27 @@ from xml.etree.ElementTree import Element
 from .breadboard import Breadboard
 from .project import Point, Rectangle, GroupedDrawable, Text, Drawable
 
-from .components import Component
-
 
 # TODO: similar defs of extend, center. Move to Drawable, which would need width() and height()?
 
-def atMega328():
+def atMega328(port):
     labels = ('~RST','RXD','TXD','PD2','PD3','PD4','VCC','GND','XTAL1','XTAL2','PD5','PD6','PD7','PB0',
             'PB1','PB2','PB3','PB4','PB5','AVCC','AREF','GND','PC0','PC1','PC2','PC3','PC4','PC5')
-    return DIL(28,'ATmega328',labels)
+    return DIL(28,'ATmega328', port, labels)
 
-def pcf8574():
+def pcf8574(port):
     labels = ('A0', 'A1', 'A2', 'P0', 'P1', 'P2','P3','Vss','P4','P5','P6','P7','~INT','SCL','SDA','Vdd')
-    return DIL(16,'PCF8574',labels)
+    return DIL(16,'PCF8574',port, labels)
 
 
-class DIL(GroupedDrawable, Component):
-    def __init__(self, pins, name, labels):
+class DIL(GroupedDrawable):
+    def __init__(self, pins, name, port, labels):
         GroupedDrawable.__init__(self,svg_id='IC')
-        self.pin1 = Point(0, 0)
         self.pins = pins
         self.name = name
         self.labels = labels
         self.add_parts()
+        self.start = port.location() - Point(2, -1) # for visual correctness
 
     def pins_per_side(self):
         return int(self.pins/2)

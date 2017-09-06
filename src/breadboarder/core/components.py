@@ -4,26 +4,17 @@ from .breadboard import Breadboard
 from breadboarder.helpers.color_codes import ColorCode
 
 
-class Component():
-    def connect(self, positions):
-        raise Exception('My Subclass should have implemented this method')
-
-
-class Button(GroupedDrawable, Component):
-    def __init__(self, *positions):
+class Button(GroupedDrawable):
+    def __init__(self, *ports):
         GroupedDrawable.__init__(self, svg_id='Button')
+        if len(ports) is not 1:
+            raise Exception('buttons only need one position for insertion') # for now :)
+        self.start = ports[0].location()
         width = Breadboard.PITCH * 2
         height = Breadboard.PITCH * 3 - 6
         rectangle = Rectangle(width, height)
         self.add(rectangle)
         self.add(Circle(rectangle.center(), Breadboard.PITCH, fill='green'))
-        self._connect(positions)
-
-    def _connect(self, positions):
-        if len(positions) is not 1:
-            raise Exception('buttons only need one position for insertion') # for now :)
-        self.move_to(positions[0].location())
-        return self
 
     def width(self):
         return 4 + Breadboard.PITCH * 2
@@ -38,40 +29,26 @@ class Button(GroupedDrawable, Component):
         return self.start + self.extent().scale(0.5)
 
 
-class Wire(Line, Component):
+class Wire(Line):
     def __init__(self, color, *ports):
         start, end = ports
         Line.__init__(self, start.location(), end.location(), color, stroke_width=3, linecap='round')
 
-    # def connect(self, positions):
-    #     start, end = positions
-    #     self.move_to(start)
-    #     self.set_end(end)
-    #     return self
 
-
-class TwoPinComponent(GroupedDrawable, Component):
-    def __init__(self, svg_id):
+class TwoPinComponent(GroupedDrawable):
+    def __init__(self, ports, svg_id):
         GroupedDrawable.__init__(self, svg_id=svg_id)
-        self.end = Point(0,0)
-
-    def connect(self, positions):
-        start, end = positions
-        self.move_to(start)
-        self.set_end(end)
+        start, end = ports
+        self.start = start.location()
+        self.end = end.location()
         self.add_elements()
-        return self
-
-    def set_end(self, end):
-        self.end = end
 
     def add_elements(self):
         raise Exception('My subclass should have implemented this message')
 
 
 class Resistor(TwoPinComponent):
-    def __init__(self, resistance, tolerance='5%'):
-        TwoPinComponent.__init__(self, svg_id='Resistor')
+    def __init__(self, resistance, tolerance, *ports):
         self.band_height = Breadboard.PITCH-1
         self.band_width = 2
         self.body_width = 3 * Breadboard.PITCH
@@ -79,6 +56,7 @@ class Resistor(TwoPinComponent):
         self.resistance = resistance
         self.coder = ColorCode()
         self.tolerance = tolerance
+        TwoPinComponent.__init__(self, ports, svg_id='Resistor')
 
     def add_elements(self):
         # coordinates are relative to the Resistor's start
@@ -105,11 +83,11 @@ class Resistor(TwoPinComponent):
 
 
 class Crystal(TwoPinComponent):
-    def __init__(self, frequency):
-        TwoPinComponent.__init__(self, svg_id='Crystal')
+    def __init__(self, frequency, *ports):
         self.frequency = frequency
         self.body_width = 2 * Breadboard.PITCH
         self.body_height = Breadboard.PITCH
+        TwoPinComponent.__init__(self, ports, svg_id='Crystal')
 
     def add_elements(self):
         # coordinates are relative to the Crystal's's start
