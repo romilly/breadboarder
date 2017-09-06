@@ -108,3 +108,7 @@ class Breadboard(GroupedDrawable):
     def connect(self, component, *labels):
         self.add(component.connect([self.ports[label].location() for label in labels]))
 
+
+    def __getitem__(self, item):
+        return self.ports[item]
+

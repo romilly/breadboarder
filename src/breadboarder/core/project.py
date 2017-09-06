@@ -82,11 +82,11 @@ class Project(CompositeItem):
 
 
 class GroupedDrawable(CompositeItem):
-    def __init__(self, svg_id=None):
+    def __init__(self, svg_id=None, origin = Point(0,0)):
         CompositeItem.__init__(self)
         self.svg_id = svg_id
         self.angle = 0
-        self.origin = Point(0,0)
+        self.origin = origin
 
     def container(self):
             group = Element('g', transform='rotate(%f,%f,%f) translate(%f,%f)' % (self.angle, self.origin.x, self.origin.y, self.start.x, self.start.y))

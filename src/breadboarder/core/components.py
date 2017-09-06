@@ -22,7 +22,7 @@ class Button(GroupedDrawable, Component):
     def _connect(self, positions):
         if len(positions) is not 1:
             raise Exception('buttons only need one position for insertion') # for now :)
-        self.move_to(positions[0])
+        self.move_to(positions[0].location())
         return self
 
     def width(self):
@@ -39,14 +39,15 @@ class Button(GroupedDrawable, Component):
 
 
 class Wire(Line, Component):
-    def __init__(self, color='black'):
-        Line.__init__(self, Point(0,0),Point(0,0), color, stroke_width=3, linecap='round')
+    def __init__(self, color, *ports):
+        start, end = ports
+        Line.__init__(self, start.location(), end.location(), color, stroke_width=3, linecap='round')
 
-    def connect(self, positions):
-        start, end = positions
-        self.move_to(start)
-        self.set_end(end)
-        return self
+    # def connect(self, positions):
+    #     start, end = positions
+    #     self.move_to(start)
+    #     self.set_end(end)
+    #     return self
 
 
 class TwoPinComponent(GroupedDrawable, Component):
