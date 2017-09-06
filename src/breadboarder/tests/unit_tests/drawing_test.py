@@ -53,7 +53,7 @@ class BreadboardTest(TestCase):
             self.assertEqual(2, ld[str(i+1)])
 
     def test_breadboard_connectors(self):
-        c = Breadboard().connectors
+        c = Breadboard().ports
         for i in range(1,26):
             self.assertTrue(('TP%d' % i) in c) # Top Plus power connectors
             self.assertTrue(('TM%d' % i) in c) # Top Minus power connectors

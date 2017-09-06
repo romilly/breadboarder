@@ -2,16 +2,27 @@ from xml.etree.ElementTree import Element
 
 from breadboarder.core.project import Rectangle, horizontal_line, Text, Point, GroupedDrawable
 
+class Port():
+    # the socket or pin belonging to a host that a component can be connected to
+    def __init__(self, host, relative_location, label):
+        self.host = host
+        self.relative_location = relative_location
+        self.label = label
+
+    def location(self):
+        return self.relative_location + self.host.start
+
 
 class SocketGroup(GroupedDrawable):
-    def __init__(self, center, rows, cols, alpha_labels, parent, start_number=1, id='sockets'):
+    def __init__(self, center, rows, cols, alpha_labels, host, start_number=1, id='sockets'):
         GroupedDrawable.__init__(self)
         self.socket_size = 2.88
         self.id = id
         for i in range(cols):
             for j in range(rows):
                 socket = self.socket().set_center(center.x + Breadboard.PITCH * i, center.y + Breadboard.PITCH * j)
-                parent.add_connector(socket, alpha_labels[j]+str(i+start_number))
+                label = alpha_labels[j] + str(i + start_number)
+                host.add_port(Port(host, socket.center(), label))
                 self.add(socket)
 
     def socket(self):
@@ -30,7 +41,7 @@ class Breadboard(GroupedDrawable):
 
     def __init__(self):
         GroupedDrawable.__init__(self, svg_id='breadboard')
-        self.connectors = {}
+        self.ports = {}
         self.width = 291.7
         self.height = 192.2
         self.inset = 19.08
@@ -52,8 +63,8 @@ class Breadboard(GroupedDrawable):
         self.inter_power_group_spacing = 53.5
         self.add_components()
 
-    def add_connector(self, connector, key):
-        self.connectors[key] = connector
+    def add_port(self, port):
+        self.ports[port.label] = port
 
     def add_components(self):
         self.add(Rectangle(self.width, self.height, fill='white'))
@@ -95,5 +106,5 @@ class Breadboard(GroupedDrawable):
             self.add(Text(letters[i], offset_to_letters +Point(0,self.PITCH*i), color='grey', size=6 ).rotate(-90))
 
     def connect(self, component, *labels):
-        self.add(component.connect([self.connectors[label].center() for label in labels]))
+        self.add(component.connect([self.ports[label].relative_location for label in labels]))
 
