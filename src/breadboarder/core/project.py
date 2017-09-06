@@ -72,7 +72,7 @@ class CompositeItem(Drawable):
         raise Exception('My Subclass should have implemented this method')
 
 
-class Drawing(CompositeItem):
+class Project(CompositeItem):
 
     def container(self):
         return Element('svg', height='480', width='640')

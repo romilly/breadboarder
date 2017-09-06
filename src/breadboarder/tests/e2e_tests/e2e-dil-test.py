@@ -1,14 +1,14 @@
 from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.dil import atMega328, pcf8574
-from breadboarder.core.drawing import Drawing, write
+from breadboarder.core.project import Project, write
 
 from breadboarder.core.components import Wire, Button, Resistor, Crystal
 
 
 def test_dil():
-    drawing = Drawing()
+    project = Project()
     breadboard = Breadboard()
-    drawing.add(breadboard)
+    project.add(breadboard)
     breadboard.connect(atMega328(), 'f10')
     breadboard.connect(pcf8574(), 'f1')
     breadboard.connect(Wire('red'),'g1','TP1')
@@ -23,7 +23,7 @@ def test_dil():
     breadboard.connect(Resistor('2R7'), 'g25','a25')
     breadboard.connect(Resistor('1M2'), 'g27','a30')
     breadboard.connect(Crystal('16Mz'), 'g24','a29')
-    svg = drawing.svg()
+    svg = project.svg()
     write(svg, 'svg/dil.svg')
 
 test_dil()

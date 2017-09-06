@@ -2,7 +2,7 @@ from unittest import TestCase
 from xml.etree.ElementTree import tostring
 
 from breadboarder.core.dil import atMega328
-from breadboarder.core.drawing import Point
+from breadboarder.core.project import Point
 from bs4 import BeautifulSoup
 from hamcrest import assert_that, is_
 

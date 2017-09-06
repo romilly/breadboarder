@@ -3,7 +3,7 @@ from collections import defaultdict
 from unittest import TestCase
 from xml.etree.ElementTree import tostring
 
-from breadboarder.core.drawing import Drawing
+from breadboarder.core.project import Project
 from bs4 import BeautifulSoup
 
 from breadboarder.core.breadboard import Breadboard
@@ -11,9 +11,9 @@ from breadboarder.core.breadboard import Breadboard
 
 class DrawingTest(TestCase):
     def test_builds_svg(self):
-        drawing = Drawing()
-        drawing.add(Breadboard())
-        svg = drawing.tostring()
+        project = Project()
+        project.add(Breadboard())
+        svg = project.tostring()
         soup = BeautifulSoup(svg,'xml')
         svg_tags = soup.find_all('svg')
         self.assertEqual(1, len(svg_tags))
@@ -21,7 +21,7 @@ class DrawingTest(TestCase):
         self.assertEqual('480',svg_root['height'])
         self.assertEqual('640',svg_root['width'])
         bb = svg_root.find('g', id='breadboard')
-        self.assertTrue(bb is not None,'drawing should contain breadboard group')
+        self.assertTrue(bb is not None,'project should contain breadboard group')
 
 
 class BreadboardTest(TestCase):

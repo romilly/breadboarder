@@ -2,7 +2,7 @@
 from xml.etree.ElementTree import Element
 
 from .breadboard import Breadboard
-from .drawing import Point, Rectangle, GroupedDrawable, Text, Drawable
+from .project import Point, Rectangle, GroupedDrawable, Text, Drawable
 
 from .components import Component
 

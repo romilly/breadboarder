@@ -537,6 +537,19 @@ I'll need to write unit tests of each component that cover insertion.</pre>
 
 Connections will need a re-think when I do polarised and three-legged components, but I can do a crystal and some headers.</pre>
 </div>
+<div title="6 September 2017" creator="RomillyCocking" modifier="RomillyCocking" created="201709060803" tags="journal" changecount="1">
+<pre>I realised yesterday that I need to change the ways that connections are handled in order to support multiple breadboards or a breadboard and Arduino, MicroBit or Pi.
+
+I had already planned to refactor the way that connection works, so this is a good time to make the change.
+
+Main changes:
+#. Drawing should be renamed //Project// as it will eventually be described by text as well as by a drawing.
+#. Components may connect two //hosts// (two breadboards, or a breadboard and an Arduino) so they should belong to the Project rather than a breadboard.
+#. This means that the location of a port (connection point) is determined by its location relative to its host offset by the location of the host.
+#. A component should always be created //with its connections//.
+
+</pre>
+</div>
 <div title="DefaultTiddlers" creator="RomillyCocking" modifier="RomillyCocking" created="201708270919" changecount="1">
 <pre>[[Plan]]</pre>
 </div>
@@ -587,6 +600,27 @@ and a calculator at Joe Walne's super [[resisto.rs|http://resisto.rs/]]
 
 This site covers the [[E3, E6, E12 and E24 ranges.|https://www.electronics-notes.com/articles/electronic_components/resistors/standard-resistor-values-e-series-e3-e6-e12-e24-e48-e96.php]]
 </pre>
+</div>
+<div title="Route Map" creator="RomillyCocking" modifier="RomillyCocking" created="201709060754" modified="201709060803" changecount="4">
+<pre>! Version 1
+
+All the code needed to illustrate [[Making the Shrimp|]] 2nd edition: ATmega328, resistors, capacitors (unpolarised), crystal, headers, button, LED and (maybe) the USB-to-serial interface.
+
+! Version 2
+
+All the code needed to create the text and illustrations for //Life After Blink//. You can use two breadboards, or a breadboard and classic Arduino Uno.
+
+! Version 3
+
+Offer a restricted natural language alternative to the Python DSL. Add the Pi (and micro:bit?) as hosts.
+
+! Version 4
+
+Web-based Application that allows you to enter text and display/download the SVG.
+
+! Version 5
+
+Add the ability to draw/connect components in the browser and generate the script.</pre>
 </div>
 <div title="SVG color codes" creator="RomillyCocking" modifier="RomillyCocking" created="201709040914" changecount="1">
 <pre>http://www.december.com/html/spec/colorsvg.html</pre>
