@@ -58,19 +58,30 @@ class Resistor(TwoPinComponent):
 
     def add_elements(self, start, end):
         # coordinates are relative to the Resistor's start
-        extent = end - start
-        length = extent.r()
-        total_wire_length = length - self.body_width
-        offset = Point(total_wire_length, -self.body_height).scale(0.5)
-        self.add(horizontal_line(Point(0,0), length, color='grey', stroke_width=2, linecap='round'))
+        vector = end - start
+        length = vector.r()
+        offset = self.add_wire(length)
+        body, rectangle = self.add_body()
+        self.add_bands(body)
+        body.add(Text(self.text(), rectangle.center() + Point(0, 1.5),
+                      anchor='middle', color='grey', size=3))
+        self.rotate(vector.theta(), start)
+        self.add(body.move_to(offset))
+
+    def text(self):
+        return ' '.join([self.resistance, self.tolerance])
+
+    def add_body(self):
         body = GroupedDrawable(svg_id='resistor body')
         rectangle = Rectangle(self.body_width, self.body_height, fill='beige')
         body.add(rectangle)
-        self.add_bands(body)
-        body.add(Text(' '.join([self.resistance, self.tolerance]), rectangle.center()+Point(0,1.5),
-                      anchor='middle', color='grey', size=3))
-        self.rotate(extent.theta(), start)
-        self.add(body.move_to(offset))
+        return body, rectangle
+
+    def add_wire(self, length):
+        total_wire_length = length - self.body_width
+        offset = Point(total_wire_length, -self.body_height).scale(0.5)
+        self.add(horizontal_line(Point(0, 0), length, color='grey', stroke_width=2, linecap='round'))
+        return offset
 
     def add_bands(self,body):
         band_colors = self.coder.bands_for(self.coder.parse(self.resistance))
