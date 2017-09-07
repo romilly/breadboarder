@@ -39,5 +39,5 @@ class ColorCode:
         multiplier = zeros + exponent
         return list(colors[digit] for digit in start)+[multiplier_color[multiplier]]
 
-    def band_for_tolerance(self, tolerance):
+    def tolerance_band(self, tolerance):
         return tolerance_bands[tolerance]

@@ -1,5 +1,5 @@
+import abc
 from .project import Point, GroupedDrawable, Rectangle, Line, Circle, Text, horizontal_line
-
 from .breadboard import Breadboard
 from breadboarder.helpers.color_codes import ColorCode
 
@@ -9,7 +9,6 @@ class Button(GroupedDrawable):
         GroupedDrawable.__init__(self, svg_id='Button')
         if len(ports) is not 1:
             raise Exception('buttons only need one position for insertion') # for now :)
-        # self.start = ports[0].location()
         width = Breadboard.PITCH * 2
         height = Breadboard.PITCH * 3 - 6
         rectangle = Rectangle(width, height)
@@ -31,16 +30,19 @@ class Wire(Line):
 
 
 class TwoPinComponent(GroupedDrawable):
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self, ports, svg_id):
         GroupedDrawable.__init__(self, svg_id=svg_id)
         start, end = ports
-        self.start = start.location()
-        self.end = end.location()
-        self.add_elements()
-        self.move_to(start.location())
+        start = start.location()
+        end = end.location()
+        self.add_elements(start, end)
+        self.move_to(start)
 
-    def add_elements(self):
-        raise Exception('My SubClass should have implemented this message')
+    @abc.abstractmethod
+    def add_elements(self, start, end):
+        pass
 
 
 class Resistor(TwoPinComponent):
@@ -54,11 +56,10 @@ class Resistor(TwoPinComponent):
         self.tolerance = tolerance
         TwoPinComponent.__init__(self, ports, svg_id='Resistor')
 
-    def add_elements(self):
+    def add_elements(self, start, end):
         # coordinates are relative to the Resistor's start
-        extent = self.end - self.start
+        extent = end - start
         length = extent.r()
-        theta = extent.theta()
         total_wire_length = length - self.body_width
         offset = Point(total_wire_length, -self.body_height).scale(0.5)
         self.add(horizontal_line(Point(0,0), length, color='grey', stroke_width=2, linecap='round'))
@@ -66,16 +67,20 @@ class Resistor(TwoPinComponent):
         rectangle = Rectangle(self.body_width, self.body_height, fill='beige')
         body.add(rectangle)
         self.add_bands(body)
-        body.add(Text(' '.join([self.resistance, self.tolerance]), rectangle.center()+Point(0,1.5), anchor='middle', color='grey', size=3))
-        self.rotate(theta, self.start)
+        body.add(Text(' '.join([self.resistance, self.tolerance]), rectangle.center()+Point(0,1.5),
+                      anchor='middle', color='grey', size=3))
+        self.rotate(extent.theta(), start)
         self.add(body.move_to(offset))
 
     def add_bands(self,body):
         band_colors = self.coder.bands_for(self.coder.parse(self.resistance))
         for (i, band) in enumerate(band_colors):
-            body.add(Rectangle(self.band_width, self.band_height, fill=band, stroke=None).move_to(Point(5 + 5*i,0.5)))
-        tolerance_band_color = self.coder.band_for_tolerance(self.tolerance)
-        body.add(Rectangle(self.band_width, self.band_height, fill=tolerance_band_color, stroke=None).move_to(Point(self.body_width-3, 0.5)))
+            body.add(self.colored_band(5 + 5 * i, band))
+        body.add(self.colored_band(self.body_width - 3, self.coder.tolerance_band(self.tolerance)))
+
+    def colored_band(self, loc, tolerance_band_color):
+        return Rectangle(self.band_width, self.band_height, fill=tolerance_band_color,
+                         stroke=None).move_to(Point(loc, 0.5))
 
 
 class Crystal(TwoPinComponent):
@@ -85,11 +90,10 @@ class Crystal(TwoPinComponent):
         self.body_height = Breadboard.PITCH
         TwoPinComponent.__init__(self, ports, svg_id='Crystal')
 
-    def add_elements(self):
+    def add_elements(self, start, end):
         # coordinates are relative to the Crystal's's start
-        extent = self.end - self.start
+        extent = end - start
         length = extent.r()
-        theta = extent.theta()
         total_wire_length = length - self.body_width
         offset = Point(total_wire_length, -self.body_height).scale(0.5)
         self.add(horizontal_line(Point(0,0), length, color='grey', stroke_width=2, linecap='round'))
@@ -97,6 +101,6 @@ class Crystal(TwoPinComponent):
         rectangle = Rectangle(self.body_width, self.body_height, fill='gray', stroke='lightgray', rx='4', ry='4')
         body.add(rectangle)
         body.add(Text(self.frequency, rectangle.center()+Point(0,1.5), anchor='middle', color='black', size=3))
-        self.rotate(theta, self.start)
+        self.rotate(extent.theta(), start)
         self.add(body.move_to(offset))
 

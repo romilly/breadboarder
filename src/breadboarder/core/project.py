@@ -1,7 +1,6 @@
 import abc
-from xml.etree.ElementTree import Element, tostring, ElementTree
-
 import math
+from xml.etree.ElementTree import Element, tostring, ElementTree
 
 
 class Point():
@@ -111,11 +110,10 @@ class Rotation(Transform):
 
 
 class GroupedDrawable(CompositeItem):
-    def __init__(self, svg_id=None, origin=Point(0,0)):
+    def __init__(self, svg_id=None):
         CompositeItem.__init__(self)
         self.svg_id = svg_id
         self.angle = 0
-        # self.origin = origin
         self.transformations = []
 
     def transformation(self):
