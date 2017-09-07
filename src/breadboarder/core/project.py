@@ -40,7 +40,7 @@ class Point():
         return math.degrees(math.atan2(self.y, self.x))
 
 
-class Drawable():
+class Drawable:
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, start):
@@ -56,6 +56,8 @@ class Drawable():
 
 
 class CompositeItem(Drawable):
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self,start=Point(0,0)):
         Drawable.__init__(self, start)
         self._children = []
@@ -69,9 +71,9 @@ class CompositeItem(Drawable):
             svg.append(child.svg())
         return svg
 
+    @abc.abstractmethod
     def container(self):
-        raise Exception('My SubClass should have implemented this method')
-
+        pass
 
 class Project(CompositeItem):
 
@@ -84,8 +86,11 @@ class Project(CompositeItem):
 
 class Transform():
     """Represents an atomic svg transformation - a translation, rotation or scaling"""
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def text(self):
-        raise Exception('my SubClass should have implemented this method')
+        pass
 
 
 class Translation(Transform):
