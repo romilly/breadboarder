@@ -2,15 +2,15 @@ from xml.etree.ElementTree import Element
 
 from breadboarder.core.project import Rectangle, horizontal_line, Text, Point, GroupedDrawable
 
+
 class Port():
     # the socket or pin belonging to a host that a component can be connected to
-    def __init__(self, host, relative_location, label):
+    def __init__(self, host, relative_location):
         self.host = host
         self.relative_location = relative_location
-        self.label = label
 
     def location(self):
-        return self.relative_location + self.host.origin
+        return self.relative_location + self.host.start
 
 
 class SocketGroup(GroupedDrawable):
@@ -22,7 +22,7 @@ class SocketGroup(GroupedDrawable):
             for j in range(rows):
                 socket = self.socket().set_center(center.x + Breadboard.PITCH * i, center.y + Breadboard.PITCH * j)
                 label = alpha_labels[j] + str(i + start_number)
-                host.add_port(Port(host, socket.center(), label))
+                host.add_port(Port(host, socket.center()), label)
                 self.add(socket)
 
     def socket(self):
@@ -63,8 +63,8 @@ class Breadboard(GroupedDrawable):
         self.inter_power_group_spacing = 53.5
         self.add_components()
 
-    def add_port(self, port):
-        self.ports[port.label] = port
+    def add_port(self, port, label):
+        self.ports[label] = port
 
     def add_components(self):
         self.add(Rectangle(self.width, self.height, fill='white'))

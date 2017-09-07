@@ -1,3 +1,4 @@
+import abc
 from xml.etree.ElementTree import Element, tostring, ElementTree
 
 import math
@@ -40,18 +41,18 @@ class Point():
 
 
 class Drawable():
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self, start):
         self.start = start
 
+    @abc.abstractmethod
     def svg(self):
-        raise Exception('my SubClass should have implemented this method')
+        pass
 
     def move_to(self, point):
         self.start = point
         return self
-
-    def move_by(self, amount):
-        self.start = self.start + amount
 
 
 class CompositeItem(Drawable):
@@ -86,6 +87,7 @@ class Transform():
     def text(self):
         raise Exception('my SubClass should have implemented this method')
 
+
 class Translation(Transform):
     def __init__(self, vector):
         self.vector = vector
@@ -108,7 +110,7 @@ class GroupedDrawable(CompositeItem):
         CompositeItem.__init__(self)
         self.svg_id = svg_id
         self.angle = 0
-        self.origin = origin
+        # self.origin = origin
         self.transformations = []
 
     def transformation(self):

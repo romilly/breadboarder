@@ -1,29 +1,30 @@
 from unittest import TestCase
 from xml.etree.ElementTree import tostring
 
-from breadboarder.core.breadboard import Port, Breadboard
+from breadboarder.core.breadboard import Port
 from breadboarder.core.dil import atMega328
 from breadboarder.core.project import Point
 from bs4 import BeautifulSoup
-from hamcrest import assert_that, is_
+from hamcrest import assert_that
 
-from breadboarder.core.components import Wire, Button, Resistor
+from breadboarder.core.components import Wire, Resistor
 from breadboarder.helpers.test_helpers import is_located_at, contains_svg_rectangle
-
-
-class WireTest(TestCase):
-    def test_inserts_itself(self):
-        wire = Wire('black', Port(MockHost(), Point(1,2),'one'), Port(MockHost(), Point(3,4), 'two'))
-        assert_that(wire.start, is_located_at(Point(1,2)))
-        assert_that(wire.end(), is_located_at(Point(3,4)))
 
 
 class MockHost():
     def __init__(self):
-        self.origin = Point(0,0)
+        self.start = Point(0,0)
+
 
 def test_port(x, y):
-    return Port(MockHost(), Point(x,y), 'whocares?')
+    return Port(MockHost(), Point(x,y))
+
+
+class WireTest(TestCase):
+    def test_inserts_itself(self):
+        wire = Wire('black', test_port(1,2), test_port(3,4))
+        assert_that(wire.start, is_located_at(Point(1,2)))
+        assert_that(wire.end(), is_located_at(Point(3,4)))
 
 
 class DilTest(TestCase):
