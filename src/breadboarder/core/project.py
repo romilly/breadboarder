@@ -29,11 +29,11 @@ class Point():
     def __str__(self):
         return 'a Point(%s,%s)' % (str(self.x),str(self.y))
 
-    def cartesian_coords(self):
+    def cartesian_coordinates(self):
         return (self.x, self.y)
 
     def r(self):
-        return math.sqrt(sum((self*self).cartesian_coords()))
+        return math.sqrt(sum((self*self).cartesian_coordinates()))
 
     def theta(self):
         return math.degrees(math.atan2(self.y, self.x))
@@ -44,7 +44,7 @@ class Drawable():
         self.start = start
 
     def svg(self):
-        raise Exception('my subclass should have implemented this method')
+        raise Exception('my SubClass should have implemented this method')
 
     def move_to(self, point):
         self.start = point
@@ -69,7 +69,7 @@ class CompositeItem(Drawable):
         return svg
 
     def container(self):
-        raise Exception('My Subclass should have implemented this method')
+        raise Exception('My SubClass should have implemented this method')
 
 
 class Project(CompositeItem):
@@ -81,22 +81,51 @@ class Project(CompositeItem):
         return tostring(self.svg())
 
 
+class Transform():
+    """Represents an atomic svg transformation - a translation, rotation or scaling"""
+    def text(self):
+        raise Exception('my SubClass should have implemented this method')
+
+class Translation(Transform):
+    def __init__(self, vector):
+        self.vector = vector
+
+    def text(self):
+        return 'translate(%f,%f)' % (self.vector.cartesian_coordinates())
+
+
+class Rotation(Transform):
+    def __init__(self, angle, origin=Point(0,0)):
+        self.angle = angle
+        self.origin = origin
+
+    def text(self):
+        return 'rotate(%f,%f,%f)' % (self.angle, self.origin.x, self.origin.y)
+
+
 class GroupedDrawable(CompositeItem):
     def __init__(self, svg_id=None, origin=Point(0,0)):
         CompositeItem.__init__(self)
         self.svg_id = svg_id
         self.angle = 0
         self.origin = origin
+        self.transformations = []
+
+    def transformation(self):
+        return ' '.join([t.text() for t in self.transformations])
 
     def container(self):
-            group = Element('g', transform='rotate(%f,%f,%f) translate(%f,%f)' % (self.angle, self.origin.x, self.origin.y, self.start.x, self.start.y))
+            group = Element('g', transform=self.transformation())
             if self.svg_id is not None:
                 group.set('id',self.svg_id)
             return group
 
     def rotate(self, theta, origin=Point(0,0)):
-        self.angle = theta
-        self.origin = origin
+        self.transformations.append(Rotation(theta, origin))
+        return self
+
+    def move_to(self, point):
+        self.transformations.append(Translation(point))
         return self
 
 

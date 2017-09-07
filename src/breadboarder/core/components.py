@@ -9,24 +9,19 @@ class Button(GroupedDrawable):
         GroupedDrawable.__init__(self, svg_id='Button')
         if len(ports) is not 1:
             raise Exception('buttons only need one position for insertion') # for now :)
-        self.start = ports[0].location()
+        # self.start = ports[0].location()
         width = Breadboard.PITCH * 2
         height = Breadboard.PITCH * 3 - 6
         rectangle = Rectangle(width, height)
         self.add(rectangle)
         self.add(Circle(rectangle.center(), Breadboard.PITCH, fill='green'))
+        self.move_to(ports[0].location())
 
     def width(self):
         return 4 + Breadboard.PITCH * 2
 
     def height(self):
         return Breadboard.PITCH * 2
-
-    def extent(self):
-        return Point(self.width(), self.height())
-
-    def center(self):
-        return self.start + self.extent().scale(0.5)
 
 
 class Wire(Line):
@@ -42,9 +37,10 @@ class TwoPinComponent(GroupedDrawable):
         self.start = start.location()
         self.end = end.location()
         self.add_elements()
+        self.move_to(start.location())
 
     def add_elements(self):
-        raise Exception('My subclass should have implemented this message')
+        raise Exception('My SubClass should have implemented this message')
 
 
 class Resistor(TwoPinComponent):

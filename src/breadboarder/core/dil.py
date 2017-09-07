@@ -24,20 +24,19 @@ class DIL(GroupedDrawable):
         self.name = name
         self.labels = labels
         self.add_parts()
-        self.start = port.location() - Point(2, -1) # for visual correctness
+        self.move_to(port.location() - Point(2, -1)) # for visual correctness
 
     def pins_per_side(self):
         return int(self.pins/2)
 
     def center(self):
-        return self.start + self.extent().scale(0.5)
+        return self.extent().scale(0.5)
 
     def width(self):
         return 4 + Breadboard.PITCH * (self.pins_per_side()-1)
 
     def height(self):
-        # TODO The height is fixed, and does not depend on start.y! Change this
-        return self.start.y + 3 * (Breadboard.PITCH - 1) -2
+        return 3 * (Breadboard.PITCH - 1) -2
 
     def add_parts(self):
         self.add(Rectangle(self.width(), self.height(), fill='grey', stroke='grey'))

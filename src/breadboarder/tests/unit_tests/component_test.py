@@ -26,16 +26,10 @@ def test_port(x, y):
     return Port(MockHost(), Point(x,y), 'whocares?')
 
 
-class ButtonTest(TestCase):
-    def test_inserts_itself(self):
-        button = Button(test_port(1,3))
-        assert_that(button.start, is_located_at(Point(1,3)))
-
-
 class DilTest(TestCase):
     def test_inserts_itself(self):
         dil = atMega328(test_port(2, 5))
-        assert_that(dil.start, is_located_at(Point(0,6)),'dil should be offset for visual fidelity')
+        assert_that(dil.transformations[0].vector, is_located_at(Point(0,6)),'dil should be offset for visual fidelity')
 
 
 class ResistorTest(TestCase):
