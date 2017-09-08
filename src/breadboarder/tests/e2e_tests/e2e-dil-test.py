@@ -2,7 +2,8 @@ from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.dil import atMega328, pcf8574
 from breadboarder.core.project import Project, write
 
-from breadboarder.core.components import Wire, Button, Resistor, Crystal
+from breadboarder.core.components import Wire, Button, Resistor, Crystal, Diode
+
 
 # TODO: add image-based testing
 
@@ -24,6 +25,7 @@ def test_dil():
     project.add(Resistor('2R7', '5%', breadboard['g25'],breadboard['a25']))
     project.add(Resistor('1M2', '5%', breadboard['g27'],breadboard['a30']))
     project.add(Crystal('16Mz', breadboard['g24'],breadboard['a29']))
+    project.add(Diode('1N4001', breadboard['d24'],breadboard['f24']))
     svg = project.svg()
     write(svg, 'svg/dil.svg')
 

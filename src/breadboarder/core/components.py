@@ -29,11 +29,10 @@ class Wire(Line):
         Line.__init__(self, start.location(), end.location(), color, stroke_width=3, linecap='round')
 
 
-# TODO: move common code up from resistor
 class TwoPinComponent(GroupedDrawable):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, ports, svg_id):
+    def __init__(self, svg_id, ports):
         GroupedDrawable.__init__(self, svg_id=svg_id)
         self.body_width = 3 * Breadboard.PITCH
         self.body_height = Breadboard.PITCH
@@ -68,14 +67,46 @@ class TwoPinComponent(GroupedDrawable):
         pass
 
 
-class Resistor(TwoPinComponent):
-    def __init__(self, resistance, tolerance, *ports):
+class BandedTwoPinComponent(TwoPinComponent):
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, svg_id, ports):
         self.band_width = 2
         self.band_height = Breadboard.PITCH-1
+        TwoPinComponent.__init__(self, svg_id, ports)
+
+    def colored_band(self, loc, color):
+            return Rectangle(self.band_width, self.band_height, fill=color,
+                             stroke=None).move_to(Point(loc, 0.5))
+
+
+class Diode(BandedTwoPinComponent):
+    def __init__(self, model, *ports):
+        self.model = model
+        BandedTwoPinComponent.__init__(self, 'diode', ports)
+
+
+    def build(self):
+        body = GroupedDrawable(svg_id='diode body')
+        rectangle = Rectangle(self.body_width, self.body_height, fill='black')
+        body.add(rectangle)
+        self.add_bands(body)
+        return body, (rectangle.center())
+
+    def add_bands(self,body):
+        body.add(self.colored_band(2, 'gray'))
+
+
+    def text(self):
+        return self.model
+
+
+class Resistor(BandedTwoPinComponent):
+    def __init__(self, resistance, tolerance, *ports):
         self.resistance = resistance
         self.coder = ColorCode()
         self.tolerance = tolerance
-        TwoPinComponent.__init__(self, ports, svg_id='Resistor')
+        BandedTwoPinComponent.__init__(self, 'Resistor', ports)
 
     def build(self):
         body = GroupedDrawable(svg_id='resistor body')
@@ -93,16 +124,12 @@ class Resistor(TwoPinComponent):
             body.add(self.colored_band(5 + 5 * i, band))
         body.add(self.colored_band(self.body_width - 3, self.coder.tolerance_band(self.tolerance)))
 
-    def colored_band(self, loc, tolerance_band_color):
-        return Rectangle(self.band_width, self.band_height, fill=tolerance_band_color,
-                         stroke=None).move_to(Point(loc, 0.5))
-
 
 class Crystal(TwoPinComponent):
     def __init__(self, frequency, *ports):
         self.frequency = frequency
         self.body_width = 2 * Breadboard.PITCH
-        TwoPinComponent.__init__(self, ports, svg_id='Crystal')
+        TwoPinComponent.__init__(self, 'Crystal', ports)
 
     def build(self):
         body = GroupedDrawable(svg_id='crystal body')
