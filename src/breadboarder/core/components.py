@@ -3,7 +3,7 @@ from .project import Point, GroupedDrawable, Rectangle, Line, Circle, Text, hori
 from .breadboard import Breadboard
 from breadboarder.helpers.color_codes import ColorCode
 
-
+# TODO: button needs a small offset
 class Button(GroupedDrawable):
     def __init__(self, *ports):
         GroupedDrawable.__init__(self, svg_id='Button')
