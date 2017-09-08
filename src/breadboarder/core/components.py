@@ -28,7 +28,7 @@ class Wire(Line):
         start, end = ports
         Line.__init__(self, start.location(), end.location(), color, stroke_width=3, linecap='round')
 
-
+# TODO: move common code up from resistor
 class TwoPinComponent(GroupedDrawable):
     __metaclass__ = abc.ABCMeta
 
@@ -47,8 +47,8 @@ class TwoPinComponent(GroupedDrawable):
 
 class Resistor(TwoPinComponent):
     def __init__(self, resistance, tolerance, *ports):
-        self.band_height = Breadboard.PITCH-1
         self.band_width = 2
+        self.band_height = Breadboard.PITCH-1
         self.body_width = 3 * Breadboard.PITCH
         self.body_height = Breadboard.PITCH
         self.resistance = resistance
@@ -61,21 +61,22 @@ class Resistor(TwoPinComponent):
         vector = end - start
         length = vector.r()
         offset = self.add_wire(length)
-        body, rectangle = self.add_body()
-        self.add_bands(body)
-        body.add(Text(self.text(), rectangle.center() + Point(0, 1.5),
+        body, center = self.build()
+        body.add(Text(self.text(), center + Point(0, 1.5),
                       anchor='middle', color='grey', size=3))
         self.rotate(vector.theta(), start)
         self.add(body.move_to(offset))
 
-    def text(self):
-        return ' '.join([self.resistance, self.tolerance])
-
-    def add_body(self):
+    def build(self):
         body = GroupedDrawable(svg_id='resistor body')
         rectangle = Rectangle(self.body_width, self.body_height, fill='beige')
         body.add(rectangle)
-        return body, rectangle
+        self.add_bands(body)
+        return body, (rectangle.center())
+
+    def text(self):
+        return ' '.join([self.resistance, self.tolerance])
+
 
     def add_wire(self, length):
         total_wire_length = length - self.body_width

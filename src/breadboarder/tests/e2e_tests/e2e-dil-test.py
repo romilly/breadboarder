@@ -4,6 +4,7 @@ from breadboarder.core.project import Project, write
 
 from breadboarder.core.components import Wire, Button, Resistor, Crystal
 
+# TODO: add image-based testing
 
 def test_dil():
     project = Project()
