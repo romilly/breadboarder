@@ -28,36 +28,22 @@ class Wire(Line):
         start, end = ports
         Line.__init__(self, start.location(), end.location(), color, stroke_width=3, linecap='round')
 
+
 # TODO: move common code up from resistor
 class TwoPinComponent(GroupedDrawable):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, ports, svg_id):
         GroupedDrawable.__init__(self, svg_id=svg_id)
+        self.body_width = 3 * Breadboard.PITCH
+        self.body_height = Breadboard.PITCH
         start, end = ports
         start = start.location()
         end = end.location()
         self.add_elements(start, end)
         self.move_to(start)
 
-    @abc.abstractmethod
     def add_elements(self, start, end):
-        pass
-
-
-class Resistor(TwoPinComponent):
-    def __init__(self, resistance, tolerance, *ports):
-        self.band_width = 2
-        self.band_height = Breadboard.PITCH-1
-        self.body_width = 3 * Breadboard.PITCH
-        self.body_height = Breadboard.PITCH
-        self.resistance = resistance
-        self.coder = ColorCode()
-        self.tolerance = tolerance
-        TwoPinComponent.__init__(self, ports, svg_id='Resistor')
-
-    def add_elements(self, start, end):
-        # coordinates are relative to the Resistor's start
         vector = end - start
         length = vector.r()
         offset = self.add_wire(length)
@@ -66,6 +52,30 @@ class Resistor(TwoPinComponent):
                       anchor='middle', color='grey', size=3))
         self.rotate(vector.theta(), start)
         self.add(body.move_to(offset))
+
+    def add_wire(self, length):
+        total_wire_length = length - self.body_width
+        offset = Point(total_wire_length, -self.body_height).scale(0.5)
+        self.add(horizontal_line(Point(0, 0), length, color='grey', stroke_width=2, linecap='round'))
+        return offset
+
+    @abc.abstractmethod
+    def build(self):
+        return (None, None)
+
+    @abc.abstractmethod
+    def text(self):
+        pass
+
+
+class Resistor(TwoPinComponent):
+    def __init__(self, resistance, tolerance, *ports):
+        self.band_width = 2
+        self.band_height = Breadboard.PITCH-1
+        self.resistance = resistance
+        self.coder = ColorCode()
+        self.tolerance = tolerance
+        TwoPinComponent.__init__(self, ports, svg_id='Resistor')
 
     def build(self):
         body = GroupedDrawable(svg_id='resistor body')
@@ -76,13 +86,6 @@ class Resistor(TwoPinComponent):
 
     def text(self):
         return ' '.join([self.resistance, self.tolerance])
-
-
-    def add_wire(self, length):
-        total_wire_length = length - self.body_width
-        offset = Point(total_wire_length, -self.body_height).scale(0.5)
-        self.add(horizontal_line(Point(0, 0), length, color='grey', stroke_width=2, linecap='round'))
-        return offset
 
     def add_bands(self,body):
         band_colors = self.coder.bands_for(self.coder.parse(self.resistance))
@@ -99,20 +102,14 @@ class Crystal(TwoPinComponent):
     def __init__(self, frequency, *ports):
         self.frequency = frequency
         self.body_width = 2 * Breadboard.PITCH
-        self.body_height = Breadboard.PITCH
         TwoPinComponent.__init__(self, ports, svg_id='Crystal')
 
-    def add_elements(self, start, end):
-        # coordinates are relative to the Crystal's's start
-        extent = end - start
-        length = extent.r()
-        total_wire_length = length - self.body_width
-        offset = Point(total_wire_length, -self.body_height).scale(0.5)
-        self.add(horizontal_line(Point(0,0), length, color='grey', stroke_width=2, linecap='round'))
-        body = GroupedDrawable(svg_id='resistor body')
-        rectangle = Rectangle(self.body_width, self.body_height, fill='gray', stroke='lightgray', rx='4', ry='4')
+    def build(self):
+        body = GroupedDrawable(svg_id='crystal body')
+        rectangle = Rectangle(self.body_width, self.body_height, fill='lightgray', stroke='gray', rx='4', ry='4')
         body.add(rectangle)
-        body.add(Text(self.frequency, rectangle.center()+Point(0,1.5), anchor='middle', color='black', size=3))
-        self.rotate(extent.theta(), start)
-        self.add(body.move_to(offset))
+        return body, (rectangle.center())
+
+    def text(self):
+        return self.frequency
 
