@@ -1,7 +1,9 @@
 import abc
-from .project import Point, GroupedDrawable, Rectangle, Line, Circle, Text, horizontal_line
-from .breadboard import Breadboard
+
 from breadboarder.helpers.color_codes import ColorCode
+from .breadboard import Breadboard
+from .project import Point, GroupedDrawable, Rectangle, Line, Circle, Text, horizontal_line
+
 
 # TODO: button needs a small offset
 class Button(GroupedDrawable):
@@ -46,9 +48,7 @@ class TwoPinComponent(GroupedDrawable):
         vector = end - start
         length = vector.r()
         offset = self.add_wire(length)
-        body, center = self.build()
-        body.add(Text(self.text(), center + Point(0, 1.5),
-                      anchor='middle', color='grey', size=3))
+        body = self.build()
         self.rotate(vector.theta(), start)
         self.add(body.move_to(offset))
 
@@ -58,8 +58,15 @@ class TwoPinComponent(GroupedDrawable):
         self.add(horizontal_line(Point(0, 0), length, color='grey', stroke_width=2, linecap='round'))
         return offset
 
-    @abc.abstractmethod
     def build(self):
+        body, center = self.build_body()
+        body.add(Text(self.text(), center + Point(0, 1.5),
+                      anchor='middle', color='grey', size=3))
+        return body
+
+
+    @abc.abstractmethod
+    def build_body(self):
         return (None, None)
 
     @abc.abstractmethod
@@ -79,19 +86,25 @@ class BandedTwoPinComponent(TwoPinComponent):
             return Rectangle(self.band_width, self.band_height, fill=color,
                              stroke=None).move_to(Point(loc, 0.5))
 
+    def bb(self, fill, svg_id):
+        body = GroupedDrawable(svg_id=svg_id)
+        rectangle = Rectangle(self.body_width, self.body_height, fill=fill)
+        body.add(rectangle)
+        self.add_bands(body)
+        return body, rectangle.center()
+
+    @abc.abstractmethod
+    def add_bands(self, body):
+        pass
+
 
 class Diode(BandedTwoPinComponent):
     def __init__(self, model, *ports):
         self.model = model
         BandedTwoPinComponent.__init__(self, 'diode', ports)
 
-
-    def build(self):
-        body = GroupedDrawable(svg_id='diode body')
-        rectangle = Rectangle(self.body_width, self.body_height, fill='black')
-        body.add(rectangle)
-        self.add_bands(body)
-        return body, (rectangle.center())
+    def build_body(self):
+        return self.bb('black', 'diode body')
 
     def add_bands(self,body):
         body.add(self.colored_band(2, 'gray'))
@@ -108,12 +121,8 @@ class Resistor(BandedTwoPinComponent):
         self.tolerance = tolerance
         BandedTwoPinComponent.__init__(self, 'Resistor', ports)
 
-    def build(self):
-        body = GroupedDrawable(svg_id='resistor body')
-        rectangle = Rectangle(self.body_width, self.body_height, fill='beige')
-        body.add(rectangle)
-        self.add_bands(body)
-        return body, (rectangle.center())
+    def build_body(self):
+        return self.bb('beige', 'resistor body')
 
     def text(self):
         return ' '.join([self.resistance, self.tolerance])
@@ -131,7 +140,7 @@ class Crystal(TwoPinComponent):
         self.body_width = 2 * Breadboard.PITCH
         TwoPinComponent.__init__(self, 'Crystal', ports)
 
-    def build(self):
+    def build_body(self):
         body = GroupedDrawable(svg_id='crystal body')
         rectangle = Rectangle(self.body_width, self.body_height, fill='lightgray', stroke='gray', rx='4', ry='4')
         body.add(rectangle)
