@@ -2,7 +2,7 @@ import abc
 
 from breadboarder.helpers.color_codes import ColorCode
 from .breadboard import Breadboard
-from .project import Point, GroupedDrawable, Rectangle, Line, Circle, Text, horizontal_line
+from .project import Point, GroupedDrawable, Rectangle, Line, Circle, Text, horizontal_line, Drawable
 
 
 # TODO: button needs a small offset
@@ -34,13 +34,14 @@ class Wire(Line):
 class TwoPinComponent(GroupedDrawable):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, svg_id, ports):
+    def __init__(self, svg_id, body, ports):
         GroupedDrawable.__init__(self, svg_id=svg_id)
         self.body_width = 3 * Breadboard.PITCH
         self.body_height = Breadboard.PITCH
         start, end = ports
         start = start.location()
         end = end.location()
+        self.body = body
         self.add_elements(start, end)
         self.move_to(start)
 
@@ -48,9 +49,10 @@ class TwoPinComponent(GroupedDrawable):
         vector = end - start
         length = vector.r()
         offset = self.add_wire(length)
-        body = self.build()
+        self.add_bands(self.body)
+        self.body.add_text(self.text())
         self.rotate(vector.theta(), start)
-        self.add(body.move_to(offset))
+        self.add(self.body.move_to(offset))
 
     def add_wire(self, length):
         total_wire_length = length - self.body_width
@@ -58,94 +60,81 @@ class TwoPinComponent(GroupedDrawable):
         self.add(horizontal_line(Point(0, 0), length, color='grey', stroke_width=2, linecap='round'))
         return offset
 
-    def build(self):
-        body, center = self.build_body()
-        body.add(Text(self.text(), center + Point(0, 1.5),
-                      anchor='middle', color='grey', size=3))
-        return body
-
-
-    @abc.abstractmethod
-    def build_body(self):
-        return (None, None)
+    def add_bands(self, body):
+        # default is to do nothing
+        pass
 
     @abc.abstractmethod
     def text(self):
         pass
 
 
-class BandedTwoPinComponent(TwoPinComponent):
-    __metaclass__ = abc.ABCMeta
+class Body(GroupedDrawable):
+    def __init__(self, fill):
+        GroupedDrawable.__init__(self)
+        self.body_width = 3 * Breadboard.PITCH
+        self.body_height = Breadboard.PITCH
+        self.rectangle = Rectangle(self.body_width, self.body_height, fill=fill)
+        self.add(self.rectangle)
+        self.band_positions = [5 + 5*i for i in range(3)]
+        self.band_positions.append(self.body_width - 3)
 
-    def __init__(self, svg_id, ports):
-        self.band_width = 2
-        self.band_height = Breadboard.PITCH-1
-        TwoPinComponent.__init__(self, svg_id, ports)
+    def add_text(self, text):
+        self.add(Text(text, self.rectangle.center() + Point(0, 1.5),
+             anchor='middle', color='grey', size=3))
 
-    def colored_band(self, loc, color):
-            return Rectangle(self.band_width, self.band_height, fill=color,
-                             stroke=None).move_to(Point(loc, 0.5))
-
-    def bb(self, fill, svg_id):
-        body = GroupedDrawable(svg_id=svg_id)
-        rectangle = Rectangle(self.body_width, self.body_height, fill=fill)
-        body.add(rectangle)
-        self.add_bands(body)
-        return body, rectangle.center()
-
-    @abc.abstractmethod
-    def add_bands(self, body):
-        pass
+    def add_band(self, color, index=-1):
+        self.add(band(color, self.band_positions[index]))
 
 
-class Diode(BandedTwoPinComponent):
-    def __init__(self, model, *ports):
-        self.model = model
-        BandedTwoPinComponent.__init__(self, 'diode', ports)
+def band(color, location):
+        band_width = 2
+        band_height = Breadboard.PITCH
+        return Rectangle(band_width, band_height, fill=color, stroke=color).move_to(Point(location, 0))
 
-    def build_body(self):
-        return self.bb('black', 'diode body')
+
+class Diode(TwoPinComponent):
+    def __init__(self, name, *ports):
+        self.name = name
+        TwoPinComponent.__init__(self, 'diode', Body('black'), ports)
 
     def add_bands(self,body):
-        body.add(self.colored_band(2, 'gray'))
-
+        body.add_band('gray')
 
     def text(self):
-        return self.model
+        return self.name
 
 
-class Resistor(BandedTwoPinComponent):
+class Resistor(TwoPinComponent):
     def __init__(self, resistance, tolerance, *ports):
         self.resistance = resistance
         self.coder = ColorCode()
         self.tolerance = tolerance
-        BandedTwoPinComponent.__init__(self, 'Resistor', ports)
+        TwoPinComponent.__init__(self, 'Resistor', Body('beige'), ports)
 
-    def build_body(self):
-        return self.bb('beige', 'resistor body')
 
     def text(self):
         return ' '.join([self.resistance, self.tolerance])
 
     def add_bands(self,body):
         band_colors = self.coder.bands_for(self.coder.parse(self.resistance))
-        for (i, band) in enumerate(band_colors):
-            body.add(self.colored_band(5 + 5 * i, band))
-        body.add(self.colored_band(self.body_width - 3, self.coder.tolerance_band(self.tolerance)))
+        for (i, color) in enumerate(band_colors):
+            body.add_band(color, i)
+        body.add_band(self.coder.tolerance_band(self.tolerance), -1)
 
 
-class Crystal(TwoPinComponent):
-    def __init__(self, frequency, *ports):
-        self.frequency = frequency
-        self.body_width = 2 * Breadboard.PITCH
-        TwoPinComponent.__init__(self, 'Crystal', ports)
-
-    def build_body(self):
-        body = GroupedDrawable(svg_id='crystal body')
-        rectangle = Rectangle(self.body_width, self.body_height, fill='lightgray', stroke='gray', rx='4', ry='4')
-        body.add(rectangle)
-        return body, (rectangle.center())
-
-    def text(self):
-        return self.frequency
+# class Crystal(TwoPinComponent):
+#     def __init__(self, frequency, *ports):
+#         self.frequency = frequency
+#         self.body_width = 2 * Breadboard.PITCH
+#         TwoPinComponent.__init__(self, 'Crystal', 'black', ports)
+#
+#     def build_body(self):
+#         body = GroupedDrawable(svg_id='crystal body')
+#         rectangle = Rectangle(self.body_width, self.body_height, fill='lightgray', stroke='gray', rx='4', ry='4')
+#         body.add(rectangle)
+#         return body, (rectangle.center())
+#
+#     def text(self):
+#         return self.frequency
 
