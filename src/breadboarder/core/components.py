@@ -70,11 +70,11 @@ class TwoPinComponent(GroupedDrawable):
 
 
 class Body(GroupedDrawable):
-    def __init__(self, fill):
+    def __init__(self, fill, rounded=False):
         GroupedDrawable.__init__(self)
         self.body_width = 3 * Breadboard.PITCH
         self.body_height = Breadboard.PITCH
-        self.rectangle = Rectangle(self.body_width, self.body_height, fill=fill)
+        self.rectangle = Rectangle(self.body_width, self.body_height, fill=fill, rounded=rounded)
         self.add(self.rectangle)
         self.band_positions = [5 + 5*i for i in range(3)]
         self.band_positions.append(self.body_width - 3)
@@ -123,18 +123,11 @@ class Resistor(TwoPinComponent):
         body.add_band(self.coder.tolerance_band(self.tolerance), -1)
 
 
-# class Crystal(TwoPinComponent):
-#     def __init__(self, frequency, *ports):
-#         self.frequency = frequency
-#         self.body_width = 2 * Breadboard.PITCH
-#         TwoPinComponent.__init__(self, 'Crystal', 'black', ports)
-#
-#     def build_body(self):
-#         body = GroupedDrawable(svg_id='crystal body')
-#         rectangle = Rectangle(self.body_width, self.body_height, fill='lightgray', stroke='gray', rx='4', ry='4')
-#         body.add(rectangle)
-#         return body, (rectangle.center())
-#
-#     def text(self):
-#         return self.frequency
+class Crystal(TwoPinComponent):
+    def __init__(self, frequency, *ports):
+        self.frequency = frequency
+        TwoPinComponent.__init__(self, 'Crystal', Body('lightgray', rounded=True), ports)
+
+    def text(self):
+        return self.frequency
 
