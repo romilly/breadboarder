@@ -89,8 +89,8 @@ class Body(GroupedDrawable):
 
 def band(color, location):
         band_width = 2
-        band_height = Breadboard.PITCH
-        return Rectangle(band_width, band_height, fill=color, stroke=color).move_to(Point(location, 0))
+        band_height = Breadboard.PITCH -2
+        return Rectangle(band_width, band_height, fill=color, stroke=color).move_to(Point(location, 1))
 
 
 class Diode(TwoPinComponent):
