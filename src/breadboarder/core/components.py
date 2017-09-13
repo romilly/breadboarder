@@ -37,8 +37,8 @@ class TwoPinComponent(GroupedDrawable):
     def __init__(self, svg_id, body, ports):
         GroupedDrawable.__init__(self, svg_id=svg_id)
         self.leg_gap = 2 * Breadboard.PITCH
-        length, offset, start, vector = self.layout(body, ports)
-        self.add_wire(length)
+        length, offset, start, vector, inset = self.layout(body, ports)
+        self.add_wires(length, offset, inset, body.width)
         self.add_bands(body)
         body.add_text(self.text())
         self.rotate(vector.theta(), start)
@@ -52,10 +52,12 @@ class TwoPinComponent(GroupedDrawable):
         vector = end - start
         length = vector.r()
         offset = Point(length - body.width, -body.height).scale(0.5)
-        return length, offset, start, vector
+        inset = 0.5 * (body.width - self.leg_gap)
+        return length, offset, start, vector, inset
 
-    def add_wire(self, length):
-        self.add(horizontal_line(Point(0, 0), length, color='grey', stroke_width=2, linecap='round'))
+    def add_wires(self, length, offset, inset, width):
+        self.add(horizontal_line(Point(0, 0), offset.x + inset, color='grey', stroke_width=2, linecap='round'))
+        self.add(horizontal_line(Point(length, 0), -(offset.x + width - inset), color='grey', stroke_width=2, linecap='round'))
 
     def add_bands(self, body):
         # default is to do nothing
