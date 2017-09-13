@@ -36,29 +36,26 @@ class TwoPinComponent(GroupedDrawable):
 
     def __init__(self, svg_id, body, ports):
         GroupedDrawable.__init__(self, svg_id=svg_id)
-        self.body_width = 3 * Breadboard.PITCH
-        self.body_height = Breadboard.PITCH
-        start, end = ports
-        start = start.location()
-        end = end.location()
-        self.body = body
-        self.add_elements(start, end)
+        self.leg_gap = 2 * Breadboard.PITCH
+        length, offset, start, vector = self.layout(body, ports)
+        self.add_wire(length)
+        self.add_bands(body)
+        body.add_text(self.text())
+        self.rotate(vector.theta(), start)
+        self.add(body.move_to(offset))
         self.move_to(start)
 
-    def add_elements(self, start, end):
+    def layout(self, body, ports):
+        p1, p2 = ports
+        start = p1.location()
+        end = p2.location()
         vector = end - start
         length = vector.r()
-        offset = self.add_wire(length)
-        self.add_bands(self.body)
-        self.body.add_text(self.text())
-        self.rotate(vector.theta(), start)
-        self.add(self.body.move_to(offset))
+        offset = Point(length - body.width, -body.height).scale(0.5)
+        return length, offset, start, vector
 
     def add_wire(self, length):
-        total_wire_length = length - self.body_width
-        offset = Point(total_wire_length, -self.body_height).scale(0.5)
         self.add(horizontal_line(Point(0, 0), length, color='grey', stroke_width=2, linecap='round'))
-        return offset
 
     def add_bands(self, body):
         # default is to do nothing
@@ -72,12 +69,12 @@ class TwoPinComponent(GroupedDrawable):
 class Body(GroupedDrawable):
     def __init__(self, fill, rounded=False):
         GroupedDrawable.__init__(self)
-        self.body_width = 3 * Breadboard.PITCH
-        self.body_height = Breadboard.PITCH
-        self.rectangle = Rectangle(self.body_width, self.body_height, fill=fill, rounded=rounded)
+        self.width = 3 * Breadboard.PITCH
+        self.height = Breadboard.PITCH
+        self.rectangle = Rectangle(self.width, self.height, fill=fill, rounded=rounded)
         self.add(self.rectangle)
         self.band_positions = [5 + 5*i for i in range(3)]
-        self.band_positions.append(self.body_width - 3)
+        self.band_positions.append(self.width - 3)
 
     def add_text(self, text):
         self.add(Text(text, self.rectangle.center() + Point(0, 1.5),
