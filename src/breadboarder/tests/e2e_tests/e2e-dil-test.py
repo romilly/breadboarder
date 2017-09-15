@@ -1,5 +1,5 @@
 from breadboarder.core.breadboard import Breadboard
-from breadboarder.core.components import Wire, Button, Resistor, Diode, Crystal
+from breadboarder.core.components import Wire, Button, Resistor, Diode, Crystal, DiskCapacitor
 from breadboarder.core.dil import atMega328, pcf8574
 from breadboarder.core.project import Project, write
 
@@ -25,6 +25,7 @@ def test_dil():
     project.add(Resistor('1M2', '5%', breadboard['g27'],breadboard['a30']))
     project.add(Crystal('16Mz', breadboard['g24'],breadboard['a29']))
     project.add(Diode('1N4001', breadboard['d24'],breadboard['f24']))
+    project.add(DiskCapacitor('1N5', breadboard['a13'],breadboard['a18']))
     svg = project.svg()
     write(svg, 'svg/dil.svg')
 

@@ -213,10 +213,14 @@ class Circle(Drawable):
         Drawable.__init__(self, start)
         self.radius = radius
         self.color = color
+        self._center = start + Point(radius, radius)
         self._attributes = attributes
 
+    def center(self):
+        return self._center
+
     def svg(self):
-        return Element('circle', cx=str(self.start.x), cy=str(self.start.y), r=str(self.radius), **self._attributes)
+        return Element('circle', cx=str(self._center.x), cy=str(self._center.y), r=str(self.radius), **self._attributes)
 
 
 def write(diagram, filename):
