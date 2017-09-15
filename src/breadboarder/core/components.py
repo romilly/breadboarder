@@ -5,7 +5,6 @@ from .breadboard import Breadboard
 from .project import Point, GroupedDrawable, Rectangle, Line, Circle, Text, horizontal_line, Drawable
 
 
-# TODO: button needs a small offset
 class Button(GroupedDrawable):
     def __init__(self, *ports):
         GroupedDrawable.__init__(self, svg_id='Button')
