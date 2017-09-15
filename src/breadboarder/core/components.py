@@ -36,8 +36,8 @@ class TwoPinComponent(GroupedDrawable):
     def __init__(self, svg_id, body, ports):
         GroupedDrawable.__init__(self, svg_id=svg_id)
         self.leg_gap = Breadboard.PITCH
-        length, offset, start, vector, inset = self.layout(body, ports)
-        self.add_wires(length, offset.x+inset)
+        length, offset, start, vector = self.layout(body, ports)
+        self.add_wires(length, body.connection_point() + offset)
         self.add_bands(body)
         body.add_text(self.text())
         self.rotate(vector.theta(), start)
@@ -47,8 +47,7 @@ class TwoPinComponent(GroupedDrawable):
     def layout(self, body, ports):
         length, start, vector = self.dimensions(ports)
         offset = Point(length - body.width, -body.height).scale(0.5)
-        inset = 0.5 * (body.width - self.leg_gap)
-        return length, offset, start, vector, inset
+        return length, offset, start, vector
 
     def dimensions(self, ports):
         p1, p2 = ports
@@ -58,9 +57,9 @@ class TwoPinComponent(GroupedDrawable):
         length = vector.r()
         return length, start, vector
 
-    def add_wires(self, length, oi):
-        self.add(horizontal_line(Point(0, 0), oi, color='grey', stroke_width=2, linecap='round'))
-        self.add(horizontal_line(Point(length, 0), -oi, color='grey', stroke_width=2, linecap='round'))
+    def add_wires(self, length, center):
+        self.add(Line(Point(0, 0), center, color='grey', stroke_width=2, linecap='round'))
+        self.add(Line(Point(length, 0), center, color='grey', stroke_width=2, linecap='round'))
 
     def add_bands(self, body):
         # default is to do nothing
@@ -72,8 +71,27 @@ class TwoPinComponent(GroupedDrawable):
 
 
 class Body(GroupedDrawable):
-    def __init__(self, fill, rounded=False):
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self):
         GroupedDrawable.__init__(self)
+
+    @abc.abstractmethod
+    def center(self):
+        pass
+
+    @abc.abstractmethod
+    def connection_point(self):
+        pass
+
+    def add_text(self, text):
+        self.add(Text(text, self.center() + Point(0, 1.5),
+             anchor='middle', color='grey', size=3))
+
+
+class RectangularBody(Body):
+    def __init__(self, fill, rounded=False):
+        Body.__init__(self)
         self.width = 3 * Breadboard.PITCH
         self.height = Breadboard.PITCH
         self.rectangle = Rectangle(self.width, self.height, fill=fill, rounded=rounded)
@@ -81,12 +99,14 @@ class Body(GroupedDrawable):
         self.band_positions = [5 + 5*i for i in range(3)]
         self.band_positions.append(self.width - 3)
 
-    def add_text(self, text):
-        self.add(Text(text, self.rectangle.center() + Point(0, 1.5),
-             anchor='middle', color='grey', size=3))
-
     def add_band(self, color, index=-1):
         self.add(band(color, self.band_positions[index]))
+
+    def center(self):
+        return self.rectangle.center()
+
+    def connection_point(self):
+        return self.center()
 
 
 def band(color, location):
@@ -98,7 +118,7 @@ def band(color, location):
 class Diode(TwoPinComponent):
     def __init__(self, name, *ports):
         self.name = name
-        TwoPinComponent.__init__(self, 'diode', Body('black'), ports)
+        TwoPinComponent.__init__(self, 'diode', RectangularBody('black'), ports)
 
     def add_bands(self,body):
         body.add_band('gray')
@@ -112,8 +132,7 @@ class Resistor(TwoPinComponent):
         self.resistance = resistance
         self.coder = ColorCode()
         self.tolerance = tolerance
-        TwoPinComponent.__init__(self, 'Resistor', Body('beige'), ports)
-
+        TwoPinComponent.__init__(self, 'Resistor', RectangularBody('beige'), ports)
 
     def text(self):
         return ' '.join([self.resistance, self.tolerance])
@@ -128,31 +147,35 @@ class Resistor(TwoPinComponent):
 class Crystal(TwoPinComponent):
     def __init__(self, frequency, *ports):
         self.frequency = frequency
-        TwoPinComponent.__init__(self, 'Crystal', Body('lightgray', rounded=True), ports)
+        TwoPinComponent.__init__(self, 'Crystal', RectangularBody('lightgray', rounded=True), ports)
 
     def text(self):
         return self.frequency
 
 
-class CapacitorBody(GroupedDrawable):
-    def __init__(self, fill):
-        GroupedDrawable.__init__(self)
+class CapacitorBody(Body):
+    def __init__(self, color):
+        Body.__init__(self)
         self.radius = Breadboard.PITCH
         self.width = 2 * self.radius
         self.height = 2 * self.radius
-        self.circle = Circle(Point(0,0), self.radius, color=fill)
+        self.circle = Circle(Point(0,0), self.radius, fill=color)
         self.add(self.circle)
-        self.move_to(Point(0, -2*self.radius))
+        self.body_offset = Point(0, -2 * self.radius)
+        self.move_to(self.body_offset)
 
-    def add_text(self, text):
-        self.add(Text(text, self.circle.center() + Point(0, 1.5),
-             anchor='middle', color='grey', size=3))
+    def center(self):
+        return self.circle.center()
+
+    def connection_point(self):
+        return self.center() + self.body_offset
+
 
 
 class DiskCapacitor(TwoPinComponent):
     def __init__(self, capacitance, *ports):
         self.capacitance = capacitance
-        TwoPinComponent.__init__(self, 'Capacitor', CapacitorBody('brown'), ports)
+        TwoPinComponent.__init__(self, 'Capacitor', CapacitorBody(color='goldenrod'), ports)
 
     def text(self):
         return self.capacitance

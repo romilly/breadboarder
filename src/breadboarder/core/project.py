@@ -207,6 +207,8 @@ class Text(Drawable):
         self.angle  = angle
         return self
 
+# TODO: add circles to ends of wires (?)
+
 
 class Circle(Drawable):
     def __init__(self, start, radius, color='green', **attributes):
