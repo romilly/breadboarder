@@ -14,19 +14,19 @@ class Port():
 
 
 class SocketGroup(GroupedDrawable):
-    def __init__(self, center, rows, cols, alpha_labels, host, start_number=1, id='sockets'):
+    def __init__(self, center, rows, cols, alpha_labels, host, start_number=1, id='sockets', fill='black'):
         GroupedDrawable.__init__(self)
         self.socket_size = 2.88
         self.id = id
         for i in range(cols):
             for j in range(rows):
-                socket = self.socket().set_center(center.x + Breadboard.PITCH * i, center.y + Breadboard.PITCH * j)
+                socket = self.socket(fill).set_center(center.x + Breadboard.PITCH * i, center.y + Breadboard.PITCH * j)
                 label = alpha_labels[j] + str(i + start_number)
                 host.add_port(Port(host, socket.center()), label)
                 self.add(socket)
 
-    def socket(self):
-        rectangle = Rectangle(self.socket_size, self.socket_size, fill='black')
+    def socket(self, fill):
+        rectangle = Rectangle(self.socket_size, self.socket_size, fill=fill, stroke=fill)
         return rectangle
 
     def container(self):
