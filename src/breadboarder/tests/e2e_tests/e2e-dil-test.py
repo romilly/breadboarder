@@ -1,14 +1,14 @@
 from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.components import Wire, Button, Resistor, Diode, Crystal, DiskCapacitor
 from breadboarder.core.dil import atMega328, pcf8574
-from breadboarder.core.project import Project, write
+from breadboarder.core.project import Project, write, Point
 
 
 # TODO: add image-based testing
 
 def test_dil():
     project = Project()
-    breadboard = Breadboard()
+    breadboard = Breadboard().move_to(Point(20, 20))
     project.add(breadboard)
     project.add(atMega328(breadboard['f10']))
     project.add(pcf8574(breadboard['f1']))

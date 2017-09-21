@@ -130,6 +130,7 @@ class GroupedDrawable(CompositeItem):
         return self
 
     def move_to(self, point):
+        Drawable.move_to(self, point)
         self.transformations.append(Translation(point))
         return self
 
