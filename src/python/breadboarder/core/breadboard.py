@@ -1,6 +1,6 @@
 from xml.etree.ElementTree import Element
 
-from breadboarder.core.project import Rectangle, horizontal_line, Text, Point, GroupedDrawable
+from breadboarder.core.svg import Rectangle, horizontal_line, Text, Point, GroupedDrawable
 
 
 class Port():
@@ -49,8 +49,12 @@ class Breadboard(GroupedDrawable):
         self.add(Rectangle(self.width, self.height, fill='white'))
         self.add_power_group(self.drop_to_top_power_group,'T')
         self.add_numeric_labels(self.drop_to_top_numeric_labels, self.columns, 'start')
-        self.add_body_sockets(Point(self.gap_from_left_to_body_sockets, self.drop_to_top_body_sockets), 'jihgf')
-        self.add_body_sockets(Point(self.gap_from_left_to_body_sockets, self.drop_to_lower_body_sockets), 'edcba')
+        self.add_body_sockets(
+            Point(self.gap_from_left_to_body_sockets,self.drop_to_top_body_sockets),
+            'jihgf')
+        self.add_body_sockets(
+            Point(self.gap_from_left_to_body_sockets, self.drop_to_lower_body_sockets),
+            'edcba')
         self.add_numeric_labels(self.drop_to_lower_numeric_labels, self.columns, 'end')
         self.add_power_group(self.drop_to_lower_power_group,'B')
 
@@ -75,25 +79,31 @@ class Breadboard(GroupedDrawable):
         self.inset_to_right_letters = 90 * 3.18
         self.inter_power_group_spacing = 53.5
 
-    def add_port(self, port, label):
-        self.ports[label] = port
-
     def add_power_group(self, vertical_location, prefix):
         EM_DASH = u'\u2014'
         self.add_power_line(vertical_location, EM_DASH, 'blue')
-        self.add_power_sockets(vertical_location + self.drop_from_line_to_power_sockets, prefix)
-        self.add_power_line(vertical_location + self.gap_between_power_lines, '+', 'red')
+        self.add_power_sockets(vertical_location +
+                               self.drop_from_line_to_power_sockets, prefix)
+        self.add_power_line(vertical_location +
+                            self.gap_between_power_lines, '+', 'red')
 
     def add_power_line(self, vertical_location, text, color):
         line_offset = Point(self.gap_to_left_of_power_line, vertical_location)
-        self.add(horizontal_line(line_offset, self.width - 2 * line_offset.x, color=color))
-        self.add(Text(text, line_offset + self.offset_from_line_start_to_text, color=color, anchor='middle', size=7).rotate(90))
-        self.add(Text(text, self.offset_from_line_start_to_text + line_offset + Point(self.width - 8, -1),
+        self.add(horizontal_line(line_offset, self.width -
+                                 2 * line_offset.x, color=color))
+        self.add(Text(text, line_offset +
+                      self.offset_from_line_start_to_text,
+                      color=color, anchor='middle', size=7).rotate(90))
+        self.add(Text(text, self.offset_from_line_start_to_text +
+                      line_offset + Point(self.width - 8, -1),
                       color=color, anchor='middle', size=7).rotate(90))
 
     def add_power_sockets(self, top_centre, prefix):
         for group in range(self.power_socket_group_count):
             self.add(SocketGroup(Point(self.inset + self.inter_power_group_spacing * group, top_centre), 2, 5, (prefix+'M',prefix+'P'), self, start_number=1 + 5*group))
+
+    def add_port(self, port, label):
+        self.ports[label] = port
 
     def add_body_sockets(self, center, alpha_labels):
         self.add_alpha_labels(Point(self.inset_to_left_letters, center.y + 2), alpha_labels)
@@ -102,7 +112,9 @@ class Breadboard(GroupedDrawable):
 
     def add_numeric_labels(self, vertical_location, count, anchor):
         for i in range(count):
-            self.add(Text(str(i+1), Point(self.inset - 1 + self.PITCH * i, vertical_location), anchor=anchor, color='grey', size=6).rotate(-90))
+            self.add(Text(str(i+1),
+                          Point(self.inset - 1 + self.PITCH * i, vertical_location),
+                          anchor=anchor, color='grey', size=6).rotate(-90))
 
     def add_alpha_labels(self, offset_to_letters, letters):
         for i in range(len(letters)):

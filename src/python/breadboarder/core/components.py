@@ -2,7 +2,7 @@ import abc
 
 from breadboarder.helpers.color_codes import ColorCode
 from .breadboard import Breadboard
-from .project import Point, GroupedDrawable, Rectangle, Line, Circle, Text, horizontal_line, Drawable
+from .svg import Point, GroupedDrawable, Rectangle, Line, Circle, Text, horizontal_line, Drawable
 
 
 class Button(GroupedDrawable):

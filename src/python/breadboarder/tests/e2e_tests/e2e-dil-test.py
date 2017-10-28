@@ -1,10 +1,13 @@
 from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.components import Wire, Button, Resistor, Diode, Crystal, DiskCapacitor
 from breadboarder.core.dil import atMega328, pcf8574
-from breadboarder.core.project import Project, write, Point
+from breadboarder.core.project import Project
+
 
 
 # TODO: add image-based testing
+from breadboarder.core.svg import Point, write
+
 
 def test_dil():
     project = Project()
