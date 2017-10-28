@@ -1,0 +1,15 @@
+[<abstract> Drawable|start| svg]<:-[<abstract>CompositeItem|_children|add
+container]
+
+[CompositeItem] <:- [Project]
+[CompositeItem] <:- [<abstract> GroupedItem| transformations|svg]
+[GroupedItem] +- [Transformation]
+[<abstract> Transformation] <: - [Translation]
+[Transformation] <:- [Rotation]
+[GroupedItem] <:-[Breadboard]
+[Drawable] <:-[Rectangle]
+[Drawable] <:-[Line]
+[Drawable] <:-[Text]
+[Breadboard] +- [Rectangle]
+[Breadboard] +- [Line]
+[Breadboard] +- [Text]
