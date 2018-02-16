@@ -37,6 +37,10 @@ class Point():
     def theta(self):
         return math.degrees(math.atan2(self.y, self.x))
 
+    def format(self):
+        return '%s %s' % (str(self.x),str(self.y))
+
+
 
 class Drawable:
     __metaclass__ = abc.ABCMeta
@@ -72,6 +76,28 @@ class CompositeItem(Drawable):
     @abc.abstractmethod
     def container(self):
         pass
+
+
+class PolygonalPath(Drawable):
+    def __init__(self, start, *points, **attributes):
+        Drawable.__init__(self, start)
+        last = start
+        self.points = []
+        # Oh for a first difference operator :)
+        for point in points:
+            self.points.append(point-last)
+            last = point
+        self._attributes = attributes
+        self.closed = True # can set to false if open path required
+
+    def svg(self):
+        p = Element('path',**self._attributes)
+        d = 'M %s' % self.start.format()
+        d += ' '.join(['l %s' % point.format() for point in self.points]) # lowercase l means move is relative
+        if self.closed:
+            d += ' Z'
+        p.set('d',d)
+        return p
 
 
 class Transform():
