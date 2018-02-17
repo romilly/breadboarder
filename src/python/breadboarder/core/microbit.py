@@ -25,14 +25,18 @@ class MicrobitConnector(GroupedDrawable):
         self.add_narrow_connectors()
 
     def add_end_connectors(self):
-        self.add(PolygonalPath(Point(0, cms(-0.154)),Point(ins(0),cms(-0.54)),
+        self.add(PolygonalPath(Point(0, cms(-0.1)),Point(ins(0),cms(-0.54)),
                         Point(ins(0.05),cms(-0.54)),Point(ins(0.05),cms(0)),fill='gold'))
+        self.add(PolygonalPath(Point(cms(5.1), cms(-0.1)),Point(cms(5.1),cms(-0.54)),
+                        Point(cms(5.1)-ins(0.05),cms(-0.54)),Point(cms(5.1)-ins(0.05),cms(0)),fill='gold'))
 
     def add_hole_connectors(self):
         pass
 
     def add_narrow_connectors(self):
-        pass
+        for i in set(range(40)) - set([0,39]):
+            self.add(Rectangle(ins(0.04),cms(0.54), fill='gold', stroke='none').move_to(Point(ins(0.009+i*0.05),cms(-0.54))))
+
 
 class Microbit(GroupedDrawable):
     def __init__(self):
