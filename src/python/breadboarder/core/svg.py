@@ -229,10 +229,9 @@ class Text(Drawable):
 
 
 class Circle(Drawable):
-    def __init__(self, start, radius, color='green', **attributes):
+    def __init__(self, start, radius, **attributes):
         Drawable.__init__(self, start)
         self.radius = radius
-        self.color = color
         self._center = start + Point(radius, radius)
         self._attributes = attributes
 
