@@ -149,7 +149,9 @@
 <node TEXT="S&amp;C" ID="ID_1081899269" CREATED="1505715251961" MODIFIED="1507370771592">
 <icon BUILTIN="button_ok"/>
 </node>
-<node TEXT="Raspbery Pint" ID="ID_17448006" CREATED="1505714915778" MODIFIED="1507370913857" LINK="../../RareBlog/plan/Raspberry-Pint-Breadboarder-talk.mm"/>
+<node TEXT="Raspbery Pint" ID="ID_17448006" CREATED="1505714915778" MODIFIED="1518943986297" LINK="../../RareBlog/plan/Raspberry-Pint-Breadboarder-talk.mm">
+<icon BUILTIN="button_ok"/>
+</node>
 <node TEXT="London Arduino" ID="ID_862780370" CREATED="1505714956578" MODIFIED="1505714965145">
 <node TEXT="need Arduino" ID="ID_429309779" CREATED="1505714967066" MODIFIED="1505714971435"/>
 </node>
@@ -251,6 +253,7 @@
 <node TEXT="Resources" POSITION="left" ID="Freemind_Link_1594441695" CREATED="1273319832507" MODIFIED="1296303609303" COLOR="#33ff33">
 <icon BUILTIN="password"/>
 <node TEXT="Xtext" ID="ID_1413880575" CREATED="1505715993784" MODIFIED="1505716047656" LINK="https://eclipse.org/Xtext/index.html"/>
+<node TEXT="2D_computer_graphics" ID="ID_1654140408" CREATED="1518944073745" MODIFIED="1518944088991" LINK="https://en.wikipedia.org/wiki/Transformation_matrix#Examples_in_2D_computer_graphics"/>
 </node>
 </node>
 </map>
