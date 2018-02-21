@@ -78,6 +78,7 @@ class Microbit(GroupedDrawable):
         self.add(Rectangle(height=cms(4.2), width=cms(5.0),rounded=True,fill='grey', stroke='none'))
         self.add_usb_port()
         self.add_decoration()
+        self.add_logo()
         self.add_leds()
         self.add_buttons()
         self.add_button_labels()
@@ -128,6 +129,14 @@ class Microbit(GroupedDrawable):
         self.add(Path(Point(0,cms(1.18)), vector(0, 4-cms(1.18)), arc(4,4,0,0,1,4,-4), vector(cms(1.18)-4, 0), fill='teal'))
         self.add(Path(Point(cms(1.18),0), vector(cms(0.6), 0), vector(cms(-0.6), cms(0.6)), fill='teal'))
         self.add(Path(Point(cms(1.18+0.6),0), vector(cms(0.21), 0), vector(cms(-0.21), cms(0.21)), fill='teal'))
+
+    def add_logo(self):
+        centre1, centre2 = (Point(cms(2.4),cms(0.82)),Point(cms(2.8),cms(0.82)))
+        self.add(Path(centre1+Point(0,cms(0.15)),
+                      arc(cms(0.15), cms(0.15), 0, 0, 1, 0, -cms(0.3)),vector(cms(0.4),0),
+                      arc(cms(0.15), cms(0.15), 0, 0, 1, 0, cms(0.3)),fill='none',stroke='teal', width='2'))
+        self.add(Circle(Point(0,0),cms(0.05), fill='teal').move_center_to(centre1))
+        self.add(Circle(Point(0,0),cms(0.05), fill='teal').move_center_to(centre2))
 
 
 

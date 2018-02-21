@@ -117,6 +117,8 @@ class Path(Drawable):
         if self.closed:
             d += ' Z'
         p.set('d', d)
+        if 'width' in self._attributes:
+            p.set('stroke-width', self._attributes['width'])
         return p
 
 class PathSegment():
