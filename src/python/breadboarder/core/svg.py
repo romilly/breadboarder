@@ -77,6 +77,8 @@ class CompositeItem(Drawable):
     def container(self):
         pass
 
+#  TODO: replace PolygonalPath with Path; this will require an easy way
+# of converting a sequence of points to a relative path (so move_to is easy)
 
 class PolygonalPath(Drawable):
     def __init__(self, start, *points, **attributes):
@@ -98,6 +100,52 @@ class PolygonalPath(Drawable):
             d += ' Z'
         p.set('d',d)
         return p
+
+
+
+class Path(Drawable):
+    def __init__(self, start, *segments, **attributes):
+        Drawable.__init__(self, start)
+        self.segments = segments
+        self.closed = True # can set to false if open path required
+        self._attributes = attributes
+
+    def svg(self):
+        p = Element('path',**self._attributes)
+        d = 'M %s ' % self.start.format()
+        d += ' '.join([segment.specification() for segment in self.segments])
+        if self.closed:
+            d += ' Z'
+        p.set('d', d)
+        return p
+
+class PathSegment():
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def specification(self):
+        pass
+
+
+class RelativeVector(PathSegment):
+    def __init__(self, x, y):
+        self.point = Point(x,y)
+
+    def specification(self):
+        return 'l %s ' % self.point.format()
+
+def vector(x, y):
+    return RelativeVector(x,y)
+
+class Arc(PathSegment):
+    def __init__(self, x, y, xrot, large_arc, sweep, endx, endy):
+        self._spec = (x, y, xrot, large_arc, sweep, endx, endy)
+
+    def specification(self):
+        return 'a %f %f, %f, %d, %d, %f %f' % self._spec
+
+def arc(x, y, xrot, large_arc, sweep, endx, endy):
+    return Arc(x, y, xrot, large_arc, sweep, endx, endy)
 
 
 class Transform():
@@ -232,14 +280,17 @@ class Circle(Drawable):
     def __init__(self, start, radius, **attributes):
         Drawable.__init__(self, start)
         self.radius = radius
-        self._center = start + Point(radius, radius)
         self._attributes = attributes
 
     def center(self):
-        return self._center
+        return self.start + Point(self.radius, self.radius)
 
     def svg(self):
-        return Element('circle', cx=str(self._center.x), cy=str(self._center.y), r=str(self.radius), **self._attributes)
+        return Element('circle', cx=str(self.center().x), cy=str(self.center().y), r=str(self.radius), **self._attributes)
+
+    def move_center_to(self, point):
+        self.move_to(point - Point(self.radius, self.radius))
+        return self
 
 
 def write(diagram, filename):
