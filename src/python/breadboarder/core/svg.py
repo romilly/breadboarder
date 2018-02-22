@@ -77,8 +77,9 @@ class CompositeItem(Drawable):
     def container(self):
         pass
 
-#  TODO: replace PolygonalPath with Path; this will require an easy way
-# of converting a sequence of points to a relative path (so move_to is easy)
+#  TODO: replace PolygonalPath with Path;
+# TODO: this will require an easy way of converting a sequence of points to a relative path (so move_to is easy)
+# TODO: or letting move_to change path elements (probably better)
 
 class PolygonalPath(Drawable):
     def __init__(self, start, *points, **attributes):
@@ -100,7 +101,6 @@ class PolygonalPath(Drawable):
             d += ' Z'
         p.set('d',d)
         return p
-
 
 
 class Path(Drawable):
@@ -145,6 +145,7 @@ class Arc(PathSegment):
 
     def specification(self):
         return 'a %f %f, %f, %d, %d, %f %f' % self._spec
+
 
 def arc(x, y, xrot, large_arc, sweep, endx, endy):
     return Arc(x, y, xrot, large_arc, sweep, endx, endy)

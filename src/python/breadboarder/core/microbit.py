@@ -18,8 +18,9 @@ class RectangularLed(GroupedDrawable):
 
 
 class MicrobitConnector(GroupedDrawable):
-    DISTANCE = 0.0492
-    WIDTH = 0.042
+    CONNECTOR_SPACING = 0.0492
+    WIDTH = 0.04
+    C_HEIGHT = cms(0.54)
 
     def __init__(self):
         GroupedDrawable.__init__(self, svg_id='microbit connector')
@@ -36,10 +37,13 @@ class MicrobitConnector(GroupedDrawable):
         return result
 
     def add_end_connectors(self):
-        self.add(PolygonalPath(Point(0, cms(-0.1)), Point(ins(0),cms(-0.54)),
-                               Point(ins(self.WIDTH), cms(-0.54)), Point(ins(self.WIDTH), cms(0)), fill='gold'))
-        self.add(PolygonalPath(Point(cms(5.0), cms(-0.1)), Point(cms(5.0),cms(-0.54)),
-                               Point(cms(5.0) - ins(self.DISTANCE), cms(-0.54)), Point(cms(5.0) - ins(self.DISTANCE), cms(0)), fill='gold'))
+        self.add(Path(Point(4,-self.C_HEIGHT),vector(-4, 0),
+                      vector(0,self.C_HEIGHT-4), arc(4,4,0,0,0,4,4), fill='gold'))
+        self.add(Path(Point(cms(5.0)-4,-self.C_HEIGHT),vector(4, 0),
+                      vector(0,self.C_HEIGHT-4), arc(4,4,0,0,1,-4,4), fill='gold'))
+
+    def offset(self, index):
+        return 0.5+ins(index*self.CONNECTOR_SPACING)
 
     def add_wide_connectors(self):
         specs = zip(self.wide_connector_start_positions, ['0','1','2','3V','GND'])
@@ -48,12 +52,13 @@ class MicrobitConnector(GroupedDrawable):
 
     def add_narrow_connectors(self):
         for i in set(range(40)) - (set([0,39]+self.wide_connector_spans())):
-            self.add(Rectangle(ins(self.WIDTH),cms(0.54), fill='gold', stroke='none').move_to(Point(ins(i*self.DISTANCE),cms(-0.54))))
+            self.add(Rectangle(ins(self.WIDTH),self.C_HEIGHT, fill='gold', stroke='none').move_to(Point(self.offset(i),-self.C_HEIGHT)))
 
     def wide_connector(self, pos, text):
         g = GroupedDrawable(text)
-        g.add(Rectangle(ins(self.WIDTH+3*self.DISTANCE),cms(0.65), fill='gold', stroke='none').move_to(Point(ins(pos*self.DISTANCE),cms(-0.65))))
-        centre = Point(ins(0.5*(self.WIDTH+self.DISTANCE)+(pos+1)*self.DISTANCE),cms(-0.7))
+        g.add(Rectangle(ins(self.WIDTH+3*self.CONNECTOR_SPACING),cms(0.65), fill='gold', stroke='none')
+             .move_to(Point(self.offset(pos),cms(-0.65))))
+        centre = Point(ins(0.5*self.WIDTH+self.CONNECTOR_SPACING)+self.offset(pos+1)-2,cms(-0.7))
         g.add(Text(text, Point(centre.x, cms(-0.2)),anchor='middle',size=6))
         g.add(Circle(Point(0,0),cms(0.27),fill='gold').
               move_center_to(centre))
@@ -103,7 +108,7 @@ class Microbit(GroupedDrawable):
 
     def add_buttons(self):
         left_offset = cms(0.263)
-        right_offset = cms(4.28)
+        right_offset = cms(5.0-(0.625+0.263))
         distance_from_top = cms(1.9)
         self.add_button(left_offset, distance_from_top)
         self.add_button(right_offset, distance_from_top)
@@ -113,7 +118,7 @@ class Microbit(GroupedDrawable):
 
     def add_button_labels(self):
         self.add_label(Point(cms(0.619),cms(2.94)),'A', inverted=False)
-        self.add_label(Point(cms(4.52),cms(1.4)),'B', inverted=True)
+        self.add_label(Point(cms(5.0-0.619),cms(1.5)),'B', inverted=True)
 
     def add_label(self, corner, text, inverted):
         scale = -1 if inverted else 1
