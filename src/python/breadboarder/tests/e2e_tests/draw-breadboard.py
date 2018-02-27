@@ -7,7 +7,7 @@ def draw_breadboard():
     project = Project()
     breadboard = Breadboard().move_to(Point(20, 20))
     project.add(breadboard)
-    svg = project.svg()
+    svg = project.element()
     write(svg, 'svg/bb.svg')
 
 

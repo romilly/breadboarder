@@ -9,5 +9,5 @@ class Project(CompositeItem):
         return Element('svg', height='480', width='640')
 
     def tostring(self):
-        return tostring(self.svg())
+        return tostring(self.element())
 

@@ -6,7 +6,7 @@ from breadboarder.core.svg import write
 def test_microbit():
     p = Project()
     p.add(Microbit())
-    svg = p.svg()
+    svg = p.element()
     write(svg, 'svg/microbit.svg')
 
 

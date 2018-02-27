@@ -49,7 +49,7 @@ class Drawable:
         self.start = start
 
     @abc.abstractmethod
-    def svg(self):
+    def element(self):
         pass
 
     def move_to(self, point):
@@ -67,10 +67,10 @@ class CompositeItem(Drawable):
     def add(self, item):
         self._children.append(item)
 
-    def svg(self):
+    def element(self):
         svg = self.container()
         for child in self._children:
-            svg.append(child.svg())
+            svg.append(child.element())
         return svg
 
     @abc.abstractmethod
@@ -93,7 +93,7 @@ class PolygonalPath(Drawable):
         self._attributes = attributes
         self.closed = True # can set to false if open path required
 
-    def svg(self):
+    def element(self):
         p = Element('path',**self._attributes)
         d = 'M %s' % self.start.format()
         d += ' '.join(['l %s' % point.format() for point in self.points]) # lowercase l means move is relative
@@ -110,7 +110,7 @@ class Path(Drawable):
         self.closed = True # can set to false if open path required
         self._attributes = attributes
 
-    def svg(self):
+    def element(self):
         p = Element('path',**self._attributes)
         d = 'M %s ' % self.start.format()
         d += ' '.join([segment.specification() for segment in self.segments])
@@ -213,7 +213,7 @@ class Rectangle(Drawable):
         self.rounded = rounded
         self._attributes = attributes
 
-    def svg(self):
+    def element(self):
         rect = Element('rect', x=str(self.start.x), y=str(self.start.y), width=str(self.width),
                           height=str(self.height), style='stroke-width:%d;stroke:%s' % (self.stroke_width, self.stroke),
                           **self._attributes)
@@ -245,7 +245,7 @@ class Line(Drawable):
     def end(self):
         return self.start + self.vector
 
-    def svg(self):
+    def element(self):
         return Element('line', x1=str(self.start.x), y1=str(self.start.y), x2=str(self.end().x), y2=str(self.end().y),
                        style='stroke:%s;stroke-width:%d;stroke-linecap:%s' % (self.color, self.stroke_width, self.linecap), **self._attributes)
 
@@ -264,7 +264,7 @@ class Text(Drawable):
         self._attributes = attributes
         self.angle = 0
 
-    def svg(self):
+    def element(self):
         text = Element('text', x=str(self.start.x), y=str(self.start.y),
             style= 'fill:%s;text-anchor:%s;font-size: %dpt' % (self.color, self.anchor, self.size))
         text.text = self.text
@@ -288,7 +288,7 @@ class Circle(Drawable):
     def center(self):
         return self.start + Point(self.radius, self.radius)
 
-    def svg(self):
+    def element(self):
         return Element('circle', cx=str(self.center().x), cy=str(self.center().y), r=str(self.radius), **self._attributes)
 
     def move_center_to(self, point):

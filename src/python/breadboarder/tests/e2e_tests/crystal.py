@@ -9,7 +9,7 @@ def draw_breadboard():
     breadboard = Breadboard().move_to(Point(20, 20))
     project.add(breadboard)
     project.add(Crystal('16Mz', breadboard['g24'], breadboard['a24']))
-    svg = project.svg()
+    svg = project.element()
     write(svg, 'svg/xtal.svg')
 
 

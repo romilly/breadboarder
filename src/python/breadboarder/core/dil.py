@@ -58,7 +58,7 @@ class Dimple(Drawable):
         Drawable.__init__(self, center)
         self.radius = radius
 
-    def svg(self):
+    def element(self):
         return Element("path", {'d': 'M %d %d A %d %d 0 1 1 %d %d' % (self.start.x, self.start.y-self.radius,
                                             self.radius, self.radius, self.start.x, self.start.y+self.radius)})
 
