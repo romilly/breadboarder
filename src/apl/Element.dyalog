@@ -1,39 +1,38 @@
 ﻿:Class Element
 
-    :Field Public tag←''
-    :Field Public _props←0 2⍴⊂''
-    :Field Public _children←⍬
-
     NL←⎕UCS 13
 
     ∇ make args;in
       :Access Public 
       :Implements Constructor
      
-      tag←⊃in←,⊆args
+      tag←⊃in←,⊆args         
+      props←0 2⍴⊂''
+      children←⍬
+
       :If 0<≢in←1↓in
           'name/value pairs must have 2 elements'⎕SIGNAL(2∧.≠≢¨in)/11
-          _props←↑in
-          'invalid names'⎕SIGNAL(80≠⎕DR¨_props[;1])/11
+          props←↑in
+          'invalid names'⎕SIGNAL(80≠⎕DR¨props[;1])/11
       :EndIf
     ∇
     
-    ∇ r←Add element 
+    ∇ r←append element 
       :Access Public
-      _children,←element
+      children,←element
     ∇
 
     ∇ r←Render
       :Access Public
       r←'<',tag,formatProps,'>',NL
-      :If 0≠≢_children
-          r,←∊_children.Render
+      :If 0≠≢children
+          r,←∊children.Render
       :EndIf
       r,←'</',tag,'>',NL
     ∇
     
     ∇ r←formatProps
-      r←∊{' ',⍺,'="',(⍕⍵),'"'}/_props
+      r←∊{' ',⍺,'="',(⍕⍵),'"'}/props
     ∇
    
     ∇ Test;s;data;z
@@ -49,5 +48,3 @@
     ∇
 
 :EndClass
-
-⍝)(!Test!!0 0 0 0 0 0 0!0

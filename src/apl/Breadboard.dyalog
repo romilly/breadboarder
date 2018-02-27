@@ -4,10 +4,13 @@
     ∇ make
       :Access Public
       :Implements Constructor
-     
+      
+      start←0 0
       set_dimensions
-      _children←⍬
-      Add ⎕NEW #.Rectangle((0 0)(height width))
+      children←⍬      
+      transformations←⍬
+
+      Add ⎕NEW #.Rectangle(start (height width))
      ⍝ Add horizontal_line (10 10) 20
     ∇
 
@@ -32,16 +35,35 @@
       inset_to_right_letters←90×3.18
       inter_power_group_spacing←53.5
     ∇
+    
+    ∇move_to xy
+    :Access Public
+      start←xy
+      transformations,←⎕NEW #.Translation xy
+    ∇
 
     ∇ r←Add element
       :Access Public
-      _children,←element
+      children,←element
+    ∇
+    
+    ∇r←transformation
+    :Access Public
+     r←¯1↓1↓⍕transformations.text
     ∇
 
-    ∇ r←element
+    ∇ r←container
+     ⍝ Going to be an override method someday
       :Access Public
-      r←⎕NEW #.Element'g'
-      r.Add¨_children.element
+      r←⎕NEW #.Element ('g' ('id' 'breadboard')('transform' transformation))
+    ∇  
+   
+    ∇ elm←element
+      :Access Public
+      elm←container
+      :If 0≠≢children
+          elm.append¨children.element
+      :EndIf
     ∇
 
 :EndClass
