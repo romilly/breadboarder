@@ -47,16 +47,16 @@ class Breadboard(GroupedDrawable):
 
     def add_components(self):
         self.add(Rectangle(self.width, self.height, fill='white'))
-        self.add_power_group(self.drop_to_top_power_group,'T')
-        self.add_numeric_labels(self.drop_to_top_numeric_labels, self.columns, 'start')
-        self.add_body_sockets(
-            Point(self.gap_from_left_to_body_sockets,self.drop_to_top_body_sockets),
-            'jihgf')
-        self.add_body_sockets(
-            Point(self.gap_from_left_to_body_sockets, self.drop_to_lower_body_sockets),
-            'edcba')
-        self.add_numeric_labels(self.drop_to_lower_numeric_labels, self.columns, 'end')
-        self.add_power_group(self.drop_to_lower_power_group,'B')
+        # self.add_power_group(self.drop_to_top_power_group,'T')
+        # self.add_numeric_labels(self.drop_to_top_numeric_labels, self.columns, 'start')
+        # self.add_body_sockets(
+        #     Point(self.gap_from_left_to_body_sockets,self.drop_to_top_body_sockets),
+        #     'jihgf')
+        # self.add_body_sockets(
+        #     Point(self.gap_from_left_to_body_sockets, self.drop_to_lower_body_sockets),
+        #     'edcba')
+        # self.add_numeric_labels(self.drop_to_lower_numeric_labels, self.columns, 'end')
+        # self.add_power_group(self.drop_to_lower_power_group,'B')
 
     def _set_dimensions(self):
         self.width = 291.7
