@@ -77,7 +77,7 @@ class CompositeItem(Drawable):
     def container(self):
         pass
 
-#  TODO: replace PolygonalPath with Path;
+# TODO: replace PolygonalPath with Path;
 # TODO: this will require an easy way of converting a sequence of points to a relative path (so move_to is easy)
 # TODO: or letting move_to change path elements (probably better)
 
