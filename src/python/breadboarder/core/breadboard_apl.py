@@ -47,7 +47,7 @@ class Breadboard(GroupedDrawable):
 
     def add_components(self):
         self.add(Rectangle(self.width, self.height, fill='white'))
-        # self.add_power_group(self.drop_to_top_power_group,'T')
+        self.add_power_group(self.drop_to_top_power_group,'T')
         # self.add_numeric_labels(self.drop_to_top_numeric_labels, self.columns, 'start')
         # self.add_body_sockets(
         #     Point(self.gap_from_left_to_body_sockets,self.drop_to_top_body_sockets),
@@ -82,8 +82,8 @@ class Breadboard(GroupedDrawable):
     def add_power_group(self, vertical_location, prefix):
         EM_DASH = u'\u2014'
         self.add_power_line(vertical_location, EM_DASH, 'blue')
-        self.add_power_sockets(vertical_location +
-                               self.drop_from_line_to_power_sockets, prefix)
+        # self.add_power_sockets(vertical_location +
+        #                       self.drop_from_line_to_power_sockets, prefix)
         self.add_power_line(vertical_location +
                             self.gap_between_power_lines, '+', 'red')
 
@@ -91,12 +91,12 @@ class Breadboard(GroupedDrawable):
         line_offset = Point(self.gap_to_left_of_power_line, vertical_location)
         self.add(horizontal_line(line_offset, self.width -
                                  2 * line_offset.x, color=color))
-        self.add(Text(text, line_offset +
-                      self.offset_from_line_start_to_text,
-                      color=color, anchor='middle', size=7).rotate(90))
-        self.add(Text(text, self.offset_from_line_start_to_text +
-                      line_offset + Point(self.width - 8, -1),
-                      color=color, anchor='middle', size=7).rotate(90))
+        #self.add(Text(text, line_offset +
+        #              self.offset_from_line_start_to_text,
+        #              color=color, anchor='middle', size=7).rotate(90))
+        #self.add(Text(text, self.offset_from_line_start_to_text +
+        #              line_offset + Point(self.width - 8, -1),
+        #              color=color, anchor='middle', size=7).rotate(90))
 
     def add_power_sockets(self, top_centre, prefix):
         for group in range(self.power_socket_group_count):

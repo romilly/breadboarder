@@ -5,4 +5,4 @@
  svg←project.svg
  xml←⎕XML svg
  xml[;4]←{⍵[⍋⍵;]}¨xml[;4]
- r←xml≡⎕XML⊃⎕NGET'c:\devt\breadboarder\svg\bb-apl.svg'
+ r←{(≢/⍵),⍵}xml (⎕XML⊃⎕NGET'c:\devt\breadboarder\svg\bb-apl.svg')

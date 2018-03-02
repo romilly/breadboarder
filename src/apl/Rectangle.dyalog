@@ -15,7 +15,7 @@
     ∇ rect←element;props
       :Access Public  
      
-      props←(↓'yx',⍪topleft),(↓'height' 'width',⍪extent)
+      props←(↓'xy',⍪topleft),(↓'width' 'height',⍪extent)
       props,←('style' 'stroke-width:1;stroke:black')('fill' 'white')
       rect←⎕NEW #.Element((⊂'rect'),props)
     ∇

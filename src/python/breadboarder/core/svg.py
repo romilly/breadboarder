@@ -68,10 +68,10 @@ class CompositeItem(Drawable):
         self._children.append(item)
 
     def element(self):
-        svg = self.container()
+        elm = self.container()
         for child in self._children:
-            svg.append(child.element())
-        return svg
+            elm.append(child.element())
+        return elm
 
     @abc.abstractmethod
     def container(self):

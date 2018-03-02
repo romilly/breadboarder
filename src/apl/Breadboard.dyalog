@@ -1,4 +1,4 @@
-﻿:Class Breadboard
+:Class Breadboard
     :Include Drawables
 
     ∇ make
@@ -10,8 +10,30 @@
       children←⍬      
       transformations←⍬
 
-      Add ⎕NEW #.Rectangle(start (height width))
-     ⍝ Add horizontal_line (10 10) 20
+      add ⎕NEW #.Rectangle(start (width height))
+      add_power_group drop_from_line_to_power_sockets ⍝ 'T' (add prefix later)
+    ∇
+    
+    ∇ add_power_group vertical_location
+    ⍝    def add_power_group(self, vertical_location, prefix):
+        EM_DASH←⎕ucs 8212 ⍝ EM_DASH = u'\u2014'
+        add_power_line(vertical_location EM_DASH 'blue')
+    ⍝    # self.add_power_sockets(vertical_location +
+    ⍝    #                       self.drop_from_line_to_power_sockets, prefix)
+        add_power_line((vertical_location + gap_between_power_lines) '+' 'red')
+    ∇
+
+    ∇add_power_line args
+    ⍝ def add_power_line(self, vertical_location, text, color):
+        (vertical_location text color)←3↑args,(≢args)↓(0 0) '' 'black'
+        line_offset ← gap_to_left_of_power_line  vertical_location ⍝ Point
+        add horizontal_line line_offset  (width - 2 × line_offset[1]) color
+        ⍝ #self.add(Text(text, line_offset +
+        ⍝ #              self.offset_from_line_start_to_text,
+        ⍝ #              color=color, anchor='middle', size=7).rotate(90))
+        ⍝ #self.add(Text(text, self.offset_from_line_start_to_text +
+        ⍝ #              line_offset + Point(self.width - 8, -1),
+        ⍝ #              color=color, anchor='middle', size=7).rotate(90))    
     ∇
 
     ∇ set_dimensions
@@ -42,7 +64,7 @@
       transformations,←⎕NEW #.Translation xy
     ∇
 
-    ∇ r←Add element
+    ∇ r←add element
       :Access Public
       children,←element
     ∇
