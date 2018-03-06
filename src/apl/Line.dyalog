@@ -8,7 +8,7 @@
 ⍝    def __init__(self, start, end, color='black', stroke_width=1, linecap='butt', **attributes):
       :Access Public
       :Implements Constructor
-     
+     ⍝ ***Wrong*** - line below has start but no end in defaults
       (start end color)←3↑args,(≢args)↓args,0 0 'black'
     ∇
 

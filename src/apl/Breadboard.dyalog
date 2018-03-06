@@ -11,6 +11,7 @@
       transformations←⍬
 
       add ⎕NEW #.Rectangle(start (width height))
+    ⍝ ***Wrong variable below: should be drop_to_top_power_group
       add_power_group drop_from_line_to_power_sockets ⍝ 'T' (add prefix later)
     ∇
     
