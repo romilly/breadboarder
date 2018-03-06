@@ -1,4 +1,4 @@
-﻿:Class Line
+:Class Line
 
     :Field Public start
     :Field Public end
@@ -8,14 +8,13 @@
 ⍝    def __init__(self, start, end, color='black', stroke_width=1, linecap='butt', **attributes):
       :Access Public
       :Implements Constructor
-     ⍝ ***Wrong*** - line below has start but no end in defaults
-      (start end color)←3↑args,(≢args)↓args,0 0 'black'
+      (start end color)←3↑args,(≢args)↓args,(0 0)(0 0) 'black'
     ∇
 
     ∇ rect←element;props
       :Access Public  
      
-      props←↓'y1' 'x1' 'y2' 'x2',⍪start,end
+      props←↓'x1' 'y1' 'x2' 'y2', ⍪start,end
       props,←⊂'style' ('stroke-width:1;stroke-linecap:butt;stroke:',color)
       rect←⎕NEW #.Element((⊂'line'),props)
     ∇
