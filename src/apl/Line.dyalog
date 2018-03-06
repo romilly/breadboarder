@@ -2,7 +2,7 @@
 
     :Field Public start
     :Field Public end
-    :Field Public color
+    :Field Public color   
 
     ∇ make args
 ⍝    def __init__(self, start, end, color='black', stroke_width=1, linecap='butt', **attributes):

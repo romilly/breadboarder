@@ -91,12 +91,12 @@ class Breadboard(GroupedDrawable):
         line_offset = Point(self.gap_to_left_of_power_line, vertical_location)
         self.add(horizontal_line(line_offset, self.width -
                                  2 * line_offset.x, color=color))
-        #self.add(Text(text, line_offset +
-        #              self.offset_from_line_start_to_text,
-        #              color=color, anchor='middle', size=7).rotate(90))
-        #self.add(Text(text, self.offset_from_line_start_to_text +
-        #              line_offset + Point(self.width - 8, -1),
-        #              color=color, anchor='middle', size=7).rotate(90))
+        self.add(Text(text, line_offset +
+                      self.offset_from_line_start_to_text,
+                      color=color, anchor='middle', size=7).rotate(90))
+        self.add(Text(text, self.offset_from_line_start_to_text +
+                      line_offset + Point(self.width - 8, -1),
+                      color=color, anchor='middle', size=7).rotate(90))
 
     def add_power_sockets(self, top_centre, prefix):
         for group in range(self.power_socket_group_count):

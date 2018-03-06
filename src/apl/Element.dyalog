@@ -1,4 +1,6 @@
-﻿:Class Element
+:Class Element
+
+    :Field Public text←''
 
     NL←⎕UCS 13
 
@@ -24,7 +26,7 @@
 
     ∇ r←Render
       :Access Public
-      r←'<',tag,formatProps,'>',NL
+      r←'<',tag,formatProps,'>',text,NL
       :If 0≠≢children
           r,←∊children.Render
       :EndIf

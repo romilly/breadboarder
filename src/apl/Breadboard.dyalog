@@ -23,17 +23,13 @@
         add_power_line((vertical_location + gap_between_power_lines) '+' 'red')
     ∇
 
-    ∇add_power_line args
+    ∇add_power_line args;left
     ⍝ def add_power_line(self, vertical_location, text, color):
         (vertical_location text color)←3↑args,(≢args)↓(0 0) '' 'black'
         line_offset ← gap_to_left_of_power_line  vertical_location ⍝ Point
-        add horizontal_line line_offset  (width - 2 × line_offset[1]) color
-        ⍝ #self.add(Text(text, line_offset +
-        ⍝ #              self.offset_from_line_start_to_text,
-        ⍝ #              color=color, anchor='middle', size=7).rotate(90))
-        ⍝ #self.add(Text(text, self.offset_from_line_start_to_text +
-        ⍝ #              line_offset + Point(self.width - 8, -1),
-        ⍝ #              color=color, anchor='middle', size=7).rotate(90))    
+        add horizontal_line line_offset  (width - 2 × line_offset[1]) color 
+        add (⎕NEW #.Text (text (left←line_offset + offset_from_line_start_to_text)  color  'middle' 7)).rotate 90
+        add (⎕NEW #.Text (text (left + (width-8) ¯1) color 'middle' 7)).rotate 90
     ∇
 
     ∇ set_dimensions
@@ -64,7 +60,7 @@
       transformations,←⎕NEW #.Translation xy
     ∇
 
-    ∇ r←add element
+    ∇ add element
       :Access Public
       children,←element
     ∇
