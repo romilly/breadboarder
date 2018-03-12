@@ -1,16 +1,14 @@
-:Class Breadboard
+:Class Breadboard : GroupedDrawable
+
     :Include Drawables   
 
     :Field Public Shared PITCH←0.1×90 ⍝ 0.1", 90 DPI
 
     ∇ make
       :Access Public
-      :Implements Constructor
+      :Implements Constructor :Base 'breadboard'
       
-      start←0 0
       set_dimensions
-      children←⍬      
-      transformations←⍬
 
       add ⎕NEW #.Rectangle(start (width height))
       add_power_group drop_to_top_power_group 'T'
@@ -64,34 +62,4 @@
       inter_power_group_spacing←53.5
     ∇
     
-    ∇move_to xy
-    :Access Public
-      start←xy
-      transformations,←⎕NEW #.Translation xy
-    ∇
-
-    ∇ add element
-      :Access Public
-      children,←element
-    ∇
-    
-    ∇r←transformation
-    :Access Public
-     r←¯1↓1↓⍕transformations.text
-    ∇
-
-    ∇ r←container
-     ⍝ Going to be an override method someday
-      :Access Public
-      r←⎕NEW #.Element ('g' ('id' 'breadboard')('transform' transformation))
-    ∇  
-   
-    ∇ elm←element
-      :Access Public
-      elm←container
-      :If 0≠≢children
-          elm.append¨children.element
-      :EndIf
-    ∇
-
 :EndClass
