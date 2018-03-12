@@ -1,6 +1,8 @@
 :Class Breadboard
     :Include Drawables   
 
+    :Field Public Shared PITCH←0.1×90 ⍝ 0.1", 90 DPI
+
     ∇ make
       :Access Public
       :Implements Constructor
@@ -25,9 +27,9 @@
     
     ∇ add_power_sockets (top_centre prefix);group;point
         
-        :For group :In ¯1+⍳self.power_socket_group_count ⍝ // Would be nicer with ⎕IO←0 and array orientation instead of the loop
+        :For group :In ¯1+⍳power_socket_group_count ⍝ // Would be nicer with ⎕IO←0 and array orientation instead of the loop
             point←(inset + inter_power_group_spacing × group), top_centre
-            add ⎕NEW #.SocketGroup (point  2  5  (prefix,¨'MP') ⎕THIS (1 + 5*group))
+            add ⎕NEW #.SocketGroup (point  2  5  (prefix,¨'MP') ⎕THIS (5*group))
         :EndFor
     ∇
 
