@@ -10,6 +10,7 @@ class Port():
         self.relative_location = relative_location
 
     def location(self):
+        # TODO: this should compose a series of transformations including rotations
         return self.relative_location + self.host.start
 
 
