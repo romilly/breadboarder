@@ -1,5 +1,5 @@
 :Class Breadboard
-    :Include Drawables
+    :Include Drawables   
 
     ∇ make
       :Access Public
@@ -11,23 +11,31 @@
       transformations←⍬
 
       add ⎕NEW #.Rectangle(start (width height))
-      add_power_group drop_to_top_power_group ⍝ 'T' (add prefix later)
+      add_power_group drop_to_top_power_group 'T'
     ∇
     
-    ∇ add_power_group vertical_location
-    ⍝    def add_power_group(self, vertical_location, prefix):
+    ∇ add_power_group (vertical_location prefix)
+    ⍝    def add_power_group(self, vertical_location, prefix):  
+
         EM_DASH←⎕ucs 8212 ⍝ EM_DASH = u'\u2014'
         add_power_line(vertical_location EM_DASH 'blue')
-    ⍝    # self.add_power_sockets(vertical_location +
-    ⍝    #                       self.drop_from_line_to_power_sockets, prefix)
+        add_power_sockets ((vertical_location + drop_from_line_to_power_sockets) prefix)
         add_power_line((vertical_location + gap_between_power_lines) '+' 'red')
+    ∇
+    
+    ∇ add_power_sockets (top_centre prefix);group;point
+        
+        :For group :In ¯1+⍳self.power_socket_group_count ⍝ // Would be nicer with ⎕IO←0 and array orientation instead of the loop
+            point←(inset + inter_power_group_spacing × group), top_centre
+            add ⎕NEW #.SocketGroup (point  2  5  (prefix,¨'MP') ⎕THIS (1 + 5*group))
+        :EndFor
     ∇
 
     ∇add_power_line args;left
     ⍝ def add_power_line(self, vertical_location, text, color):
         (vertical_location text color)←3↑args,(≢args)↓(0 0) '' 'black'
         line_offset ← gap_to_left_of_power_line  vertical_location ⍝ Point
-        add horizontal_line line_offset  (width - 2 × line_offset[1]) color 
+        add horizontal_line line_offset (width - 2 × line_offset[1]) color 
         add (⎕NEW #.Text (text (left←line_offset + offset_from_line_start_to_text)  color  'middle' 7)).rotate 90
         add (⎕NEW #.Text (text (left + (width-8) ¯1) color 'middle' 7)).rotate 90
     ∇

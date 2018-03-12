@@ -83,8 +83,8 @@ class Breadboard(GroupedDrawable):
     def add_power_group(self, vertical_location, prefix):
         EM_DASH = u'\u2014'
         self.add_power_line(vertical_location, EM_DASH, 'blue')
-        # self.add_power_sockets(vertical_location +
-        #                       self.drop_from_line_to_power_sockets, prefix)
+        self.add_power_sockets(vertical_location +
+                              self.drop_from_line_to_power_sockets, prefix)
         self.add_power_line(vertical_location +
                             self.gap_between_power_lines, '+', 'red')
 
