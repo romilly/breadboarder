@@ -74,13 +74,19 @@ class MicrobitButton(GroupedDrawable):
          self.add(Circle(Point(cms(0.13),cms(0.13)),cms(0.5*0.37)))
 
 
-class Microbit(GroupedDrawable):
+class MicroBit(GroupedDrawable):
+     def __init__(self, svg_id):
+         GroupedDrawable.__init__(self, svg_id=svg_id)
+         self.add(Rectangle(height=cms(4.2), width=cms(5.0), rounded=True, fill='grey', stroke='none'))
+
+
+class MicrobitFront(MicroBit):
     def __init__(self):
-        GroupedDrawable.__init__(self, svg_id='microbit')
+        MicroBit.__init__(self, svg_id='microbit front')
         self.add_parts()
 
     def add_parts(self):
-        self.add(Rectangle(height=cms(4.2), width=cms(5.0),rounded=True,fill='grey', stroke='none'))
+        # self.add(Rectangle(height=cms(4.2), width=cms(5.0),rounded=True,fill='grey', stroke='none'))
         self.add_usb_port()
         self.add_decoration()
         self.add_logo()
