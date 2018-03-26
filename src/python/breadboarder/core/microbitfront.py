@@ -22,11 +22,11 @@ class MicrobitConnector(GroupedDrawable):
     WIDTH = 0.04
     C_HEIGHT = cms(0.54)
 
-    def __init__(self):
+    def __init__(self,add_text=True):
         GroupedDrawable.__init__(self, svg_id='microbit connector')
         self.wide_connector_start_positions = [1, 9, 18, 27, 35]
         self.add_end_connectors()
-        self.add_wide_connectors()
+        self.add_wide_connectors(add_text)
         self.add_narrow_connectors()
 
     def wide_connector_spans(self):
@@ -45,10 +45,11 @@ class MicrobitConnector(GroupedDrawable):
     def offset(self, index):
         return 0.5+ins(index*self.CONNECTOR_SPACING)
 
-    def add_wide_connectors(self):
-        specs = zip(self.wide_connector_start_positions, ['0','1','2','3V','GND'])
-        for spec in specs:
-            self.add(self.wide_connector(*spec))
+    def add_wide_connectors(self,add_text):
+        texts = ['0','1','2','3V','GND'] if add_text else 5*['']
+        specs = zip(self.wide_connector_start_positions, texts)
+        for (pos, text) in specs:
+            self.add(self.wide_connector(pos, text))
 
     def add_narrow_connectors(self):
         for i in set(range(40)) - (set([0,39]+self.wide_connector_spans())):
@@ -59,7 +60,8 @@ class MicrobitConnector(GroupedDrawable):
         g.add(Rectangle(ins(self.WIDTH+3*self.CONNECTOR_SPACING),cms(0.65), fill='gold', stroke='none')
              .move_to(Point(self.offset(pos),cms(-0.65))))
         centre = Point(ins(0.5*self.WIDTH+self.CONNECTOR_SPACING)+self.offset(pos+1)-2,cms(-0.7))
-        g.add(Text(text, Point(centre.x, cms(-0.2)),anchor='middle',size=6))
+        if text:
+            g.add(Text(text, Point(centre.x, cms(-0.2)),anchor='middle',size=6))
         g.add(Circle(Point(0,0),cms(0.27),fill='gold').
               move_center_to(centre))
         g.add(Circle(Point(0,0),cms(0.245),fill='white').
