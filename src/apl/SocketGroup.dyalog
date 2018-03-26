@@ -17,8 +17,8 @@
             :For j :In ¯1+⍳rows
                 sock ← (socket fill).set_center center + #.Breadboard.PITCH × i j 
                 label ← ((j+1)⊃alpha_labels),⍕i + start_number
-                ⍝ host.add_port ⎕NEW #.Port (host socket.center label)
-                add sock
+                host.add_port (⎕NEW #.Port (host sock.center label)) label
+                add sock 
             :EndFor
         :EndFor
 

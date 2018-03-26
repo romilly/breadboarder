@@ -4,19 +4,36 @@
 
     :Field Public Shared PITCH←0.1×90 ⍝ 0.1 inch, 90 DPI
 
+    :Property Default Keyed port
+    :Access Public
+
+        ∇ r←Get args
+          r←ports[portnames⍳⊆⊃args.Indexers]
+        ∇
+
+    :EndProperty
+
     ∇ make
       :Access Public
       :Implements Constructor :Base 'breadboard'
      
       set_dimensions
+      portnames←ports←⍬
      
       add ⎕NEW #.Rectangle(start(width height))
       add_power_group drop_to_top_power_group'T'
       add_numeric_labels drop_to_top_numeric_labels columns'start'
-      add_body_sockets(gap_from_left_to_body_sockets drop_to_top_body_sockets)'jihgf'   
+      add_body_sockets(gap_from_left_to_body_sockets drop_to_top_body_sockets)'jihgf'
       add_body_sockets(gap_from_left_to_body_sockets drop_to_lower_body_sockets)'edcba'
-      add_numeric_labels drop_to_lower_numeric_labels columns 'end'
+      add_numeric_labels drop_to_lower_numeric_labels columns'end'
       add_power_group drop_to_lower_power_group'B'
+    ∇
+
+    ∇ add_port(port label)
+      :Access Public
+     
+      portnames,←⊂label
+      ports,←port
     ∇
 
     ∇ add_body_sockets(center alpha_labels)
