@@ -24,6 +24,12 @@
          
      topleft←point-0.5×extent
      r←⎕THIS
+    ∇     
+    
+    ∇ r←center
+    :Access Public
+
+     r←topleft+0.5×extent
     ∇
 
 :EndClass

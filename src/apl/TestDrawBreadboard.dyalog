@@ -1,4 +1,4 @@
- r←TestDrawBreadboard;project;breadboard;svg;xml;sortstyles;pyxml;fixtrailingzeros
+ r←TestDrawBreadboard;project;breadboard;svg;xml;sortstyles;pyxml;fixtrailingzeros;ports
 
  sortstyles←{
      0=≢styles←⍸';'∊¨⍵[;2]:⍵ ⍝ no styles
@@ -17,6 +17,10 @@
  project←⎕NEW Project
  (breadboard←⎕NEW Breadboard).move_to 20 20
  project.Add breadboard
+ ports←breadboard['g1' 'TP1']
+ ∘∘∘
+ project.Add ⎕NEW #.Wire((⊂'red'),breadboard['g1' 'TP1'])
+
  svg←project.svg
  xml←⎕XML svg
  xml[;4]←fixtrailingzeros¨sortstyles¨{⍵[⍋⍵;]}¨xml[;4]
