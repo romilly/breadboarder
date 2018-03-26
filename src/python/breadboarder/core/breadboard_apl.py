@@ -49,15 +49,15 @@ class Breadboard(GroupedDrawable):
     def add_components(self):
         self.add(Rectangle(self.width, self.height, fill='white'))
         self.add_power_group(self.drop_to_top_power_group,'T')
-        # self.add_numeric_labels(self.drop_to_top_numeric_labels, self.columns, 'start')
-        # self.add_body_sockets(
-        #     Point(self.gap_from_left_to_body_sockets,self.drop_to_top_body_sockets),
-        #     'jihgf')
-        # self.add_body_sockets(
-        #     Point(self.gap_from_left_to_body_sockets, self.drop_to_lower_body_sockets),
-        #     'edcba')
-        # self.add_numeric_labels(self.drop_to_lower_numeric_labels, self.columns, 'end')
-        # self.add_power_group(self.drop_to_lower_power_group,'B')
+        self.add_numeric_labels(self.drop_to_top_numeric_labels, self.columns, 'start')
+        self.add_body_sockets(
+             Point(self.gap_from_left_to_body_sockets,self.drop_to_top_body_sockets),
+             'jihgf')
+        self.add_body_sockets(
+             Point(self.gap_from_left_to_body_sockets, self.drop_to_lower_body_sockets),
+             'edcba')
+        self.add_numeric_labels(self.drop_to_lower_numeric_labels, self.columns, 'end')
+        self.add_power_group(self.drop_to_lower_power_group,'B')
 
     def _set_dimensions(self):
         self.width = 291.7
@@ -68,7 +68,7 @@ class Breadboard(GroupedDrawable):
         self.gap_from_left_to_body_sockets = 15.2
         self.drop_to_top_numeric_labels = 90 * 0.469
         self.drop_to_top_body_sockets = 47.4
-        self.drop_to_lower_body_sockets = 108
+        self.drop_to_lower_body_sockets = 108.0
         self.drop_to_lower_numeric_labels = 90 * 1.66
         self.drop_to_top_power_group = 5
         self.drop_to_lower_power_group = 1.81 * 90
@@ -106,16 +106,16 @@ class Breadboard(GroupedDrawable):
     def add_port(self, port, label):
         self.ports[label] = port
 
-    def add_body_sockets(self, center, alpha_labels):
-        self.add_alpha_labels(Point(self.inset_to_left_letters, center.y + 2), alpha_labels)
-        self.add(SocketGroup(center, 5, self.columns, alpha_labels, self))
-        self.add_alpha_labels(Point(self.inset_to_right_letters, center.y + 2), alpha_labels)
-
     def add_numeric_labels(self, vertical_location, count, anchor):
         for i in range(count):
             self.add(Text(str(i+1),
                           Point(self.inset - 1 + self.PITCH * i, vertical_location),
                           anchor=anchor, color='grey', size=6).rotate(-90))
+
+    def add_body_sockets(self, center, alpha_labels):
+        self.add_alpha_labels(Point(self.inset_to_left_letters, center.y + 2), alpha_labels)
+        self.add(SocketGroup(center, 5, self.columns, alpha_labels, self))
+        self.add_alpha_labels(Point(self.inset_to_right_letters, center.y + 2), alpha_labels)
 
     def add_alpha_labels(self, offset_to_letters, letters):
         for i in range(len(letters)):

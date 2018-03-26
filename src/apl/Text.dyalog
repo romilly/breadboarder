@@ -21,7 +21,7 @@
       props,←⊂'style' ('fill:',color,';font-size: ',(⍕size),'pt;text-anchor:',anchor)
       
       :If angle≠0
-          props,←⊂'transform' ('rotate(',(⍕angle),(∊',',¨⍕¨⌊start),')')
+          props,←⊂('¯'⎕R '-') 'transform' ('rotate(',(⍕angle),(∊',',¨⍕¨⌊start),')')
       :EndIf
 
                  

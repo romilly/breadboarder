@@ -34,7 +34,7 @@
     ∇
     
     ∇ r←formatProps
-      r←∊{' ',⍺,'="',(⍕⍵),'"'}/props
+      r←('¯'⎕R '-') ∊{' ',⍺,'="',(⍕⍵),'"'}/props
     ∇
    
     ∇ Test;s;data;z
