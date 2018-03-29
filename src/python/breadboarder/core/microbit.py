@@ -1,3 +1,5 @@
+import abc
+
 from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.svg import GroupedDrawable, Rectangle, Point, PolygonalPath, Text, Circle, Path, vector, arc
 
@@ -77,10 +79,37 @@ class MicrobitButton(GroupedDrawable):
 
 
 class MicroBit(GroupedDrawable):
-     def __init__(self, svg_id):
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, svg_id):
          GroupedDrawable.__init__(self, svg_id=svg_id)
          self.add(Rectangle(height=cms(4.2), width=cms(5.0), rounded=True, fill='grey', stroke='none'))
 
+    @abc.abstractmethod
+    def add_parts(self):
+        pass
+
+
+    def add_button(self, left, top):
+        self.add(MicrobitButton().move_to(Point(left, top)))
+
+
+class MicrobitBack(MicroBit):
+    def __init__(self):
+        MicroBit.__init__(self, svg_id='microbit back')
+        self.add_parts()
+
+    def add_parts(self):
+        self.add_jst_power_socket()
+        self.add_usb_port_back()
+        self.add_button(cms(3.14),0)
+        self.add(MicrobitConnector(add_text=False).move_to(Point(0, cms(4.2))))
+
+    def add_jst_power_socket(self):
+        self.add(Rectangle(height=cms(0.58), width=cms(0.8), fill='antiquewhite', stroke='none').move_to(Point(cms(5.0-(0.8+0.23)),0)))
+
+    def add_usb_port_back(self):
+        self.add(Rectangle(height=cms(0.4),width=cms(0.55),fill='silver', stroke='none').move_to(Point(cms(2.4),-cms(0.1))))
 
 class MicrobitFront(MicroBit):
     def __init__(self):
@@ -88,8 +117,7 @@ class MicrobitFront(MicroBit):
         self.add_parts()
 
     def add_parts(self):
-        # self.add(Rectangle(height=cms(4.2), width=cms(5.0),rounded=True,fill='grey', stroke='none'))
-        self.add_usb_port()
+        self.add_usb_port_front()
         self.add_decoration()
         self.add_logo()
         self.add_leds()
@@ -97,8 +125,9 @@ class MicrobitFront(MicroBit):
         self.add_button_labels()
         self.add(MicrobitConnector().move_to(Point(0, cms(4.2))))
 
-    def add_usb_port(self):
+    def add_usb_port_front(self):
         self.add(Rectangle(height=cms(0.2),width=cms(0.4),fill='lightgrey', stroke='none').move_to(Point(cms(2.4),-cms(0.2))))
+
 
     def add_leds(self):
         for i in range(5):
@@ -120,9 +149,6 @@ class MicrobitFront(MicroBit):
         distance_from_top = cms(1.9)
         self.add_button(left_offset, distance_from_top)
         self.add_button(right_offset, distance_from_top)
-
-    def add_button(self, left, top):
-        self.add(MicrobitButton().move_to(Point(left, top)))
 
     def add_button_labels(self):
         self.add_label(Point(cms(0.619),cms(2.94)),'A', inverted=False)
