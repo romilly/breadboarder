@@ -24,11 +24,11 @@ class MicrobitConnector(GroupedDrawable):
     WIDTH = 0.04
     C_HEIGHT = cms(0.54)
 
-    def __init__(self,add_text=True):
-        GroupedDrawable.__init__(self, svg_id='microbit connector')
+    def __init__(self,side='front'):
+        GroupedDrawable.__init__(self, svg_id='microbit connector %s' % side)
         self.wide_connector_start_positions = [1, 9, 18, 27, 35]
         self.add_end_connectors()
-        self.add_wide_connectors(add_text)
+        self.add_wide_connectors(side)
         self.add_narrow_connectors()
 
     def wide_connector_spans(self):
@@ -47,8 +47,8 @@ class MicrobitConnector(GroupedDrawable):
     def offset(self, index):
         return 0.5+ins(index*self.CONNECTOR_SPACING)
 
-    def add_wide_connectors(self,add_text):
-        texts = ['0','1','2','3V','GND'] if add_text else 5*['']
+    def add_wide_connectors(self, side):
+        texts = ['0','1','2','3V','GND'] if side=='front' else 5*['']
         specs = zip(self.wide_connector_start_positions, texts)
         for (pos, text) in specs:
             self.add(self.wide_connector(pos, text))
@@ -103,7 +103,7 @@ class MicrobitBack(MicroBit):
         self.add_jst_power_socket()
         self.add_usb_port_back()
         self.add_button(cms(3.14),0)
-        self.add(MicrobitConnector(add_text=False).move_to(Point(0, cms(4.2))))
+        self.add(MicrobitConnector(side='back').move_to(Point(0, cms(4.2))))
 
     def add_jst_power_socket(self):
         self.add(Rectangle(height=cms(0.58), width=cms(0.8), fill='antiquewhite', stroke='none').move_to(Point(cms(5.0-(0.8+0.23)),0)))
