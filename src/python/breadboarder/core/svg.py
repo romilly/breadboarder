@@ -231,13 +231,14 @@ class Rectangle(Drawable):
 
 
 class Line(Drawable):
-    def __init__(self, start, end, color='black', stroke_width=1, linecap='butt', **attributes):
+    def __init__(self, start, end, color='black', stroke_width=1, linecap='butt', stroke_dasharray=None, **attributes):
         Drawable.__init__(self, start)
         self.vector = end-start
         self.color = color
         self.stroke_width = stroke_width
         self.linecap = linecap
         self._attributes = attributes
+        self.stroke_dasharray = stroke_dasharray
 
     def set_end(self, point):
         self.vector = point-self.start
@@ -246,8 +247,11 @@ class Line(Drawable):
         return self.start + self.vector
 
     def element(self):
+        style = 'stroke:%s;stroke-width:%d;stroke-linecap:%s;' % (self.color, self.stroke_width, self.linecap)
+        if self.stroke_dasharray:
+            style += 'stroke-dasharray: %s;' % self.stroke_dasharray
         return Element('line', x1=str(self.start.x), y1=str(self.start.y), x2=str(self.end().x), y2=str(self.end().y),
-                       style='stroke:%s;stroke-width:%d;stroke-linecap:%s' % (self.color, self.stroke_width, self.linecap), **self._attributes)
+                       style=style, **self._attributes)
 
 
 def horizontal_line(start, length, color='black', stroke_width=1, linecap='butt'):
