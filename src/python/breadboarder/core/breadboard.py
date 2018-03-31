@@ -36,6 +36,23 @@ class SocketGroup(GroupedDrawable):
 
 # TODO: document Breadboard measurements in docs/BREADBOARD_LAYOUT.md
 
+def to_cms(distance):
+    return distance * Breadboard.PITCH / 0.254
+
+def cms(*distances):
+    if len(distances) == 1:
+        return to_cms(distances[0])
+    return [to_cms(distance) for distance in distances]
+
+
+def to_ins(distance):
+    return distance * Breadboard.PITCH * 10
+
+def ins(*distances):
+    if len(distances) == 1:
+        return to_ins(distances[0])
+    return [to_ins(distance) for distance in distances]
+
 
 class Breadboard(GroupedDrawable):
     PITCH = 0.1*90 # 0.1", 90 DPI
