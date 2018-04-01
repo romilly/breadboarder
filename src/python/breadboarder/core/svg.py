@@ -139,6 +139,7 @@ class RelativeVector(PathSegment):
 def vector(x, y):
     return RelativeVector(x,y)
 
+
 class Arc(PathSegment):
     def __init__(self, x, y, xrot, large_arc, sweep, endx, endy):
         self._spec = (x, y, xrot, large_arc, sweep, endx, endy)

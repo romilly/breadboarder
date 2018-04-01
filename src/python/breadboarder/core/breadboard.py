@@ -1,6 +1,6 @@
 from xml.etree.ElementTree import Element
 
-from breadboarder.core.svg import Rectangle, horizontal_line, Text, Point, GroupedDrawable
+from breadboarder.core.svg import Rectangle, horizontal_line, Text, Point, GroupedDrawable, vector
 
 
 class Port():
@@ -140,4 +140,8 @@ class Breadboard(GroupedDrawable):
 
     def __getitem__(self, item):
         return self.ports[item]
+
+def v(x, y):  # for brevity, which is the soul of wit
+    return vector(*cms(x, y))
+
 
