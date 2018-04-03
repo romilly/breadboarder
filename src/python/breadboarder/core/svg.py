@@ -230,6 +230,9 @@ class Rectangle(Drawable):
     def center(self):
         return self.start + Point(self.width, self.height).scale(0.5)
 
+    def set_fill(self, color):
+        self._attributes['fill'] = color
+
 
 class Line(Drawable):
     def __init__(self, start, end, color='black', stroke_width=1, linecap='butt', stroke_dasharray=None, **attributes):
