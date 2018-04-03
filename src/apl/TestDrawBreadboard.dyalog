@@ -1,7 +1,7 @@
  r←TestDrawBreadboard;project;breadboard;svg;xml;sortstyles;pyxml;fixtrailingzeros;ports;pysvg
 
  sortstyles←{
-     w←⍵[⍋⍵:]
+     w←⍵[⍋⍵;]
      0=≢styles←⍸';'∊¨w[;2]:⍵ ⍝ no styles
      w[styles;2]←{1↓∊';',¨{⍵[⍋⍵]}((~m)×1++\m←⍵=';')⊆⍵}¨w[styles;2]
      w
