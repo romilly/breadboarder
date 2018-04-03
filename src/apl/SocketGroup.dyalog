@@ -21,7 +21,6 @@
                 add sock 
             :EndFor
         :EndFor
-
     ∇       
     
     ∇r←socket fill
