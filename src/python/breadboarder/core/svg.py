@@ -189,7 +189,9 @@ class GroupedDrawable(CompositeItem):
         return ' '.join([t.text() for t in self.transformations])
 
     def container(self):
-            group = Element('g', transform=self.transformation())
+            group = Element('g')
+            if len(self.transformations) > 0:
+                group.set('transform',self.transformation())
             if self.svg_id is not None:
                 group.set('id',self.svg_id)
             return group
@@ -205,19 +207,23 @@ class GroupedDrawable(CompositeItem):
 
 
 class Rectangle(Drawable):
-    def __init__(self, width, height, stroke_width=1, stroke='black',rounded=False, **attributes):
+    def __init__(self, width, height, stroke_width=1, stroke='black', stroke_dasharray=None,rounded=False, **attributes):
         Drawable.__init__(self, Point(0,0))
         self.width = width
         self.height = height
         self.stroke_width = stroke_width
+        self.stroke_dasharray = stroke_dasharray
         self.stroke = stroke
         self.rounded = rounded
         self._attributes = attributes
 
     def element(self):
+        style = 'stroke-width:%d;stroke:%s;' % (self.stroke_width, self.stroke)
+        if self.stroke_dasharray:
+            style += 'stroke-dasharray: %s;' % self.stroke_dasharray
         rect = Element('rect', x=str(self.start.x), y=str(self.start.y), width=str(self.width),
-                          height=str(self.height), style='stroke-width:%d;stroke:%s' % (self.stroke_width, self.stroke),
-                          **self._attributes)
+                       height=str(self.height), style=style,
+                       **self._attributes)
         if self.rounded:
             rect.set('rx', '4')
             rect.set('ry', '4')
