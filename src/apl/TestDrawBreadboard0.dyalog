@@ -1,4 +1,4 @@
- r←TestDrawBreadboard;project;breadboard;svg;xml;sortstyles;pyxml;fixtrailingzeros;ports;pysvg
+ r←TestDrawBreadboard0;project;breadboard;svg;xml;sortstyles;pyxml;fixtrailingzeros;ports;pysvg;ToUTF8
 
  sortstyles←{
      w←⍵[⍋⍵;]
@@ -14,6 +14,8 @@
      w
  }
 
+ ToUTF8←{⎕UCS'UTF-8'⎕UCS ⍵}
+
  project←⎕NEW Project
  (breadboard←⎕NEW Breadboard).move_to 20 20
  project.Add breadboard
@@ -23,10 +25,10 @@
  svg←project.svg
  pysvg←⊃⎕NGET'c:\devt\breadboarder\svg\bb-apl.svg'
 
- xml←⎕XML svg
- xml[;4]←fixtrailingzeros¨sortstyles¨xml[;4]
+ 'F1'⎕WC'Form' 'APL Produced'('Coord' 'Pixel')('Size'(260 360))('Posn'(30 0))
+ 'F1.HR'⎕WC'HTMLRenderer'('AsChild' 1)('Posn'(0 0))('Size'(300 400))
+ F1.HR.HTML←ToUTF8 svg
 
- pyxml←⎕XML pysvg
- pyxml[;4]←fixtrailingzeros¨sortstyles¨pyxml[;4]
-
- r←{(≡/⍵),⍵}xml pyxml
+ 'F2'⎕WC'Form' 'Python Produced'('Coord' 'Pixel')('Size'(260 360))('Posn'(30 400))
+ 'F2.HR'⎕WC'HTMLRenderer'('AsChild' 1)('Posn'(0 0))('Size'(300 400))
+ F2.HR.HTML←ToUTF8 pysvg
