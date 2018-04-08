@@ -12,6 +12,7 @@ def decode(radices, values):
         result = v + result * r
     return result
 
+
 class Array():
     def __init__(self, shape, elements):
         self._shape = shape
@@ -49,4 +50,5 @@ class Array():
         return Array(new_shape, elements)
 
     def str(self):
+        # TODO: implement something more like APL's output
         return '%s⍴%s' % (self._shape, self._elements)
