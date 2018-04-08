@@ -18,12 +18,17 @@ class Array():
         self._shape = shape
         self._elements = elements
 
+    def shape(self):
+        return Array([len(self._shape)], copy(self._shape))
+
     @classmethod
     def cv(cls, item_list):
         return Array([len(item_list),1], item_list)
 
     def reshape(self, new_shape):
-        count = reduce(operator.add, new_shape)
+        if isinstance(new_shape, Array):
+            new_shape = new_shape._elements
+        count = reduce(operator.mul, new_shape, 1) # 1 is identity for multiply
         elements = take(count,cycle(self._elements))
         return Array(new_shape, elements)
 
@@ -36,19 +41,27 @@ class Array():
     def __setitem__(self, idx_, value):
         self._elements[self.idx(idx_)] = value
 
-    def transpose(self):
-        # flips last two dimensions
-        # scalars and vectors are returned unchanged
-        if len(self._shape) < 2:
-            return Array(copy(self._shape), copy(self._elements))
-        elements = len(self._elements)*[0]
-        new_shape = self._shape[:-2]+self._shape[-1:]+[self._shape[-2]]
-        idx = 0
-        for j in range(self._shape[-2]):
-            for i in range(self._shape[-1]):
-                elements[idx] = self[i,j]
-        return Array(new_shape, elements)
+    def dot(self, array):
+        # TODO: handle scalar args
+        if not isinstance(array, Array):
+            raise Exception('domain error')
+        if self._shape[-1] != array._shape[0]:
+            raise Exception('length error')
+        leading_count = reduce(operator.mul, self._shape[:-1], 1)
+        trailing_count = reduce(operator.mul, array._shape[1:], 1)
+        l = self._shape[-1]
+        elements = (leading_count*trailing_count*[0])
+        index = 0
+        for i in range(0, leading_count):
+            for j in range(0, trailing_count):
+                for k in range(l):
+                    first = i * l + k
+                    last = j + trailing_count * k
+                    elements[index] += self._elements[first] * array._elements[last]
+                index += 1
+        return Array(self._shape[:-1]+array._shape[1:], elements)
 
-    def str(self):
+
+    def __str__(self):
         # TODO: implement something more like APL's output
         return '%s⍴%s' % (self._shape, self._elements)
