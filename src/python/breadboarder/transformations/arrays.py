@@ -1,9 +1,9 @@
 import operator
 from copy import copy
 from functools import reduce
-from itertools import cycle, accumulate
-
+from itertools import cycle
 from more_itertools import take
+
 
 def decode(radices, values):
     result = 0
@@ -13,6 +13,13 @@ def decode(radices, values):
     return result
 
 
+
+def cv(item_list):
+        return Array([len(item_list),1], item_list)
+
+def scalar(value):
+        return(Array([],[value]))
+
 class Array():
     def __init__(self, shape, elements):
         self._shape = shape
@@ -20,10 +27,6 @@ class Array():
 
     def shape(self):
         return Array([len(self._shape)], copy(self._shape))
-
-    @classmethod
-    def cv(cls, item_list):
-        return Array([len(item_list),1], item_list)
 
     def reshape(self, new_shape):
         if isinstance(new_shape, Array):
@@ -42,7 +45,7 @@ class Array():
         self._elements[self.idx(idx_)] = value
 
     def dot(self, array):
-        # TODO: handle scalar args
+        # TODO: one day handle scalar args
         if not isinstance(array, Array):
             raise Exception('domain error')
         if self._shape[-1] != array._shape[0]:

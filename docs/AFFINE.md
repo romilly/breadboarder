@@ -1,4 +1,46 @@
-# 2D Affine transformations
+# Affine transformations in *breadboarder*
+
+This document explains the requirement for Affine transformations in *breadboarder*.
+It also documents the design decisions behind the Python implementation.
+
+At some point the document is likely to be merged into more comprehensive documentation for *breadboarder*.
+
+Some of the Python transformation code was prototyped in APL and there is a brief description of the APL protoype.
+The APL code and its description will be removed at some point.
+
+## Why Affine transformations?
+
+This section describes a difficulty that arises when using *breadboarder* for all but the simplest designs,
+and explains how Affine transformations resolve the problem.
+
+### *breadboarder* components and connections
+
+A typical *breadboarder* project consists of connected *compound components* (like a breadboard, an Arduino or a
+BBC micro:bit) and *basic components* (like wires, resistors, capacitors, switches, or diodes).
+
+Compound components have connection points (called *ports*). Basic components connect two or more ports on one or more
+compound components.
+
+When you lay out a *breadboarder* project it is convenient to be able to move and rotate compound components before you
+specify their connections.
+
+### Locating ports
+
+Components in *breadboarder* are rendered as SVG groups. SVG provides suitable transformations
+(translations and rotations) that you can use to position the components,but this raises a potential problem.
+
+A basic component can be used to connect different compound components which will be rendered by distinct SVG groups.
+
+The component's location in the diagram will be determined byt the position its endpoints. These are determined by the
+position of the ports to which it is connected.
+
+The ports may belong to different compound components (an Arduino and a breadboard, for example) that are rendered by
+distinct SVG groups so the locations of the ports cannot be determined by SVG.
+
+The solution is to write Python code that uses transformations to turn the relative locations of the ports and their
+parent compound components into into absolute coordinates. Then *breadboarder* can generate SVG to draw the basic
+components in their correct locations.
+
 ## Theory
 
 Affine transformations like translation, rotation, scale and shear can be implemented elegantly
@@ -52,14 +94,8 @@ In APL you can generate a translation matrix using
 ⍝ define dot to be inner product
      dot ← +.×
 
-⍝ Generate a translation by (5,3):
-
-     translate 5 3
-1 0 5
-0 1 3
-0 0 1
      T ← translate 2 ¯1 ⍝ translate by (2.-1)
-      T 
+     T 
 1 0  2
 0 1 ¯1
 0 0  1   
@@ -77,7 +113,7 @@ The trivial function `to_h` converts an array of points into homogeneous coordin
     to_h 2 3
 2 3 1
 
-⍝ create a 2 × 4 matrix of four points in catestian coordinates
+⍝ create a 2 × 4 matrix of four points in cartesian coordinates
       points ← ?2 4⍴10
       points
 7 8 3 1
@@ -138,6 +174,24 @@ dependency to *breadboarder*.
 modelled on APL arrays.
 
 The implementation is designed for simplicity rather than performance and it contains only those features required by
-*breadboarder*.
+*breadboarder*. It does little error checking as the Arrays used in breadboarder are all of compatible shapes.
+
+I did not implement separate classes for Vector and Matrix as I wanted to avoid duplicated code.
+
+## The Array class
+
+An Array is constructed from a shape and a list of elements.
+
+The shape can be a list or a vector (a one-dimensional Array).
+
+Inner product is implemented as a `dot` method in the Array class. It handles vector, matrix and tensor
+arguments. It does not support scalar extension as this is not needed in *breadboarder*.
+
+## Transformations
+
+*breadboarder* already contains Transformation classes. These will be enhanced to generate their corresponding
+transformation arrays.
+
+In order to support 
 
 

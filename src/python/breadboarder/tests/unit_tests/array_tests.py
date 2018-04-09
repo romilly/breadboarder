@@ -3,7 +3,7 @@ from unittest import TestCase
 from hamcrest import assert_that, equal_to
 from hamcrest.core.base_matcher import BaseMatcher
 
-from breadboarder.transformations.arrays import decode, Array
+from breadboarder.transformations.arrays import decode, Array, scalar
 
 
 class DecodeTest(TestCase):
@@ -52,7 +52,7 @@ class ArrayTest(TestCase):
         assert_that(self.a.reshape([0]), equal_to_array(Array([0],[])))
         assert_that(self.a.reshape([0, 3]), equal_to_array(Array([0, 3],[])))
         assert_that(self.a.reshape([3, 0]), equal_to_array(Array([3, 0],[])))
-        assert_that(self.a.reshape([]), equal_to_array(Array([],[1])))
+        assert_that(self.a.reshape([]), equal_to_array(scalar(1)))
 
     def test_dot_checks_array_argument(self):
         try:
@@ -80,7 +80,7 @@ class ArrayTest(TestCase):
         assert_that(c.dot(d), equal_to_array(Array([4,2],[112, 93, 66, 70, 94, 76, 100, 93])))
 
     def test_dot_multiplies_tensor_by_matrix(self):
-        # not really needed, but I'd like to be sure I got it right!
+        # not really needed, but I want to be sure I got it right!
         c = Array([4, 3],[10, 7, 1, 2, 1, 8, 10, 4, 2, 6, 5, 5])
         e = Array([2, 3, 4],[10, 1, 3, 2, 10, 4, 9, 6, 3, 7, 2, 4, 6, 4, 9, 7, 6, 9, 2, 6, 8, 7, 8, 1])
         assert_that(e.dot(c), equal_to_array(Array([2, 3, 3],[144, 93, 34, 234, 140, 90, 88, 56, 83, 200, 117,
