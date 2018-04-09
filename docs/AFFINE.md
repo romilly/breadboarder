@@ -37,9 +37,12 @@ position of the ports to which it is connected.
 The ports may belong to different compound components (an Arduino and a breadboard, for example) that are rendered by
 distinct SVG groups so the locations of the ports cannot be determined by SVG.
 
-The solution is to write Python code that uses transformations to turn the relative locations of the ports and their
-parent compound components into into absolute coordinates. Then *breadboarder* can generate SVG to draw the basic
+The solution is to write Python code to turn the relative locations of the ports and
+their parent compound components into into absolute coordinates. Then *breadboarder* can generate SVG to draw the basic
 components in their correct locations.
+
+The process can easily be implemented using
+[Affine transformations](https://en.wikipedia.org/wiki/Affine_transformation).
 
 ## Theory
 
@@ -51,10 +54,9 @@ and [Transformation Matrices](https://en.wikipedia.org/wiki/Transformation_matri
 
 #### Homogeneous coordinates
 
-In the 2D case, the point (x,y) can be represented as a vector (x, y ,1).
+In the 2D case, the point (x,y) can be represented as a vector `(x, y ,1)`.
 
-NB: If m is any non-zero value, the vector
-`(mx, my, m)` represents the same point.
+If m is any non-zero value, the vector `(mx, my, m)` represents the same point.
 
 ### Translation
 
@@ -80,9 +82,9 @@ If the plane is rotated about the origin by an angle θ, the new coordinates of 
 ```
 by the vector `(x,y,1)` to give the new location of the point in homogeneous coordinates.
 
-Scale and shear are not yet needed in breadboarder but their implementation is simple.
+Scale and shear are not needed in *breadboarder*.
 
-### Scale
+The code to generate and apply Affine transofrmations was prototyped in APL before coding in Python.
 
 ## Transformations in APL
 
@@ -103,8 +105,9 @@ In APL you can generate a translation matrix using
 7 5 1
 ```
 
-Each point can be represented in APL as a (1-d) 3-element vector or a 3×1 matrix;
-multiple points can be transformed if they are represented in homogeneous coordinates as the columns of a 3×n matrix.
+Each point can be represented in APL as a (1-d) 3-element vector or a 3×1 matrix.
+
+Multiple points can be transformed if they are represented in homogeneous coordinates as the columns of a 3×n matrix.
 
 The trivial function `to_h` converts an array of points into homogeneous coordinates:
 
@@ -126,7 +129,7 @@ The trivial function `to_h` converts an array of points into homogeneous coordin
 1 8 5 6
 1 1 1 1
 
-⍝ translate them by (2,¯1)
+⍝ translate them by (2,¯1) using T defied above
       xp ← T dot to_h points
       xp
 9 10 5 3
@@ -170,7 +173,7 @@ to_radians←{⍵×○÷180} ⍝ convert degrees to radians
 It would be easy to implement matrix-based transformations in Python using numpy, but this would add a significant
 dependency to *breadboarder*.
 
-`breadboarder.transformations.arrays` contains a (currently incomplete) implementation of an Array class,
+`breadboarder.transformations.arrays` contains a partial implementation of an Array class,
 modelled on APL arrays.
 
 The implementation is designed for simplicity rather than performance and it contains only those features required by
@@ -191,7 +194,5 @@ arguments. It does not support scalar extension as this is not needed in *breadb
 
 *breadboarder* already contains Transformation classes. These will be enhanced to generate their corresponding
 transformation arrays.
-
-In order to support 
 
 
