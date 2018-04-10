@@ -53,32 +53,6 @@ def down_right(x, y=None):
     return sv(x,y)
 
 
-# TODO: replace PolygonalPath with Path;
-# TODO: this will require an easy way of converting a sequence of points to a relative path (so move_to is easy)
-# TODO: or letting move_to change path elements (probably better)
-
-class PolygonalPath(Drawable):
-    def __init__(self, start, *points, **attributes):
-        Drawable.__init__(self, start)
-        last = start
-        self.points = []
-        # Oh for a first difference operator :)
-        for point in points:
-            self.points.append(point-last)
-            last = point
-        self._attributes = attributes
-        self.closed = True # can set to false if open path required
-
-    def element(self):
-        p = Element('path',**self._attributes)
-        d = 'M %s' % self.start.format()
-        d += ' '.join(['l %s' % point.format() for point in self.points]) # lowercase l means move is relative
-        if self.closed:
-            d += ' Z'
-        p.set('d',d)
-        return p
-
-
 class Path(Drawable):
     def __init__(self, start, *segments, **attributes):
         Drawable.__init__(self, start)
@@ -111,6 +85,10 @@ class RelativeVector(PathSegment):
 
     def specification(self):
         return 'l %s ' % self.point.format()
+
+    def scale(self,scale):
+        self.point= self.point.scale(scale)
+        return self
 
 
 def vector(x, y):
