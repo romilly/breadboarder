@@ -1,4 +1,4 @@
-from breadboarder.core.breadboard_apl import Breadboard
+from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.components import Wire
 from breadboarder.core.project import Project
 from breadboarder.svg.svg import Point, write

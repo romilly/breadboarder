@@ -59,8 +59,8 @@ class Dimple(Drawable):
         self.radius = radius
 
     def element(self):
-        return Element("path", {'d': 'M %d %d A %d %d 0 1 1 %d %d' % (self.start.x, self.start.y-self.radius,
-                                            self.radius, self.radius, self.start.x, self.start.y+self.radius)})
+        return Element("path", {'d': 'M %d %d A %d %d 0 1 1 %d %d' % (self.top_left.x, self.top_left.y - self.radius,
+                                                                      self.radius, self.radius, self.top_left.x, self.top_left.y + self.radius)})
 
 
 

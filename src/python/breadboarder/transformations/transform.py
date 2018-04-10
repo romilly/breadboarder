@@ -17,6 +17,10 @@ class Transform():
         pass
 
 
+    def offset(self):
+        return 0
+
+
 class Translation(Transform):
     def __init__(self, vector):
         self.vector = vector
@@ -26,6 +30,9 @@ class Translation(Transform):
 
     def as_matrix(self):
         return
+
+    def offset(self):
+        return self.vector
 
 
 class Rotation(Transform):

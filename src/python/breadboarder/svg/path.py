@@ -2,7 +2,7 @@ from _elementtree import Element
 from abc import ABCMeta, abstractmethod
 
 from breadboarder.svg.point import Point
-from breadboarder.svg.svg import cms, Drawable
+from breadboarder.svg.svg import cms, Drawable, SimpleItem
 
 
 def v(x, y):  # for brevity, which is the soul of wit
@@ -53,16 +53,16 @@ def down_right(x, y=None):
     return sv(x,y)
 
 
-class Path(Drawable):
+class Path(SimpleItem):
     def __init__(self, start, *segments, **attributes):
-        Drawable.__init__(self, start)
+        SimpleItem.__init__(self, start)
         self.segments = segments
         self.closed = True # can set to false if open path required
         self._attributes = attributes
 
     def element(self):
         p = Element('path',**self._attributes)
-        d = 'M %s ' % self.start.format()
+        d = 'M %s ' % self.top_left.format()
         d += ' '.join([segment.specification() for segment in self.segments])
         if self.closed:
             d += ' Z'

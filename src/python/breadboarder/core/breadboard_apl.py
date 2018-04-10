@@ -11,7 +11,7 @@ class Port():
 
     def location(self):
         # TODO: this should compose a series of transformations including rotations
-        return self.relative_location + self.host.start
+        return self.relative_location + self.host.location()
 
 
 class SocketGroup(GroupedDrawable):
