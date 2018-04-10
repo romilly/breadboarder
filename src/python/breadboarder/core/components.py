@@ -1,8 +1,7 @@
 import abc
 
 from breadboarder.helpers.color_codes import ColorCode
-from .breadboard import Breadboard
-from .svg import Point, GroupedDrawable, Rectangle, Line, Circle, Text, horizontal_line, Drawable
+from breadboarder.svg.svg import Point, GroupedDrawable, Rectangle, Line, Circle, Text, PITCH
 
 
 class Button(GroupedDrawable):
@@ -10,18 +9,18 @@ class Button(GroupedDrawable):
         GroupedDrawable.__init__(self, svg_id='Button')
         if len(ports) is not 1:
             raise Exception('buttons only need one position for insertion') # for now :)
-        width = Breadboard.PITCH * 2 + 3
-        height = Breadboard.PITCH * 3 - 6
+        width = PITCH * 2 + 3
+        height = PITCH * 3 - 6
         rectangle = Rectangle(width, height)
         self.add(rectangle)
-        self.add(Circle(rectangle.center()-Point(Breadboard.PITCH, Breadboard.PITCH), Breadboard.PITCH, fill='green'))
+        self.add(Circle(rectangle.center()-Point(PITCH, PITCH), PITCH, fill='green'))
         self.move_to(ports[0].location()  - Point(1.5, 1.5))
 
     def width(self):
-        return 4 + Breadboard.PITCH * 2
+        return 4 + PITCH * 2
 
     def height(self):
-        return Breadboard.PITCH * 2
+        return PITCH * 2
 
 
 class Wire(Line):
@@ -35,7 +34,7 @@ class TwoPinComponent(GroupedDrawable):
 
     def __init__(self, svg_id, body, ports):
         GroupedDrawable.__init__(self, svg_id=svg_id)
-        self.leg_gap = Breadboard.PITCH
+        self.leg_gap = PITCH
         length, offset, start, vector = self.layout(body, ports)
         self.add_wires(length, body.connection_point() + offset)
         self.add_bands(body)
@@ -92,8 +91,8 @@ class Body(GroupedDrawable):
 class RectangularBody(Body):
     def __init__(self, fill, rounded=False):
         Body.__init__(self)
-        self.width = 3 * Breadboard.PITCH
-        self.height = Breadboard.PITCH
+        self.width = 3 * PITCH
+        self.height = PITCH
         self.rectangle = Rectangle(self.width, self.height, fill=fill, rounded=rounded)
         self.add(self.rectangle)
         self.band_positions = [5 + 5*i for i in range(3)]
@@ -111,7 +110,7 @@ class RectangularBody(Body):
 
 def band(color, location):
         band_width = 2
-        band_height = Breadboard.PITCH -2
+        band_height = PITCH -2
         return Rectangle(band_width, band_height, fill=color, stroke=color).move_to(Point(location, 1))
 
 
@@ -156,7 +155,7 @@ class Crystal(TwoPinComponent):
 class CapacitorBody(Body):
     def __init__(self, color):
         Body.__init__(self)
-        self.radius = Breadboard.PITCH
+        self.radius = PITCH
         self.width = 2 * self.radius
         self.height = 2 * self.radius
         self.circle = Circle(Point(0,0), self.radius, fill=color)

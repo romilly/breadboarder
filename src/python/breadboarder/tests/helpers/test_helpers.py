@@ -1,6 +1,6 @@
 from hamcrest.core.base_matcher import BaseMatcher
 
-from breadboarder.core.svg import Point
+from breadboarder.svg.svg import Point
 
 
 class PointMatcher(BaseMatcher):

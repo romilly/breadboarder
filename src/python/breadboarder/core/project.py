@@ -1,6 +1,6 @@
 from xml.etree.ElementTree import Element, tostring
 
-from breadboarder.core.svg import CompositeItem
+from breadboarder.svg.svg import CompositeItem
 
 
 class Project(CompositeItem):

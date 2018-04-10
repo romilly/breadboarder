@@ -6,7 +6,7 @@ from breadboarder.core.project import Project
 
 
 # TODO: add image-based testing
-from breadboarder.core.svg import Point, write
+from breadboarder.svg.svg import Point, write
 
 
 def test_dil():

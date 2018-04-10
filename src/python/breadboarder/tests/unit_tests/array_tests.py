@@ -81,6 +81,7 @@ class ArrayTest(TestCase):
 
     def test_dot_multiplies_tensor_by_matrix(self):
         # not really needed, but I want to be sure I got it right!
+        # The values look random cos they are :)
         c = Array([4, 3],[10, 7, 1, 2, 1, 8, 10, 4, 2, 6, 5, 5])
         e = Array([2, 3, 4],[10, 1, 3, 2, 10, 4, 9, 6, 3, 7, 2, 4, 6, 4, 9, 7, 6, 9, 2, 6, 8, 7, 8, 1])
         assert_that(e.dot(c), equal_to_array(Array([2, 3, 3],[144, 93, 34, 234, 140, 90, 88, 56, 83, 200, 117,

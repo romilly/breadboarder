@@ -1,5 +1,5 @@
 from breadboarder.core.project import Project
-from breadboarder.core.svg import PolygonalPath, Point, write
+from breadboarder.svg.svg import PolygonalPath, Point, write
 
 
 def test_path():

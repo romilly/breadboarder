@@ -1,54 +1,37 @@
-import abc
-import math
+from abc import abstractmethod, ABCMeta
 from xml.etree.ElementTree import Element, ElementTree
+from breadboarder.transformations.transform import Point, Rotation, Translation
 
-class Point():
-    def __init__(self,x ,y):
-        self.x = x
-        self.y = y
-
-    def __add__(self, other):
-        return Point(self.x+other.x, self.y+other.y)
-
-    def __sub__(self, other):
-        return Point(self.x-other.x, self.y-other.y)
-
-    def __mul__(self, other):
-        # Hademard (direct) product
-        return Point(self.x*other.x, self.y*other.y)
+PITCH = 0.1*90 # 0.1", 90 DPI
 
 
-    def v_flip(self):
-        # flip about vertical axis
-        return Point(-self.x, self.y)
+def to_cms(distance):
+    return distance * PITCH / 0.254
 
-    def scale(self, factor):
-        return Point(self.x * factor, self.y * factor)
 
-    def __str__(self):
-        return 'a Point(%s,%s)' % (str(self.x),str(self.y))
+def cms(*distances):
+    if len(distances) == 1:
+        return to_cms(distances[0])
+    return [to_cms(distance) for distance in distances]
 
-    def cartesian_coordinates(self):
-        return (self.x, self.y)
 
-    def r(self):
-        return math.sqrt(sum((self*self).cartesian_coordinates()))
+def to_ins(distance):
+    return distance * PITCH * 10
 
-    def theta(self):
-        return math.degrees(math.atan2(self.y, self.x))
 
-    def format(self):
-        return '%s %s' % (str(self.x),str(self.y))
-
+def ins(*distances):
+    if len(distances) == 1:
+        return to_ins(distances[0])
+    return [to_ins(distance) for distance in distances]
 
 
 class Drawable:
-    __metaclass__ = abc.ABCMeta
+    __metaclass__ = ABCMeta
 
     def __init__(self, start):
         self.start = start
 
-    @abc.abstractmethod
+    @abstractmethod
     def element(self):
         pass
 
@@ -58,9 +41,9 @@ class Drawable:
 
 
 class CompositeItem(Drawable):
-    __metaclass__ = abc.ABCMeta
+    __metaclass__ = ABCMeta
 
-    def __init__(self,start=Point(0,0)):
+    def __init__(self, start=Point(0,0)):
         Drawable.__init__(self, start)
         self._children = []
 
@@ -73,116 +56,15 @@ class CompositeItem(Drawable):
             elm.append(child.element())
         return elm
 
-    @abc.abstractmethod
+    @abstractmethod
     def container(self):
         pass
-
-# TODO: replace PolygonalPath with Path;
-# TODO: this will require an easy way of converting a sequence of points to a relative path (so move_to is easy)
-# TODO: or letting move_to change path elements (probably better)
-
-class PolygonalPath(Drawable):
-    def __init__(self, start, *points, **attributes):
-        Drawable.__init__(self, start)
-        last = start
-        self.points = []
-        # Oh for a first difference operator :)
-        for point in points:
-            self.points.append(point-last)
-            last = point
-        self._attributes = attributes
-        self.closed = True # can set to false if open path required
-
-    def element(self):
-        p = Element('path',**self._attributes)
-        d = 'M %s' % self.start.format()
-        d += ' '.join(['l %s' % point.format() for point in self.points]) # lowercase l means move is relative
-        if self.closed:
-            d += ' Z'
-        p.set('d',d)
-        return p
-
-
-class Path(Drawable):
-    def __init__(self, start, *segments, **attributes):
-        Drawable.__init__(self, start)
-        self.segments = segments
-        self.closed = True # can set to false if open path required
-        self._attributes = attributes
-
-    def element(self):
-        p = Element('path',**self._attributes)
-        d = 'M %s ' % self.start.format()
-        d += ' '.join([segment.specification() for segment in self.segments])
-        if self.closed:
-            d += ' Z'
-        p.set('d', d)
-        if 'width' in self._attributes:
-            p.set('stroke-width', self._attributes['width'])
-        return p
-
-class PathSegment():
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def specification(self):
-        pass
-
-
-class RelativeVector(PathSegment):
-    def __init__(self, x, y):
-        self.point = Point(x,y)
-
-    def specification(self):
-        return 'l %s ' % self.point.format()
-
-def vector(x, y):
-    return RelativeVector(x,y)
-
-
-class Arc(PathSegment):
-    def __init__(self, x, y, xrot, large_arc, sweep, endx, endy):
-        self._spec = (x, y, xrot, large_arc, sweep, endx, endy)
-
-    def specification(self):
-        return 'a %f %f, %f, %d, %d, %f %f' % self._spec
-
-
-def arc(x, y, xrot, large_arc, sweep, endx, endy):
-    return Arc(x, y, xrot, large_arc, sweep, endx, endy)
-
-
-class Transform():
-    """Represents an atomic svg transformation - a translation, rotation or scaling"""
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def text(self):
-        pass
-
-
-class Translation(Transform):
-    def __init__(self, vector):
-        self.vector = vector
-
-    def text(self):
-        return 'translate(%f,%f)' % (self.vector.cartesian_coordinates())
-
-
-class Rotation(Transform):
-    def __init__(self, angle, origin=Point(0,0)):
-        self.angle = angle
-        self.origin = origin
-
-    def text(self):
-        return 'rotate(%f,%f,%f)' % (self.angle, self.origin.x, self.origin.y)
 
 
 class GroupedDrawable(CompositeItem):
     def __init__(self, svg_id=None):
         CompositeItem.__init__(self)
         self.svg_id = svg_id
-        self.angle = 0
         self.transformations = []
 
     def transformation(self):

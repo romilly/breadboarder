@@ -1,6 +1,6 @@
 from xml.etree.ElementTree import Element
 
-from breadboarder.core.svg import Rectangle, horizontal_line, Text, Point, GroupedDrawable
+from breadboarder.svg.svg import Rectangle, horizontal_line, Text, Point, GroupedDrawable
 
 
 class Port():

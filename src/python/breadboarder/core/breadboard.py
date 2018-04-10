@@ -1,6 +1,6 @@
 from xml.etree.ElementTree import Element
 
-from breadboarder.core.svg import Rectangle, horizontal_line, Text, Point, GroupedDrawable, vector
+from breadboarder.svg.svg import Rectangle, horizontal_line, Text, Point, GroupedDrawable, vector, PITCH
 
 
 class Port():
@@ -21,7 +21,7 @@ class SocketGroup(GroupedDrawable):
         self.id = id
         for i in range(cols):
             for j in range(rows):
-                socket = self.socket(fill).set_center(center.x + Breadboard.PITCH * i, center.y + Breadboard.PITCH * j)
+                socket = self.socket(fill).set_center(center.x + PITCH * i, center.y + PITCH * j)
                 label = alpha_labels[j] + str(i + start_number)
                 host.add_port(Port(host, socket.center()), label)
                 self.add(socket)
@@ -36,26 +36,8 @@ class SocketGroup(GroupedDrawable):
 
 # TODO: document Breadboard measurements in docs/BREADBOARD_LAYOUT.md
 
-def to_cms(distance):
-    return distance * Breadboard.PITCH / 0.254
-
-def cms(*distances):
-    if len(distances) == 1:
-        return to_cms(distances[0])
-    return [to_cms(distance) for distance in distances]
-
-
-def to_ins(distance):
-    return distance * Breadboard.PITCH * 10
-
-def ins(*distances):
-    if len(distances) == 1:
-        return to_ins(distances[0])
-    return [to_ins(distance) for distance in distances]
-
 
 class Breadboard(GroupedDrawable):
-    PITCH = 0.1*90 # 0.1", 90 DPI
 
     def __init__(self):
         GroupedDrawable.__init__(self, svg_id='breadboard')
@@ -131,17 +113,12 @@ class Breadboard(GroupedDrawable):
     def add_numeric_labels(self, vertical_location, count, anchor):
         for i in range(count):
             self.add(Text(str(i+1),
-                          Point(self.inset - 1 + self.PITCH * i, vertical_location),
+                          Point(self.inset - 1 + PITCH * i, vertical_location),
                           anchor=anchor, color='grey', size=6).rotate(-90))
 
     def add_alpha_labels(self, offset_to_letters, letters):
         for i in range(len(letters)):
-            self.add(Text(letters[i], offset_to_letters +Point(0,self.PITCH*i), color='grey', size=6 ).rotate(-90))
+            self.add(Text(letters[i], offset_to_letters +Point(0,PITCH*i), color='grey', size=6 ).rotate(-90))
 
     def __getitem__(self, item):
         return self.ports[item]
-
-def v(x, y):  # for brevity, which is the soul of wit
-    return vector(*cms(x, y))
-
-

@@ -2,7 +2,7 @@
 from xml.etree.ElementTree import Element
 
 from .breadboard import Breadboard
-from .svg import Point, Rectangle, GroupedDrawable, Text, Drawable
+from breadboarder.svg.svg import Point, Rectangle, GroupedDrawable, Text, Drawable
 
 
 # TODO: similar defs of extend, center. Move to Drawable, which would need width() and height()?

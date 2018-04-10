@@ -1,5 +1,6 @@
 from breadboarder.core.breadboard import SocketGroup, Breadboard
-from breadboarder.core.project import GroupedDrawable, Rectangle, Point, Text
+from breadboarder.svg.svg import GroupedDrawable, Rectangle, Text, PITCH
+from breadboarder.transformations.transform import Point
 
 
 class CP2102(GroupedDrawable):
@@ -21,10 +22,10 @@ class CP2102(GroupedDrawable):
                  .move_to(Point(0, 0.5*(self.height-self.usb_height))))
         self.add(Text('CP2102',Point(self.usb_width + 5, 10),color='white'))
         for pin_index, label in enumerate(self.labels):
-            self.add(Text(label, Point(self.board_offset+self.board_width-10,6 + Breadboard.PITCH*pin_index),
+            self.add(Text(label, Point(self.board_offset+self.board_width-10,6 + PITCH*pin_index),
                           color='white',size=3, anchor='end'))
             self.add(Rectangle(self.pin_width, self.pin_height, fill='gold', stroke='none')
-                     .move_to(Point(self.board_offset+self.board_width-6, 4+Breadboard.PITCH*pin_index)))
+                     .move_to(Point(self.board_offset+self.board_width-6, 4+PITCH*pin_index)))
         self.add(SocketGroup(Point(self.board_offset+self.board_width-6+self.pin_width, 5),
                              6,1,self.labels, self, fill='none'))
 

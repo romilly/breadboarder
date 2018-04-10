@@ -190,9 +190,19 @@ The shape can be a list or a vector (a one-dimensional Array).
 Inner product is implemented as a `dot` method in the Array class. It handles vector, matrix and tensor
 arguments. It does not support scalar extension as this is not needed in *breadboarder*.
 
-## Transformations
+## Transformations and other changes
 
 *breadboarder* already contains Transformation classes. These will be enhanced to generate their corresponding
 transformation arrays.
+
+Since basic components and compound components are treated differently, this now needs to be reflected in the
+class hierarchy.
+
+## Tests
+
+I am writing some integration tests to verify that the port locations of compound components with
+multiple transformations are correctly calculated.
+
+
 
 
