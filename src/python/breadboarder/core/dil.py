@@ -2,7 +2,7 @@
 from xml.etree.ElementTree import Element
 
 from .breadboard import Breadboard
-from breadboarder.svg.svg import Point, Rectangle, GroupedDrawable, Text, Drawable
+from breadboarder.svg.svg import Point, Rectangle, GroupedDrawable, Text, Drawable, PITCH, SimpleItem
 
 
 # TODO: similar defs of extend, center. Move to Drawable, which would need width() and height()?
@@ -33,16 +33,16 @@ class DIL(GroupedDrawable):
         return self.extent().scale(0.5)
 
     def width(self):
-        return 4 + Breadboard.PITCH * (self.pins_per_side()-1)
+        return 4 + PITCH * (self.pins_per_side()-1)
 
     def height(self):
-        return 3 * (Breadboard.PITCH - 1) -2
+        return 3 * (PITCH - 1) -2
 
     def add_parts(self):
         self.add(Rectangle(self.width(), self.height(), fill='grey', stroke='grey'))
         self.add(Text(self.name,(self.center()+ Point(0, 2)), color='lightgrey', anchor='middle',size=4))
         for i in range(0, self.pins_per_side()):
-            x = Breadboard.PITCH*i
+            x = PITCH*i
             self.add(Rectangle(4, 2,fill='white').move_to(Point(x,-2.5)))
             self.add(Rectangle(4, 2,fill='white').move_to(Point(x,self.height()+1)))
             self.add(Text(self.labels[i], Point(x+3,self.height()-1),size=2, anchor='start').rotate(-90))
@@ -53,9 +53,9 @@ class DIL(GroupedDrawable):
         return Point(self.width(), self.height())
 
 
-class Dimple(Drawable):
+class Dimple(SimpleItem):
     def __init__(self, center, radius):
-        Drawable.__init__(self, center)
+        SimpleItem.__init__(self, center)
         self.radius = radius
 
     def element(self):

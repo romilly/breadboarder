@@ -1,6 +1,6 @@
 from breadboarder.core.project import Project
 from breadboarder.svg.point import Point
-from breadboarder.svg.svg import CompositeItem, Line, write, GroupedDrawable, Text, Rectangle
+from breadboarder.svg.svg import Line, write, GroupedDrawable, Text, Rectangle
 
 
 class Grid(GroupedDrawable):
