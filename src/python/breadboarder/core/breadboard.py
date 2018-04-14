@@ -10,8 +10,7 @@ class Port():
         self.relative_location = relative_location
 
     def location(self):
-        # TODO: this should compose a series of transformations including rotations
-        return self.relative_location + self.host.location()
+        return self.host.location_of(self.relative_location)
 
 
 class SocketGroup(GroupedDrawable):
@@ -22,7 +21,7 @@ class SocketGroup(GroupedDrawable):
         for i in range(cols):
             for j in range(rows):
                 socket = self.socket(fill).set_center(center.x + PITCH * i, center.y + PITCH * j)
-                label = alpha_labels[j] + str(i + start_number)
+                label = alpha_labels[j] + ('' if start_number == -1 else str(i + start_number))
                 host.add_port(Port(host, socket.center()), label)
                 self.add(socket)
 

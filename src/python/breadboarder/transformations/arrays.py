@@ -13,9 +13,20 @@ def decode(radices, values):
     return result
 
 
+def cv(*items):
+        return Array([len(items),1], list(items))
 
-def cv(item_list):
-        return Array([len(item_list),1], item_list)
+
+def identity(n):
+    result = zeros(n)
+    for i in range(n):
+        result[i,i]= 1
+    return result
+
+
+def zeros(n):
+    return Array([n, n], (n * n) * [0])
+
 
 def scalar(value):
         return(Array([],[value]))

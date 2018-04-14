@@ -2,6 +2,7 @@ import math
 from abc import ABCMeta, abstractmethod
 
 from breadboarder.svg.point import Point
+from math import sin, cos, radians
 
 
 class Transform():
@@ -16,9 +17,9 @@ class Transform():
     def as_matrix(self):
         pass
 
-
-    def offset(self):
-        return 0
+    @abstractmethod
+    def transform(self, point):
+        pass
 
 
 class Translation(Transform):
@@ -31,8 +32,8 @@ class Translation(Transform):
     def as_matrix(self):
         return
 
-    def offset(self):
-        return self.vector
+    def transform(self, point):
+        return point + self.vector
 
 
 class Rotation(Transform):
@@ -42,3 +43,11 @@ class Rotation(Transform):
 
     def text(self):
         return 'rotate(%f,%f,%f)' % (self.angle, self.origin.x, self.origin.y)
+
+    def transform(self, point):
+        p = point # - self.origin
+        s = sin(radians(-self.angle))
+        c = cos(radians(-self.angle))
+        point1 = Point(c*p.x + s * p.y, (c*p.y - s*p.x))
+        result = point1 # + self.origin
+        return result

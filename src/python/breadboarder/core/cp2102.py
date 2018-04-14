@@ -27,7 +27,10 @@ class CP2102(GroupedDrawable):
             self.add(Rectangle(self.pin_width, self.pin_height, fill='gold', stroke='none')
                      .move_to(Point(self.board_offset+self.board_width-6, 4+PITCH*pin_index)))
         self.add(SocketGroup(Point(self.board_offset+self.board_width-6+self.pin_width, 5),
-                             6,1,self.labels, self, fill='none'))
+                             6,1,self.labels, self, start_number=-1, fill='none'))
 
     def add_port(self, port, label):
         self.ports[label] = port
+
+    def __getitem__(self, item):
+        return self.ports[item]

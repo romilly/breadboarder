@@ -35,18 +35,14 @@ class TwoPinComponent(GroupedDrawable):
     def __init__(self, svg_id, body, ports):
         GroupedDrawable.__init__(self, svg_id=svg_id)
         self.leg_gap = PITCH
-        length, offset, start, vector = self.layout(body, ports)
+        length, start, vector = self.dimensions(ports)
+        offset = Point(length - body.width, -body.height).scale(0.5)
         self.add_wires(length, body.connection_point() + offset)
         self.add_bands(body)
         body.add_text(self.text())
         self.rotate(vector.theta(), start)
         self.add(body.move_to(offset))
         self.move_to(start)
-
-    def layout(self, body, ports):
-        length, start, vector = self.dimensions(ports)
-        offset = Point(length - body.width, -body.height).scale(0.5)
-        return length, offset, start, vector
 
     def dimensions(self, ports):
         p1, p2 = ports

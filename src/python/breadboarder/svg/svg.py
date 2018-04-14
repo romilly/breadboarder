@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABCMeta
+from copy import copy
 from xml.etree.ElementTree import Element, ElementTree
 from breadboarder.transformations.transform import Point, Rotation, Translation
 
@@ -54,10 +55,11 @@ class CompositeItem(Drawable):
 
 
 class GroupedDrawable(CompositeItem):
-    def __init__(self, svg_id=None):
+    def __init__(self, svg_id=None, opacity=100):
         CompositeItem.__init__(self)
         self.svg_id = svg_id
         self.transformations = []
+        self.opacity = opacity
 
     def transformation(self):
         return ' '.join([t.text() for t in self.transformations])
@@ -68,6 +70,8 @@ class GroupedDrawable(CompositeItem):
                 group.set('transform',self.transformation())
             if self.svg_id is not None:
                 group.set('id',self.svg_id)
+            if self.opacity != 100:
+                group.set('opacity',str(self.opacity))
             return group
 
     def rotate(self, theta, origin=Point(0,0)):
@@ -78,11 +82,11 @@ class GroupedDrawable(CompositeItem):
         self.transformations.append(Translation(point))
         return self
 
-    def location(self):
-        loc = Point(0,0)
+    def location_of(self, point):
+        p = copy(point)
         for transformation in self.transformations:
-            loc += transformation.offset()
-        return loc
+            p = transformation.transform(p)
+        return p
 
 
 class SimpleItem(Drawable):
