@@ -1,12 +1,19 @@
-import abc
+from abc import ABCMeta, abstractmethod
 import math
 
+from breadboarder.core.project import Part
 from breadboarder.helpers.color_codes import ColorCode
 from breadboarder.svg.path import Path, arc
 from breadboarder.svg.svg import Point, GroupedDrawable, Rectangle, Line, Circle, Text, PITCH
 
 
-class Button(GroupedDrawable):
+class Button(GroupedDrawable, Part):
+    def id_prefix(self):
+        return 'B'
+
+    def part_type(self):
+        return 'Button'
+
     def __init__(self, *ports):
         GroupedDrawable.__init__(self, svg_id='Button')
         if len(ports) is not 1:
@@ -26,15 +33,29 @@ class Button(GroupedDrawable):
 
 
 # TODO: Change to composition (using Path) rather than scummy inheritance
-class Wire(Line):
+class Wire(GroupedDrawable, Part):
     def __init__(self, color, *ports):
+        GroupedDrawable.__init__(self)
         start, end = ports
-        Line.__init__(self, start.location(), end.location(), color, stroke_width=3, linecap='round')
+        self.color = color
+        self.add(Line(start.location(), end.location(), color, 3, 'round'))
+
+    def id_prefix(self):
+        return 'JW'
+
+    def part_type(self):
+        return 'Jumper Wire'
+
+    def description(self):
+        return '%s %s' % (self.color, self.part_type())
 
 
 # TODO: this is a mess; maybe some methods/properties belong in Body.
-class TwoPinComponent(GroupedDrawable):
-    __metaclass__ = abc.ABCMeta
+class TwoPinComponent(GroupedDrawable, Part):
+    def description(self):
+        return '%s (%s)' % (self.part_type(),self.text())
+
+    __metaclass__ = ABCMeta
 
     def __init__(self, svg_id, body, ports):
         GroupedDrawable.__init__(self, svg_id=svg_id)
@@ -67,22 +88,21 @@ class TwoPinComponent(GroupedDrawable):
         # default is to do nothing
         pass
 
-    @abc.abstractmethod
     def text(self):
-        pass
+        return ''
 
 
 class Body(GroupedDrawable):
-    __metaclass__ = abc.ABCMeta
+    __metaclass__ = ABCMeta
 
     def __init__(self):
         GroupedDrawable.__init__(self)
 
-    @abc.abstractmethod
+    @abstractmethod
     def center(self):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def connection_point(self):
         pass
 
@@ -118,6 +138,12 @@ def band(color, location):
 
 
 class Diode(TwoPinComponent):
+    def id_prefix(self):
+        return 'D'
+
+    def part_type(self):
+        return 'Diode'
+
     def __init__(self, name, *ports):
         self.name = name
         TwoPinComponent.__init__(self, 'diode', RectangularBody('black'), ports)
@@ -136,6 +162,12 @@ class Resistor(TwoPinComponent):
         self.tolerance = tolerance
         TwoPinComponent.__init__(self, 'Resistor', RectangularBody('beige'), ports)
 
+    def id_prefix(self):
+        return 'R'
+
+    def part_type(self):
+        return 'Resistor'
+
     def text(self):
         return ' '.join([self.resistance, self.tolerance])
 
@@ -147,6 +179,12 @@ class Resistor(TwoPinComponent):
 
 
 class Crystal(TwoPinComponent):
+    def id_prefix(self):
+        return 'X'
+
+    def part_type(self):
+        return 'Crystal'
+
     def __init__(self, frequency, *ports):
         self.frequency = frequency
         TwoPinComponent.__init__(self, 'Crystal', RectangularBody('lightgray', rounded=True), ports)
@@ -178,6 +216,12 @@ class LedBody(Body):
 
 
 class LED(TwoPinComponent):
+    def id_prefix(self):
+        return 'LED'
+
+    def part_type(self):
+        return 'LED'
+
     def __init__(self, color, *ports):
         TwoPinComponent.__init__(self, 'LED', LedBody(color=color), ports)
 
@@ -205,6 +249,12 @@ class DiskCapacitor(TwoPinComponent):
     def __init__(self, capacitance, *ports):
         self.capacitance = capacitance
         TwoPinComponent.__init__(self, 'Capacitor', CapacitorBody(color='goldenrod'), ports)
+
+    def id_prefix(self):
+        return 'C'
+
+    def part_type(self):
+        return 'Capacitor'
 
     def text(self):
         return self.capacitance

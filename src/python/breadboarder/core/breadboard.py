@@ -1,5 +1,6 @@
 from xml.etree.ElementTree import Element
 
+from breadboarder.core.host import Host
 from breadboarder.svg.svg import Rectangle, horizontal_line, Text, Point, GroupedDrawable, PITCH
 
 
@@ -39,15 +40,22 @@ class SocketGroup(GroupedDrawable):
 # TODO: document Breadboard measurements in docs/BREADBOARD_LAYOUT.md
 
 
-class Breadboard(GroupedDrawable):
+class Breadboard(Host):
 
     def __init__(self):
-        GroupedDrawable.__init__(self, svg_id='breadboard')
-        self.ports = {}
-        self._set_dimensions()
-        self.add_components()
+        Host.__init__(self, svg_id='breadboard')
+
+    def part_type(self):
+        return 'Breadboard'
+
+    def description(self):
+        return '480-way Breadboard'
+
+    def id_prefix(self):
+        return 'BB'
 
     def add_components(self):
+        self._set_dimensions()
         self.add(Rectangle(self.width, self.height, fill='white'))
         self.add_power_group(self.drop_to_top_power_group,'T')
         self.add_numeric_labels(self.drop_to_top_numeric_labels, self.columns, 'start')
@@ -104,9 +112,6 @@ class Breadboard(GroupedDrawable):
         for group in range(self.power_socket_group_count):
             self.add(SocketGroup(Point(self.inset + self.inter_power_group_spacing * group, top_centre), 2, 5, (prefix+'M',prefix+'P'), self, start_number=1 + 5*group))
 
-    def add_port(self, port, label):
-        self.ports[label] = port
-
     def add_body_sockets(self, center, alpha_labels):
         self.add_alpha_labels(Point(self.inset_to_left_letters, center.y + 2), alpha_labels)
         self.add(SocketGroup(center, 5, self.columns, alpha_labels, self))
@@ -122,5 +127,4 @@ class Breadboard(GroupedDrawable):
         for i in range(len(letters)):
             self.add(Text(letters[i], offset_to_letters +Point(0,PITCH*i), color='grey', size=6 ).rotate(-90))
 
-    def __getitem__(self, item):
-        return self.ports[item]
+

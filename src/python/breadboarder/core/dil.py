@@ -1,6 +1,7 @@
 # draw Dual In Line IC chip (like ATMegas 328)
 from xml.etree.ElementTree import Element
 
+from breadboarder.core.project import Part
 from .breadboard import Breadboard
 from breadboarder.svg.svg import Point, Rectangle, GroupedDrawable, Text, Drawable, PITCH, SimpleItem
 
@@ -17,7 +18,11 @@ def pcf8574(port):
     return DIL(16,'PCF8574',port, labels)
 
 
-class DIL(GroupedDrawable):
+class DIL(GroupedDrawable, Part):
+
+    def description(self):
+        return self.name
+
     def __init__(self, pins, name, port, labels):
         GroupedDrawable.__init__(self,svg_id='IC')
         self.pins = pins
@@ -25,6 +30,12 @@ class DIL(GroupedDrawable):
         self.labels = labels
         self.add_parts()
         self.move_to(port.location() - Point(2, -1)) # for visual correctness
+
+    def id_prefix(self):
+        return 'IC'
+
+    def part_type(self):
+        return 'Integrated Circuit'
 
     def pins_per_side(self):
         return int(self.pins/2)

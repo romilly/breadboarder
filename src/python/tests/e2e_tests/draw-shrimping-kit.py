@@ -26,6 +26,7 @@ def draw_shrimp_kit():
     project.add(DiskCapacitor('1N4', breadboard['c2'], breadboard['c3']))
     project.add(LED('red',breadboard['g12'],breadboard['g17']))
     svg = project.element()
+    print(project.bom_md())
     write(svg, 'svg/shrimp-kit.svg')
 
 
