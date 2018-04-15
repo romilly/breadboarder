@@ -1,29 +1,30 @@
 from abc import ABCMeta, abstractmethod
 import math
 
-from breadboarder.core.project import Part
+from breadboarder.core.project import Part, Component
 from breadboarder.helpers.color_codes import ColorCode
 from breadboarder.svg.path import Path, arc
 from breadboarder.svg.svg import Point, GroupedDrawable, Rectangle, Line, Circle, Text, PITCH
 
 
-class Button(GroupedDrawable, Part):
+class Button(Component):
     def id_prefix(self):
         return 'B'
 
     def part_type(self):
         return 'Button'
 
-    def __init__(self, *ports):
-        GroupedDrawable.__init__(self, svg_id='Button')
-        if len(ports) is not 1:
-            raise Exception('buttons only need one position for insertion') # for now :)
+    def lab_instruction(self):
+        return 'Insert the button with the top left pin in %s' %  self.connected_ports[0].describe_location()
+
+    def __init__(self, port):
+        Component.__init__(self, [port])
         width = PITCH * 2 + 3
         height = PITCH * 3 - 6
         rectangle = Rectangle(width, height)
         self.add(rectangle)
         self.add(Circle(rectangle.center()-Point(PITCH, PITCH), PITCH, fill='green'))
-        self.move_to(ports[0].location()  - Point(1.5, 1.5))
+        self.move_to(port.location()  - Point(1.5, 1.5))
 
     def width(self):
         return 4 + PITCH * 2
@@ -33,9 +34,9 @@ class Button(GroupedDrawable, Part):
 
 
 # TODO: Change to composition (using Path) rather than scummy inheritance
-class Wire(GroupedDrawable, Part):
+class Wire(Component):
     def __init__(self, color, *ports):
-        GroupedDrawable.__init__(self)
+        Component.__init__(self, ports)
         start, end = ports
         self.color = color
         self.add(Line(start.location(), end.location(), color, 3, 'round'))
@@ -51,14 +52,14 @@ class Wire(GroupedDrawable, Part):
 
 
 # TODO: this is a mess; maybe some methods/properties belong in Body.
-class TwoPinComponent(GroupedDrawable, Part):
+class TwoPinComponent(Component):
     def description(self):
         return '%s (%s)' % (self.part_type(),self.text())
 
     __metaclass__ = ABCMeta
 
     def __init__(self, svg_id, body, ports):
-        GroupedDrawable.__init__(self, svg_id=svg_id)
+        Component.__init__(self, ports)
         self.leg_gap = PITCH
         length, start, vector = self.dimensions(ports)
         # Offset is where the midpoint of the body should be
@@ -90,6 +91,11 @@ class TwoPinComponent(GroupedDrawable, Part):
 
     def text(self):
         return ''
+
+    def lab_instruction(self):
+        return 'Connect a %s from %s to %s' % (self.description(),
+                                             self.connected_ports[0].describe_location(),
+                                             self.connected_ports[1].describe_location())
 
 
 class Body(GroupedDrawable):

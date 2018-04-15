@@ -1,10 +1,14 @@
 from collections import defaultdict
 from xml.etree.ElementTree import register_namespace, tostring, XML
-from breadboarder.svg.svg import CompositeItem
+
+from breadboarder.markdown.robowriter import RoboWriter
+from breadboarder.svg.svg import CompositeItem, GroupedDrawable
 from abc import ABCMeta, abstractmethod
+
 
 class Part():
     __metaclass__ = ABCMeta
+
     def __init__(self):
         self._id = ''
 
@@ -24,6 +28,18 @@ class Part():
 
     @abstractmethod
     def description(self):
+        pass
+
+
+class Component(GroupedDrawable, Part):
+    __metaclass__ = ABCMeta
+
+    def __init__(self, connected_ports):
+        GroupedDrawable.__init__(self)
+        self.connected_ports = connected_ports
+
+    @abstractmethod
+    def lab_instruction(self):
         pass
 
 
@@ -52,8 +68,22 @@ class Project(CompositeItem):
         CompositeItem.add(self,item)
         self.bom.add(item)
 
-    def bom_md(self):
-        return self.bom.md()
+    def md(self, name, loc):
+        writer = RoboWriter()
+        self.markdown_for_bom(writer)
+        writer.add_heading('Instructions', 2)
+        self.markdown_instructions(writer)
+        writer.add_image(name, loc)
+        return writer.md()
+
+    def markdown_for_bom(self, writer):
+        self.bom.write_md(writer)
+
+    def markdown_instructions(self, writer):
+        for component in self._children:
+            instruction = component.lab_instruction()
+            if instruction is not None:
+                writer.add_step(instruction)
 
 
 class BillOfMaterials():
@@ -67,15 +97,12 @@ class BillOfMaterials():
         self.parts[part_type] = listed
         part.set_id('%s-%d)' %(part.id_prefix(), len(listed)))
 
-    def md(self):
-        keys = self.parts.keys()
-        sorted(keys)
-        result = ''
+    def write_md(self, writer):
+        keys = sorted(list(self.parts.keys()))
+        writer.add_heading('BOM', 2)
         for key in keys:
-            result += ('\n'+key+'s\n\n')
-            for item in self.parts[key]:
-                result += item.description()+'\n'
-        return result
+            writer.add_heading(key+'s', 3)
+            writer.add_para(', '.join([item.description() for item in self.parts[key]]))
 
 
 

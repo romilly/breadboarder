@@ -6,12 +6,16 @@ from breadboarder.svg.svg import Rectangle, horizontal_line, Text, Point, Groupe
 
 class Port():
     # the socket or pin belonging to a host that a component can be connected to
-    def __init__(self, host, relative_location):
+    def __init__(self, host, relative_location, portname):
         self.host = host
+        self.portname = portname
         self.relative_location = relative_location
 
     def location(self):
         return self.host.location_of(self.relative_location)
+
+    def describe_location(self):
+        return self.host.describe_port_location(self.portname)
 
 
 class SocketGroup(GroupedDrawable):
@@ -23,7 +27,7 @@ class SocketGroup(GroupedDrawable):
             for j in range(rows):
                 socket = self.socket(fill).set_center(center.x + PITCH * i, center.y + PITCH * j)
                 label = alpha_labels[j] + self.numeric_label(i, start_number)
-                host.add_port(Port(host, socket.center()), label)
+                host.add_port(Port(host, socket.center(), label))
                 self.add(socket)
 
     def numeric_label(self, i, start_number):
