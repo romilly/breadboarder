@@ -1,6 +1,8 @@
 import abc
+import math
 
 from breadboarder.helpers.color_codes import ColorCode
+from breadboarder.svg.path import Path, arc
 from breadboarder.svg.svg import Point, GroupedDrawable, Rectangle, Line, Circle, Text, PITCH
 
 
@@ -23,12 +25,14 @@ class Button(GroupedDrawable):
         return PITCH * 2
 
 
+# TODO: Change to composition (using Path) rather than scummy inheritance
 class Wire(Line):
     def __init__(self, color, *ports):
         start, end = ports
         Line.__init__(self, start.location(), end.location(), color, stroke_width=3, linecap='round')
 
 
+# TODO: this is a mess; maybe some methods/properties belong in Body.
 class TwoPinComponent(GroupedDrawable):
     __metaclass__ = abc.ABCMeta
 
@@ -36,11 +40,13 @@ class TwoPinComponent(GroupedDrawable):
         GroupedDrawable.__init__(self, svg_id=svg_id)
         self.leg_gap = PITCH
         length, start, vector = self.dimensions(ports)
+        # Offset is where the midpoint of the body should be
         offset = Point(length - body.width, -body.height).scale(0.5)
         self.add_wires(length, body.connection_point() + offset)
         self.add_bands(body)
         body.add_text(self.text())
-        self.rotate(vector.theta(), start)
+        if vector.theta() != 0:
+            self.rotate(vector.theta(), start)
         self.add(body.move_to(offset))
         self.move_to(start)
 
@@ -56,6 +62,7 @@ class TwoPinComponent(GroupedDrawable):
         self.add(Line(Point(0, 0), center, color='grey', stroke_width=2, linecap='round'))
         self.add(Line(Point(length, 0), center, color='grey', stroke_width=2, linecap='round'))
 
+    # TODO: remove this smell
     def add_bands(self, body):
         # default is to do nothing
         pass
@@ -146,6 +153,33 @@ class Crystal(TwoPinComponent):
 
     def text(self):
         return self.frequency
+
+
+class LedBody(Body):
+    def __init__(self, color):
+        Body.__init__(self)
+        self.radius = 0.5*PITCH
+        f = 1.35 # radius of perimiter/inner radius
+        pr = self.radius * f  # perimeter radius
+        py = math.sqrt(f*f - 1)*self.radius
+        self.width = 2*self.radius
+        self.height = 2*self.radius
+        self.circle = Circle(Point(0, 0), self.radius, fill=color)
+        perimeter = Path(Point(2*self.radius,  self.radius-py),
+                         arc(pr, pr, 0, 1, 0, 0, 2*py), fill=color, opacity='0.6')
+        self.add(perimeter)
+        self.add(self.circle)
+
+    def center(self):
+         return self.circle.center()
+
+    def connection_point(self):
+        return self.center()
+
+
+class LED(TwoPinComponent):
+    def __init__(self, color, *ports):
+        TwoPinComponent.__init__(self, 'LED', LedBody(color=color), ports)
 
 
 class CapacitorBody(Body):

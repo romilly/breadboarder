@@ -21,9 +21,12 @@ class SocketGroup(GroupedDrawable):
         for i in range(cols):
             for j in range(rows):
                 socket = self.socket(fill).set_center(center.x + PITCH * i, center.y + PITCH * j)
-                label = alpha_labels[j] + ('' if start_number == -1 else str(i + start_number))
+                label = alpha_labels[j] + self.numeric_label(i, start_number)
                 host.add_port(Port(host, socket.center()), label)
                 self.add(socket)
+
+    def numeric_label(self, i, start_number):
+        return '' if start_number == -1 else str(i + start_number)
 
     def socket(self, fill):
         rectangle = Rectangle(self.socket_size, self.socket_size, fill=fill, stroke=fill)

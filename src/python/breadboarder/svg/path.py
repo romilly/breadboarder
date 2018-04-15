@@ -71,6 +71,7 @@ class Path(SimpleItem):
             p.set('stroke-width', self._attributes['width'])
         return p
 
+
 class PathSegment():
     __metaclass__ = ABCMeta
 
@@ -100,7 +101,7 @@ class Arc(PathSegment):
         self._spec = (x, y, xrot, large_arc, sweep, endx, endy)
 
     def specification(self):
-        return 'a %f %f, %f, %d, %d, %f %f' % self._spec
+        return 'a %f %f, %f, %d, %d, %f, %f' % self._spec
 
 
 def arc(x, y, xrot, large_arc, sweep, endx, endy):
