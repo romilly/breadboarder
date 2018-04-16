@@ -54,7 +54,7 @@ class Wire(Component):
 # TODO: this is a mess; maybe some methods/properties belong in Body.
 class TwoPinComponent(Component):
     def description(self):
-        return '%s (%s)' % (self.part_type(),self.text())
+        return '%s (%s)' % (self.id(),self.text())
 
     __metaclass__ = ABCMeta
 
