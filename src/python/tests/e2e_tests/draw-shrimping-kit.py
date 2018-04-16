@@ -1,7 +1,6 @@
 from breadboarder.core.breadboard import Breadboard
-from breadboarder.core.components import Wire, Crystal, Resistor, DiskCapacitor, LED
+from breadboarder.core.components import Wire, Crystal, Resistor, DiskCapacitor, LED, atMega328
 from breadboarder.core.cp2102 import CP2102
-from breadboarder.core.dil import atMega328
 from breadboarder.core.project import Project
 from breadboarder.svg.svg import Point, write
 

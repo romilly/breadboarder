@@ -183,8 +183,6 @@ class Text(SimpleItem):
         self.angle  = angle
         return self
 
-# TODO: add circles to ends of wires (?)
-
 
 class Circle(SimpleItem):
     def __init__(self, start, radius, **attributes):
@@ -201,6 +199,18 @@ class Circle(SimpleItem):
     def move_center_to(self, point):
         self.move_to(point - Point(self.radius, self.radius))
         return self
+
+
+class Dimple(SimpleItem):
+    def __init__(self, center, radius):
+        SimpleItem.__init__(self, center)
+        self.radius = radius
+
+    def element(self):
+        return Element("path", {'d': 'M %d %d A %d %d 0 1 1 %d %d' % (self.top_left.x, self.top_left.y - self.radius,
+                                                                      self.radius, self.radius, self.top_left.x, self.top_left.y + self.radius)})
+
+
 
 
 def write(diagram, filename):
