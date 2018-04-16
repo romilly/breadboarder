@@ -53,6 +53,9 @@ class CompositeItem(Drawable):
     def container(self):
         pass
 
+    def children(self):
+        return self._children
+
 
 class GroupedDrawable(CompositeItem):
     def __init__(self, svg_id=None, opacity=100):

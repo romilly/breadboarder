@@ -1,7 +1,7 @@
 from io import StringIO
 
 
-class RoboWriter():
+class MarkdownWriter():
     def __init__(self):
         self.contents = StringIO()
 
@@ -21,6 +21,7 @@ class RoboWriter():
     def add_image(self, caption, location):
         self.nl(2)
         self.contents.write('![%s](%s)' % (caption, location))
+        self.nl(2)
 
     def add_step(self, line):
         self.contents.write('1. %s\n' % line)
@@ -29,6 +30,6 @@ class RoboWriter():
         for i in range(count):
             self.contents.write('\n')
 
-    def md(self):
+    def markdown(self):
         self.contents.flush()
         return self.contents.getvalue()

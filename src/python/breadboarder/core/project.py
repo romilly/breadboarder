@@ -1,7 +1,7 @@
 from xml.etree.ElementTree import register_namespace, tostring, XML
 
-from breadboarder.bom.bom import BillOfMaterials
-from breadboarder.markdown.robowriter import RoboWriter
+from breadboarder.bom.bom import BillOfMaterials, BomWriter
+from breadboarder.markdown.markdownwriter import MarkdownWriter
 from breadboarder.svg.svg import CompositeItem, GroupedDrawable
 from abc import ABCMeta, abstractmethod
 
@@ -49,7 +49,11 @@ class Project(CompositeItem):
         self.width = width
         self.height = height
         self.view_box = view_box
-        self.bom = BillOfMaterials()
+
+    def welcome(self, visitor):
+        visitor.visit_project(self)
+        for part in self.children():
+            visitor.visit_part(part)
 
     def container(self):
         register_namespace("","http://www.w3.org/2000/svg")
@@ -64,20 +68,12 @@ class Project(CompositeItem):
     def tostring(self):
         return tostring(self.element())
 
-    def add(self, item):
-        CompositeItem.add(self,item)
-        self.bom.add(item)
+    def bom(self):
+        bom = BillOfMaterials()
+        self.welcome(bom)
+        return bom
 
-    def md(self, name, loc):
-        writer = RoboWriter()
-        self.markdown_for_bom(writer)
-        writer.add_heading('Instructions', 2)
-        self.markdown_instructions(writer)
-        writer.add_image(name, loc)
-        return writer.md()
 
-    def markdown_for_bom(self, writer):
-        self.bom.write_md(writer)
 
     def markdown_instructions(self, writer):
         for component in self._children:

@@ -33,7 +33,11 @@ class Button(Component):
         return PITCH * 2
 
 
-# TODO: Change to composition (using Path) rather than scummy inheritance
+def title_case(color):
+    return color[0].upper()+color[1:]
+
+
+# TODO: using Path instead of Line
 class Wire(Component):
     def __init__(self, color, *ports):
         Component.__init__(self, ports)
@@ -48,7 +52,7 @@ class Wire(Component):
         return 'Jumper Wire'
 
     def description(self):
-        return '%s %s' % (self.color, self.part_type())
+        return '%s %s' % (title_case(self.color), self.part_type())
 
 
 # TODO: this is a mess; maybe some methods/properties belong in Body.
@@ -278,6 +282,10 @@ def pcf8574(port):
 
 
 class DIL(Component):
+
+    def lab_instruction(self):
+        return 'Insert pin 1 of the %s (%s) into %s' % (self.description(), self.id(),
+                                                        self.connected_ports[0].describe_location())
 
     def description(self):
         return self.name
