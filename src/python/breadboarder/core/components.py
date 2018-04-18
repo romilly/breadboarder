@@ -58,7 +58,14 @@ class Wire(Component):
         return 'Jumper Wire'
 
     def description(self):
-        return '%s %s' % (title_case(self.color), self.part_type())
+        return '%s %s (%s)' % (title_case(self.color), self.part_type(), self.genders())
+
+    def genders(self):
+        return '%s-%s' % tuple([self.gender(port) for port in self.connected_ports])
+
+    def gender(self, port):
+        # the type of the port determines the gender of that wnd of the wire
+        return {'pin': 'F', 'socket': 'M'}[port.port_type]
 
 
 # TODO: this is a mess; maybe some methods/properties belong in Body.
