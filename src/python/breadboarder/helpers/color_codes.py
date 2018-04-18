@@ -25,7 +25,7 @@ class ColorCode:
     def parse(text):
         i = res_reg.match(text)
         if i is None:
-            raise Exception('I only understand resistance values in standard form - e.g. 2R2, 220K, 1M2')
+            raise Exception('I only understand resistance values in standard form - e.g. 2R2, 220k, 1M2')
         if i.group(1):
             return Decimal(i.group(1))*multipliers[i.group(2)]
         else:
@@ -40,4 +40,6 @@ class ColorCode:
         return list(colors[digit] for digit in start)+[multiplier_color[multiplier]]
 
     def tolerance_band(self, tolerance):
+        if tolerance not in tolerance_bands:
+            raise ValueError('Tolerance must be 1%, 5% or 10%')
         return tolerance_bands[tolerance]

@@ -1,10 +1,12 @@
 from collections import defaultdict
 
+from breadboarder.author.visitor import ProjectVisitor
 from breadboarder.markdown.markdownwriter import MarkdownWriter
 
 
-class BillOfMaterials():
+class BillOfMaterials(ProjectVisitor):
     def __init__(self):
+        ProjectVisitor.__init__(self)
         self.parts = defaultdict(list)
 
     def visit_project(self, project):
@@ -28,16 +30,16 @@ class BillOfMaterials():
 
 
 class BomWriter():
-    def __init__(self, bom):
-        self._bom = bom
+    def __init__(self):
+        pass
 
-    def markdown(self):
+    def markdown(self, bom):
         writer = MarkdownWriter()
-        keys = self._bom.sorted_keys()
+        keys = bom.sorted_keys()
         writer.add_heading('Bill of Materials', 2)
         for key in keys:
-            items = self._bom[key]
+            items = bom[key]
             writer.add_heading(key+('s' if len(items) > 1 else ''), 3)
-            writer.add_para(', '.join([item.description() for item in self._bom[key]]))
+            writer.add_para(', '.join([item.description() for item in bom[key]]))
         return writer.markdown()
 

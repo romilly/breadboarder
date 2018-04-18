@@ -8,10 +8,10 @@ class Host(GroupedDrawable, Part):
     __metaclass__ = ABCMeta
 
     def lab_instruction(self):
-        return None
+        return 'Take a %s (%s)' % (self.description(),self.id())
 
-    def __init__(self, svg_id):
-        GroupedDrawable.__init__(self, svg_id)
+    def __init__(self):
+        GroupedDrawable.__init__(self)
         self.ports = {}
         self.add_components()
 

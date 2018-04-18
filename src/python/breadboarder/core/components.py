@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import math
 
-from breadboarder.core.project import Part, Component
+from breadboarder.core.project import Component
 from breadboarder.helpers.color_codes import ColorCode
 from breadboarder.svg.path import Path, arc
 from breadboarder.svg.svg import Point, GroupedDrawable, Rectangle, Line, Circle, Text, PITCH, Dimple
@@ -39,6 +39,12 @@ def title_case(color):
 
 # TODO: using Path instead of Line
 class Wire(Component):
+
+    def lab_instruction(self):
+        return 'Connect a %s from %s to %s' % (self.description(),
+                                             self.connected_ports[0].describe_location(),
+                                             self.connected_ports[1].describe_location())
+
     def __init__(self, color, *ports):
         Component.__init__(self, ports)
         start, end = ports
@@ -58,10 +64,11 @@ class Wire(Component):
 # TODO: this is a mess; maybe some methods/properties belong in Body.
 class TwoPinComponent(Component):
     def description(self):
-        return '%s (%s)' % (self.id(),self.text())
+        return '(%s)' % (self.text())
 
     __metaclass__ = ABCMeta
 
+# TODO: remove svg_id
     def __init__(self, svg_id, body, ports):
         Component.__init__(self, ports)
         self.leg_gap = PITCH
@@ -97,9 +104,12 @@ class TwoPinComponent(Component):
         return ''
 
     def lab_instruction(self):
-        return 'Connect a %s from %s to %s' % (self.description(),
-                                             self.connected_ports[0].describe_location(),
-                                             self.connected_ports[1].describe_location())
+        return 'Connect a %s %s: %s from %s to %s' % (
+                self.part_type(),
+                self.id(),
+                self.description(),
+                self.connected_ports[0].describe_location(),
+                self.connected_ports[1].describe_location())
 
 
 class Body(GroupedDrawable):
@@ -130,6 +140,10 @@ class RectangularBody(Body):
         self.add(self.rectangle)
         self.band_positions = [5 + 5*i for i in range(3)]
         self.band_positions.append(self.width - 3)
+
+    def add_bands(self, colors):
+        for (color, index) in zip(colors, [0, 1, 2, -1]):
+            self.add_band(color, index)
 
     def add_band(self, color, index=-1):
         self.add(band(color, self.band_positions[index]))
@@ -182,10 +196,16 @@ class Resistor(TwoPinComponent):
         return ' '.join([self.resistance, self.tolerance])
 
     def add_bands(self,body):
+        bands = self.find_bands()
+        body.add_bands(bands)
+
+    def find_bands(self):
         band_colors = self.coder.bands_for(self.coder.parse(self.resistance))
-        for (i, color) in enumerate(band_colors):
-            body.add_band(color, i)
-        body.add_band(self.coder.tolerance_band(self.tolerance), -1)
+        tolerance_band = self.coder.tolerance_band(self.tolerance)
+        return band_colors+[tolerance_band]
+
+    def description(self):
+        return '%s (%s)' % (self.text(), ' '.join(map(title_case, self.find_bands())))
 
 
 class Crystal(TwoPinComponent):

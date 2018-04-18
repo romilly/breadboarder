@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from decimal import Decimal
-from hamcrest import assert_that, is_
+from hamcrest import assert_that, is_, equal_to
 
 from breadboarder.helpers.color_codes import ColorCode
 
@@ -22,3 +22,11 @@ class ColorCodeTest(TestCase):
 
     def tests_converts_value_to_color_code(self):
         assert_that(self.cc.bands_for(Decimal('2.7')),is_(['red','violet','gold']))
+
+    def test_checks_tolerance(self):
+        assert_that(self.cc.tolerance_band('5%'), equal_to('gold'))
+        try:
+            self.cc.tolerance_band(5)
+            self.fail('should cause an error')
+        except (ValueError):
+            pass

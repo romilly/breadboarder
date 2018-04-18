@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABCMeta
 from copy import copy
-from xml.etree.ElementTree import Element, ElementTree
+from xml.etree.ElementTree import Element, ElementTree, register_namespace, XML
 from breadboarder.transformations.transform import Point, Rotation, Translation
 
 PITCH = 0.1*90 # 0.1", 90 DPI
@@ -34,6 +34,23 @@ class Drawable:
         pass
 
 
+class SVGDocument(object):
+    def __init__(self, width=640, height=480, view_box=None):
+        self.width = width
+        self.height = height
+        self.view_box = view_box
+        register_namespace("", "http://www.w3.org/2000/svg")
+        if self.view_box:
+            vb = ' viewBox="%d %d %d %d"' % self.view_box
+        else:
+            vb = ''
+        self.document = XML('<svg width="%d" height="%d" version="1.1" xmlns="http://www.w3.org/2000/svg"%s></svg>' % (
+                self.width, self.height, vb))
+
+    def add(self, element):
+        self.document.append(element)
+
+
 class CompositeItem(Drawable):
     __metaclass__ = ABCMeta
 
@@ -58,9 +75,8 @@ class CompositeItem(Drawable):
 
 
 class GroupedDrawable(CompositeItem):
-    def __init__(self, svg_id=None, opacity=100):
+    def __init__(self, opacity=100):
         CompositeItem.__init__(self)
-        self.svg_id = svg_id
         self.transformations = []
         self.opacity = opacity
 
@@ -71,8 +87,6 @@ class GroupedDrawable(CompositeItem):
             group = Element('g')
             if len(self.transformations) > 0:
                 group.set('transform',self.transformation())
-            if self.svg_id is not None:
-                group.set('id',self.svg_id)
             if self.opacity != 100:
                 group.set('opacity',str(self.opacity))
             return group

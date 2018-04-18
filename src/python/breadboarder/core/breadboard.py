@@ -3,13 +3,13 @@ from breadboarder.core.port import SocketGroup
 from breadboarder.svg.svg import Rectangle, horizontal_line, Text, Point, PITCH
 
 
-# TODO: document Breadboard measurements in docs/BREADBOARD_LAYOUT.md
+# TODO: document Breadboard measurements in doc/BREADBOARD_LAYOUT.md
 
 
 class Breadboard(Host):
 
     def __init__(self):
-        Host.__init__(self, svg_id='breadboard')
+        Host.__init__(self)
 
     def part_type(self):
         return 'Breadboard'

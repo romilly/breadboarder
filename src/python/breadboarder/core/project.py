@@ -1,12 +1,9 @@
-from xml.etree.ElementTree import register_namespace, tostring, XML
-
-from breadboarder.bom.bom import BillOfMaterials, BomWriter
-from breadboarder.markdown.markdownwriter import MarkdownWriter
-from breadboarder.svg.svg import CompositeItem, GroupedDrawable
+from breadboarder.author.bom import BillOfMaterials
+from breadboarder.svg.svg import GroupedDrawable, Drawable
 from abc import ABCMeta, abstractmethod
 
 
-class Part():
+class Part(Drawable):
     __metaclass__ = ABCMeta
 
     def __init__(self):
@@ -30,56 +27,56 @@ class Part():
     def description(self):
         pass
 
+    @abstractmethod
+    def lab_instruction(self):
+        pass
+
+SHOULD_HAVE_IMPLEMENTED = '%s - My subclass shold have implemented this method'
+
 
 class Component(GroupedDrawable, Part):
     __metaclass__ = ABCMeta
 
     def __init__(self, connected_ports):
         GroupedDrawable.__init__(self)
+        Part.__init__(self)
         self.connected_ports = connected_ports
 
-    @abstractmethod
+    def id_prefix(self):
+        raise NotImplementedError(SHOULD_HAVE_IMPLEMENTED % self)
+
+    def description(self):
+        raise NotImplementedError(SHOULD_HAVE_IMPLEMENTED % self)
+
     def lab_instruction(self):
-        pass
+        raise NotImplementedError(SHOULD_HAVE_IMPLEMENTED % self)
+
+    def part_type(self):
+        raise NotImplementedError(SHOULD_HAVE_IMPLEMENTED % self)
 
 
-class Project(CompositeItem):
-    def __init__(self, width=640, height=480, view_box=None):
-        CompositeItem.__init__(self)
-        self.width = width
-        self.height = height
-        self.view_box = view_box
+class Project():
+    def __init__(self):
+        self._parts = []
+
+    def add(self,part):
+        self._parts.append(part)
+
+    def parts(self):
+        return self._parts
 
     def welcome(self, visitor):
+        visitor.start()
         visitor.visit_project(self)
-        for part in self.children():
+        for part in self.parts():
             visitor.visit_part(part)
+        visitor.end()
 
-    def container(self):
-        register_namespace("","http://www.w3.org/2000/svg")
-        if self.view_box:
-            vb = ' viewBox="%d %d %d %d"' % self.view_box
-        else:
-            vb = ''
-        xml = XML('<svg width="%d" height="%d" version="1.1" xmlns="http://www.w3.org/2000/svg"%s></svg>' % (
-        self.width, self.height, vb))
-        return xml
-
-    def tostring(self):
-        return tostring(self.element())
-
-    def bom(self):
+    def build_bom(self):
         bom = BillOfMaterials()
         self.welcome(bom)
         return bom
 
-
-
-    def markdown_instructions(self, writer):
-        for component in self._children:
-            instruction = component.lab_instruction()
-            if instruction is not None:
-                writer.add_step(instruction)
 
 
 

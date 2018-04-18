@@ -9,7 +9,7 @@ class CP2102(Host):
         return 'CP2102 UART'
 
     def __init__(self):
-        Host.__init__(self, svg_id='CP2102')
+        Host.__init__(self)
 
     def id_prefix(self):
         return 'CP2102'
