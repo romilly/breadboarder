@@ -34,22 +34,6 @@ class Drawable:
         pass
 
 
-class SVGDocument(object):
-    def __init__(self, width=640, height=480, view_box=None):
-        self.width = width
-        self.height = height
-        self.view_box = view_box
-        register_namespace("", "http://www.w3.org/2000/svg")
-        if self.view_box:
-            vb = ' viewBox="%d %d %d %d"' % self.view_box
-        else:
-            vb = ''
-        self.document = XML('<svg width="%d" height="%d" version="1.1" xmlns="http://www.w3.org/2000/svg"%s></svg>' % (
-                self.width, self.height, vb))
-
-    def add(self, element):
-        self.document.append(element)
-
 
 class CompositeItem(Drawable):
     __metaclass__ = ABCMeta
@@ -226,9 +210,6 @@ class Dimple(SimpleItem):
     def element(self):
         return Element("path", {'d': 'M %d %d A %d %d 0 1 1 %d %d' % (self.top_left.x, self.top_left.y - self.radius,
                                                                       self.radius, self.radius, self.top_left.x, self.top_left.y + self.radius)})
-
-
-
-
-def write(diagram, filename):
-    ElementTree(diagram).write(filename, 'UTF-8')
+def write(data, filename):
+        with open(filename, 'w', encoding='UTF-8') as f:
+            f.write(data)

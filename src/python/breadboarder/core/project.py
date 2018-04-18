@@ -1,4 +1,6 @@
 from breadboarder.author.bom import BillOfMaterials
+from breadboarder.author.illustrations import SVGBuilder
+from breadboarder.author.instructions import InstructionsBuilder
 from breadboarder.svg.svg import GroupedDrawable, Drawable
 from abc import ABCMeta, abstractmethod
 
@@ -62,8 +64,10 @@ class Project():
     def __init__(self):
         self._parts = []
 
-    def add(self,part):
-        self._parts.append(part)
+    def add(self,*parts):
+        for part in parts:
+            self._parts.append(part)
+        return self
 
     def parts(self):
         return self._parts
@@ -79,6 +83,16 @@ class Project():
         bom = BillOfMaterials()
         self.welcome(bom)
         return bom
+
+    def build_instructions(self):
+        builder = InstructionsBuilder()
+        self.welcome(builder)
+        return builder.instructions()
+
+    def build_svg(self):
+        svb = SVGBuilder()
+        self.welcome(svb)
+        return svb.svg().decode('UTF-8')
 
 
 

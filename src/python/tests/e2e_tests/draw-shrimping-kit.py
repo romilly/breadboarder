@@ -4,7 +4,7 @@ from breadboarder.svg.svg import write
 
 def draw_shrimp_kit():
     project = shrimp_kit()
-    svg = project.element()
+    svg = project.build_svg()
     write(svg, 'svg/shrimp-kit.svg')
 
 

@@ -28,13 +28,16 @@ class BillOfMaterials(ProjectVisitor):
     def __setitem__(self, part_type, listed):
         self.parts[part_type] = listed
 
+    def markdown(self, writer):
+        bw = BomWriter()
+        bw.markdown(self, writer)
+
 
 class BomWriter():
     def __init__(self):
         pass
 
-    def markdown(self, bom):
-        writer = MarkdownWriter()
+    def markdown(self, bom, writer):
         keys = bom.sorted_keys()
         writer.add_heading('Bill of Materials', 2)
         for key in keys:

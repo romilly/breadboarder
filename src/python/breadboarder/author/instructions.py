@@ -2,7 +2,6 @@ from collections import OrderedDict
 
 from breadboarder.author.visitor import ProjectVisitor
 from breadboarder.markdown.markdownwriter import MarkdownWriter
-from breadboarder.svg.svg import SVGDocument
 
 
 class DefaultFigureNamer(object):
@@ -18,18 +17,15 @@ class DefaultFigureNamer(object):
 
 class Instructions(object):
     def __init__(self):
-        self.writer = MarkdownWriter()
-        self.images = OrderedDict()
-        self.document = SVGDocument()
+        self.instructions = []
 
     def add_instruction(self, instruction):
-        self.writer.add_step(instruction)
+        self.instructions.append(instruction)
 
-    def add_image_element(self, element):
-        self.document.add(element)
+    def markdown(self, writer):
+        for instruction in self.instructions:
+            writer.add_step(instruction)
 
-    def markdown(self):
-        return self.writer.markdown()
 
 
 class InstructionsBuilder(ProjectVisitor):
@@ -43,7 +39,6 @@ class InstructionsBuilder(ProjectVisitor):
 
     def visit_part(self, part):
         self._instructions.add_instruction(part.lab_instruction())
-        self._instructions.add_image_element(part.element())
 
     def instructions(self):
         return self._instructions
