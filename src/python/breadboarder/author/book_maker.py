@@ -9,6 +9,7 @@ class BookMaker():
     def __init__(self):
         pass
 
+# TODO: instructions() should handle bom, steps and illustrations
     def publish(self, project, title, filename, directory='manuscript'):
         writer = MarkdownWriter()
         writer.add_heading(title)
