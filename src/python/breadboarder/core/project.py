@@ -31,6 +31,9 @@ class Part(Drawable):
     def lab_instruction(self):
         pass
 
+    def full_description(self):
+        return self.description()
+
 SHOULD_HAVE_IMPLEMENTED = '%s - My subclass shold have implemented this method'
 
 

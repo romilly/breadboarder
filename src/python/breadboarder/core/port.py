@@ -5,10 +5,11 @@ from breadboarder.svg.svg import GroupedDrawable, PITCH, Rectangle
 
 class Port():
     # the socket or pin belonging to a host that a component can be connected to
-    def __init__(self, host, relative_location, portname):
+    def __init__(self, host, relative_location, portname, port_type='socket'):
         self.host = host
         self.portname = portname
         self.relative_location = relative_location
+        self.port_type = port_type
 
     def location(self):
         return self.host.location_of(self.relative_location)
@@ -16,9 +17,14 @@ class Port():
     def describe_location(self):
         return self.host.describe_port_location(self.portname)
 
+    def description(self):
+        return '%s %s' % (self.port_type, self.portname)
+
 
 class SocketGroup(GroupedDrawable):
-    def __init__(self, center, rows, cols, alpha_labels, host, start_number=1, id='sockets', fill='black'):
+    # TODO: remove fill as this is determined by port_type
+    def __init__(self, center, rows, cols, alpha_labels, host, start_number=1,
+                 id='sockets', fill='black', port_type='socket'):
         GroupedDrawable.__init__(self)
         self.socket_size = 2.88
         self.id = id
@@ -26,7 +32,7 @@ class SocketGroup(GroupedDrawable):
             for j in range(rows):
                 socket = self.socket(fill).set_center(center.x + PITCH * i, center.y + PITCH * j)
                 label = alpha_labels[j] + self.numeric_label(i, start_number)
-                host.add_port(Port(host, socket.center(), label))
+                host.add_port(Port(host, socket.center(), label, port_type=port_type))
                 self.add(socket)
 
     def numeric_label(self, i, start_number):

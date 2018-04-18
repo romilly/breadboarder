@@ -15,10 +15,14 @@ class Breadboard(Host):
         return 'Breadboard'
 
     def description(self):
-        return '480-way Breadboard'
+        return 'Breadboard'
 
     def id_prefix(self):
         return 'BB'
+
+    def full_description(self):
+        return '%s: 480-way Breadboard' % self.id()
+
 
     def add_components(self):
         self._set_dimensions()

@@ -26,4 +26,4 @@ class Host(GroupedDrawable, Part):
         return self.ports[item]
 
     def describe_port_location(self, port_name):
-        return self.description()+' '+port_name
+        return self.id()+' '+self[port_name].description()

@@ -12,7 +12,7 @@ class CP2102(Host):
         Host.__init__(self)
 
     def id_prefix(self):
-        return 'CP2102'
+        return 'CP2102-'
 
     def part_type(self):
         return 'CP2102'
@@ -38,4 +38,4 @@ class CP2102(Host):
             self.add(Rectangle(self.pin_width, self.pin_height, fill='gold', stroke='none')
                      .move_to(Point(self.board_offset + self.board_width - 6, 4 + PITCH * pin_index)))
         self.add(SocketGroup(Point(self.board_offset + self.board_width - 6 + self.pin_width, 5),
-                             6, 1, self.labels, self, start_number=-1, fill='none'))
+                             6, 1, self.labels, self, start_number=-1, fill='none', port_type='pin'))

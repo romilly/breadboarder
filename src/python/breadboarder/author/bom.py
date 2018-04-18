@@ -40,6 +40,6 @@ class BomWriter():
         for key in keys:
             items = bom[key]
             writer.add_heading(key+('s' if len(items) > 1 else ''), 3)
-            writer.add_para(', '.join([item.description() for item in bom[key]]))
+            writer.add_para(', '.join([item.full_description() for item in bom[key]]))
         return writer.markdown()
 

@@ -103,11 +103,12 @@ class TwoPinComponent(Component):
     def text(self):
         return ''
 
+    def full_description(self):
+        return '%s %s: %s' % (self.part_type(), self.id(), self.description())
+
     def lab_instruction(self):
-        return 'Connect a %s %s: %s from %s to %s' % (
-                self.part_type(),
-                self.id(),
-                self.description(),
+        return 'Connect a %s from %s to %s' % (
+                self.full_description(),
                 self.connected_ports[0].describe_location(),
                 self.connected_ports[1].describe_location())
 
