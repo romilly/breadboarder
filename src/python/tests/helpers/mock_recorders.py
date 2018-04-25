@@ -1,6 +1,6 @@
 from io import StringIO
 
-from breadboarder.author.recorders import TextRecorder, SVGRecorder
+from breadboarder.author.pubwriters import TextRecorder, SVGRecorder
 
 
 class MockTextRecorder(TextRecorder):

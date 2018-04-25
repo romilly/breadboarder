@@ -3,7 +3,7 @@ from unittest import TestCase
 from hamcrest import assert_that, equal_to, string_contains_in_order, contains_string
 
 from breadboarder.author.book_maker import BookMaker, StepTaker, StepSpreader
-from breadboarder.author.recorders import MockPubWriter
+from breadboarder.author.pubwriters import MockPubWriter
 from breadboarder.core.project import Note
 from breadboarder.markdown.markdownformatter import MarkdownFormatter
 from tests.helpers.test_projects import test_project

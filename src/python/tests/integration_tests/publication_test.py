@@ -3,9 +3,8 @@ from unittest import TestCase
 from hamcrest import assert_that, contains_string
 
 from breadboarder.author.book_maker import BookMaker, StepSpreader
-from breadboarder.author.illustrations import SVGWriter
-from breadboarder.author.instructions import DefaultFigureNamer
-from breadboarder.author.recorders import MockPubWriter
+from breadboarder.author.illustrator import SVGWriter, DefaultFigureNamer
+from breadboarder.author.pubwriters import MockPubWriter
 from breadboarder.core.project import Note, Project
 from breadboarder.markdown.markdownformatter import MarkdownFormatter
 from tests.unit_tests.bookmaker_test import InstructionWriter
