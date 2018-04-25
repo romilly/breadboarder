@@ -7,7 +7,7 @@ from breadboarder.svg.svg import GroupedDrawable
 class Host(GroupedDrawable, Part):
     __metaclass__ = ABCMeta
 
-    def lab_instruction(self):
+    def instruction(self):
         return 'Take a %s (%s)' % (self.description(),self.id())
 
     def __init__(self):

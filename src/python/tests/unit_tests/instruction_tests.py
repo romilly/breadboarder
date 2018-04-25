@@ -48,5 +48,5 @@ class InstructionTests(TestCase):
         self.check_instruction(xtal, 'Crystal X1: (16MHz)')
 
     def check_instruction(self, r, desc):
-        assert_that(r.lab_instruction(),
+        assert_that(r.instruction(),
                     equal_to('Connect a %s from Board p1 to Board p2' % desc))

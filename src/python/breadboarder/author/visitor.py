@@ -4,9 +4,6 @@ from abc import ABCMeta, abstractmethod
 class ProjectVisitor():
     __metaclass__ = ABCMeta
 
-    def __init__(self):
-        pass
-
     def start(self):
         pass
 
@@ -15,8 +12,9 @@ class ProjectVisitor():
         pass
 
     @abstractmethod
-    def visit_part(self, part):
+    def take(self, step):
         pass
 
+    @abstractmethod
     def end(self):
         pass

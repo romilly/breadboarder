@@ -14,7 +14,7 @@ class Button(Component):
     def part_type(self):
         return 'Button'
 
-    def lab_instruction(self):
+    def instruction(self):
         return 'Insert the button with the top left pin in %s' %  self.connected_ports[0].describe_location()
 
     def __init__(self, port):
@@ -40,7 +40,7 @@ def title_case(color):
 # TODO: using Path instead of Line
 class Wire(Component):
 
-    def lab_instruction(self):
+    def instruction(self):
         return 'Connect a %s from %s to %s' % (self.description(),
                                              self.connected_ports[0].describe_location(),
                                              self.connected_ports[1].describe_location())
@@ -113,7 +113,7 @@ class TwoPinComponent(Component):
     def full_description(self):
         return '%s %s: %s' % (self.part_type(), self.id(), self.description())
 
-    def lab_instruction(self):
+    def instruction(self):
         return 'Connect a %s from %s to %s' % (
                 self.full_description(),
                 self.connected_ports[0].describe_location(),
@@ -311,7 +311,7 @@ def pcf8574(port):
 
 class DIL(Component):
 
-    def lab_instruction(self):
+    def instruction(self):
         return 'Insert pin 1 of the %s (%s) into %s' % (self.description(), self.id(),
                                                         self.connected_ports[0].describe_location())
 

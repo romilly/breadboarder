@@ -1,11 +1,19 @@
-from breadboarder.author.bom import BillOfMaterials
-from breadboarder.author.illustrations import SVGBuilder
-from breadboarder.author.instructions import InstructionsBuilder
+from breadboarder.author.bom import BomWriter, BillOfMaterials
 from breadboarder.svg.svg import GroupedDrawable, Drawable
 from abc import ABCMeta, abstractmethod
 
+class Step(object):
+    __metaclass__ = ABCMeta
 
-class Part(Drawable):
+    @abstractmethod
+    def instruction(self):
+        pass
+
+    def is_part(self):
+        return False
+
+
+class Part(Drawable, Step):
     __metaclass__ = ABCMeta
 
     def __init__(self):
@@ -29,9 +37,8 @@ class Part(Drawable):
     def description(self):
         pass
 
-    @abstractmethod
-    def lab_instruction(self):
-        pass
+    def is_part(self):
+        return True
 
     def full_description(self):
         return self.description()
@@ -53,7 +60,7 @@ class Component(GroupedDrawable, Part):
     def description(self):
         raise NotImplementedError(SHOULD_HAVE_IMPLEMENTED % self)
 
-    def lab_instruction(self):
+    def instruction(self):
         raise NotImplementedError(SHOULD_HAVE_IMPLEMENTED % self)
 
     def part_type(self):
@@ -62,37 +69,36 @@ class Component(GroupedDrawable, Part):
 
 class Project():
     def __init__(self):
-        self._parts = []
+        self._steps = []
+        self._bom = BillOfMaterials()
 
-    def add(self,*parts):
-        for part in parts:
-            self._parts.append(part)
+    def bom(self):
+        return self._bom
+
+    def add(self,*steps):
+        for step in steps:
+            self._steps.append(step)
+            if step.is_part():
+                self._bom.add(step)
         return self
-
-    def parts(self):
-        return self._parts
 
     def welcome(self, visitor):
         visitor.start()
         visitor.visit_project(self)
-        for part in self.parts():
-            visitor.visit_part(part)
+        for step in self.steps():
+            visitor.take(step)
         visitor.end()
 
-    def build_bom(self):
-        bom = BillOfMaterials()
-        self.welcome(bom)
-        return bom
+    def steps(self):
+        return self._steps
 
-    def build_instructions(self):
-        builder = InstructionsBuilder()
-        self.welcome(builder)
-        return builder.instructions()
+class Note(Step):
+    def __init__(self, text):
+        self.text = text
 
-    def build_svg(self):
-        svb = SVGBuilder()
-        self.welcome(svb)
-        return svb.svg().decode('UTF-8')
+    def instruction(self):
+        return self.text
+
 
 
 
