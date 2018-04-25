@@ -1,10 +1,6 @@
-import os
 from abc import abstractmethod, ABCMeta
 
 from breadboarder.author.visitor import ProjectVisitor
-from breadboarder.examples.shrimp_kit import shrimp_kit
-
-# TODO: Try the idea below
 
 
 class BookMaker(ProjectVisitor):
