@@ -1,4 +1,3 @@
-import math
 from abc import ABCMeta, abstractmethod
 
 from breadboarder.svg.point import Point
@@ -45,9 +44,9 @@ class Rotation(Transform):
         return 'rotate(%f,%f,%f)' % (self.angle, self.origin.x, self.origin.y)
 
     def transform(self, point):
-        p = point # - self.origin
+        p = point
         s = sin(radians(-self.angle))
         c = cos(radians(-self.angle))
         point1 = Point(c*p.x + s * p.y, (c*p.y - s*p.x))
-        result = point1 # + self.origin
+        result = point1
         return result

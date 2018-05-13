@@ -1,10 +1,6 @@
 from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.components import Wire, Button, Resistor, Diode, Crystal, DiskCapacitor, atMega328, pcf8574
 from breadboarder.core.project import Project
-
-
-
-# TODO: add image-based testing
 from breadboarder.svg.svg import Point, write
 
 

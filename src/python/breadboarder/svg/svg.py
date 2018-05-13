@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABCMeta
 from copy import copy
 from xml.etree.ElementTree import Element
-from breadboarder.transformations.transform import Point, Rotation, Translation
+from breadboarder.svg.transform import Point, Rotation, Translation
 
 PITCH = 0.1*90 # 0.1", 90 DPI
 

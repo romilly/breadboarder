@@ -1,50 +1,12 @@
-from abc import abstractmethod, ABCMeta
+from breadboarder.author.illustrator import Illustrator
+from breadboarder.markdown.markdownformatter import MarkdownFormatter
+from breadboarder.publishing.figure_namer import DefaultFigureNamer
+from unit_tests.test_instruction_writer import InstructionWriter
 
-from breadboarder.author.visitor import ProjectVisitor
-
-
-class BookMaker(ProjectVisitor):
-    """
-    The bookmaker flows the project steps through a StepTaker
-    """
-
-    def end(self):
-        self.step_taker.end()
-
-    def __init__(self, step_taker):
-        self.step_taker = step_taker
-
-    def take(self, step):
-        self.step_taker.take(step)
-
-    def visit_project(self, project):
-        pass
-
-    def publish(self, project):
-        project.welcome(self)
-
-
-class StepTaker():
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def take(self, step):
-        pass
-
-    @abstractmethod
-    def end(self):
-        pass
-
-
-class StepSpreader(StepTaker):
-    def __init__(self, *takers):
-        self.takers = takers
-
-    def take(self, step):
-        for taker in self.takers:
-            taker.take(step)
-
-    def end(self):
-        for taker in self.takers:
-            taker.end()
+#   TODO: move figure_namer into editor?
+def make_book(project, editor, file_writer):
+    figure_namer = DefaultFigureNamer()
+    iw = InstructionWriter(MarkdownFormatter(file_writer), editor, figure_namer)
+    pw = Illustrator(file_writer, editor, figure_namer)
+    project.publish(iw, pw)
 

@@ -2,6 +2,7 @@ from breadboarder.author.bom import BomWriter, BillOfMaterials
 from breadboarder.svg.svg import GroupedDrawable, Drawable
 from abc import ABCMeta, abstractmethod
 
+
 class Step(object):
     __metaclass__ = ABCMeta
 
@@ -89,8 +90,13 @@ class Project():
             visitor.take(step)
         visitor.end()
 
+    def publish(self, *visitors):
+        for visitor in visitors:
+            self.welcome(visitor)
+
     def steps(self):
         return self._steps
+
 
 class Note(Step):
     def __init__(self, text):
