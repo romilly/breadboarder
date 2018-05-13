@@ -4,7 +4,7 @@ from hamcrest import assert_that, contains_string
 
 from breadboarder.author.pubwriters import MockPubWriter
 from breadboarder.core.project import Note
-from breadboarder.markdown.markdownformatter import MarkdownFormatter
+from breadboarder.publishing.markdownformatter import MarkdownFormatter
 from breadboarder.publishing.figure_namer import DefaultFigureNamer
 from breadboarder.publishing.instruction_writer import InstructionWriter
 

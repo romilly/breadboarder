@@ -141,3 +141,4 @@ fabric.properties
 
 /svg/
 /results/
+/src/tests/unit_tests/.pytest_cache/
