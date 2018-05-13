@@ -2,9 +2,10 @@ from abc import ABCMeta, abstractmethod
 import math
 
 from breadboarder.core.project import Component
+from breadboarder.core.units import PITCH
 from breadboarder.helpers.color_codes import ColorCode
-from breadboarder.svg.path import Path, arc
-from breadboarder.svg.svg import Point, GroupedDrawable, Rectangle, Line, Circle, Text, PITCH, Dimple
+from svg.path import Path, arc
+from svg.svg import Point, GroupedDrawable, Rectangle, Line, Circle, Text, Dimple
 
 
 class Button(Component):

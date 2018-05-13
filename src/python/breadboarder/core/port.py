@@ -1,6 +1,7 @@
 from _elementtree import Element
 
-from breadboarder.svg.svg import GroupedDrawable, PITCH, Rectangle
+from breadboarder.core.units import PITCH
+from svg.svg import GroupedDrawable, Rectangle
 
 
 class Port():

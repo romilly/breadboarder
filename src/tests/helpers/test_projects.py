@@ -1,7 +1,7 @@
 from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.components import Wire, atMega328, LED
 from breadboarder.core.project import Project
-from breadboarder.svg.point import Point
+from svg.point import Point
 
 
 def test_project():

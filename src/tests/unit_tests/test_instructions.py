@@ -5,7 +5,7 @@ from hamcrest import assert_that, equal_to
 from breadboarder.core.components import Resistor, DiskCapacitor, Crystal
 from breadboarder.core.host import Host
 from breadboarder.core.port import Port
-from breadboarder.svg.point import Point
+from svg.point import Point
 
 
 class MockBoard(Host):
