@@ -4,13 +4,15 @@ from hamcrest import assert_that, contains_string
 from breadboarder.author.book_maker import make_book
 from breadboarder.author.pubwriters import MockPubWriter
 from breadboarder.core.project import Note, Project
+from breadboarder.publishing.figure_namer import DefaultFigureNamer
 from unit_tests.test_instruction_writer import MockEditor
 
 
 class BookMakerTest(TestCase):
     def test_publishes_text_and_images(self):
         file_writer = MockPubWriter('manuscript','test')
-        editor = MockEditor()
+        namer = DefaultFigureNamer()
+        editor = MockEditor(file_writer, namer)
         project = Project()
         project.add(
                  Note('Note 1'),

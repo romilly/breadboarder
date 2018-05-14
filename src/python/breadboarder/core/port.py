@@ -36,6 +36,7 @@ class SocketGroup(GroupedDrawable):
                 host.add_port(Port(host, socket.center(), label, port_type=port_type))
                 self.add(socket)
 
+    # TODO: use None, not -1, as flag
     def numeric_label(self, i, start_number):
         return '' if start_number == -1 else str(i + start_number)
 

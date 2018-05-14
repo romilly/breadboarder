@@ -1,11 +1,10 @@
 from unittest import TestCase
-
 from hamcrest import assert_that, equal_to
+from svg.point import Point
 
 from breadboarder.core.components import Resistor, DiskCapacitor, Crystal
 from breadboarder.core.host import Host
 from breadboarder.core.port import Port
-from svg.point import Point
 
 
 class MockBoard(Host):
@@ -35,8 +34,6 @@ class InstructionTests(TestCase):
         host.add_port(self.p1)
         host.add_port(self.p2)
 
-
-
     def test_resistor(self):
         r = Resistor('100k', '5%', self.p1, self.p2)
         r.set_id('R1')
@@ -52,6 +49,6 @@ class InstructionTests(TestCase):
         xtal.set_id('X1')
         self.check_instruction(xtal, 'Crystal X1: (16MHz)')
 
-    def check_instruction(self, r, desc):
-        assert_that(r.instruction(),
+    def check_instruction(self, component, desc):
+        assert_that(component.instruction(),
                     equal_to('Connect a %s from bb socket p1 to bb socket p2' % desc))
