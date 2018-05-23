@@ -19,4 +19,5 @@ There are not in priority order. Priorities need to be decided.
 1. Web-based editor
 1. Javascript graphical front-end
 1. Link to TIB (The Intelligent Breadboard) for automatic wiring validation/test
+1. Link to Google Speech kit
     
