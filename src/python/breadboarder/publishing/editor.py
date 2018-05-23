@@ -19,7 +19,7 @@ class Editor(ProjectVisitor):
         self.options = options
 
     def visit_project(self, project):
-        pass
+        self.file_writer.open()
 
     def take(self, step):
         self.formatter.step(step.instruction())

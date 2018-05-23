@@ -1,7 +1,10 @@
+from breadboarder.author.book_maker import make_book
+from breadboarder.author.pubwriters import FileBasedPublicationWriter
 from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.components import Wire, Button, Resistor, Diode, Crystal, DiskCapacitor, atMega328, pcf8574
 from breadboarder.core.project import Project
-from breadboarder.svg.svg import Point, write
+from breadboarder.publishing.editor import Editor
+from svg.svg import Point
 
 
 def test_dil():
@@ -24,7 +27,7 @@ def test_dil():
     project.add(Crystal('16Mz', breadboard['g24'],breadboard['a29']))
     project.add(Diode('1N4001', breadboard['d24'],breadboard['f24']))
     project.add(DiskCapacitor('1N5', breadboard['a13'],breadboard['a18']))
-
-    write(svg, 'svg/dil.svg')
+    file_writer = FileBasedPublicationWriter('manuscript', 'test')
+    make_book(project, file_writer, options=Editor.PicturePerStep)
 
 test_dil()

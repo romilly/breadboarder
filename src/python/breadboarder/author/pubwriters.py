@@ -16,29 +16,43 @@ class PublicationWriter():
     def write(self, text, path):
         pass
 
-    @classmethod
-    def path_to_document(self, root_path, title):
-        return os.path.join(root_path, '%s.md' % title)
+    def path_to_document(self):
+        return os.path.join(self.root_path, '%s.md' % self.title)
 
     @abstractmethod
     def close(self):
+        pass
+
+    @abstractmethod
+    def open(self):
         pass
 
     def find_path(self, filename):
         if filename:
             path = os.path.join(self.root_path, filename)
         else:
-            path = self.path_to_document(self.root_path, self.title)
+            path = self.path_to_document()
         return path
 
 
 class FileBasedPublicationWriter(PublicationWriter):
+    def __init__(self, root_path, title):
+        PublicationWriter.__init__(self, root_path, title)
+        self.doc = None
+
+    def open(self):
+        self.doc = open(self.path_to_document(),'w')
 
     def close(self):
-        pass
+        self.doc.close()
 
-    def write(self, text, path):
-        pass
+    def write(self, text, filename=None):
+        if filename is None:
+            self.doc.write(text)
+            return
+        with open(self.find_path(filename), 'w') as f:
+            f.write(text)
+
 
 
 class MockPublicationWriter(PublicationWriter):
