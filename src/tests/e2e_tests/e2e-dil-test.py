@@ -24,7 +24,7 @@ def test_dil():
     project.add(Crystal('16Mz', breadboard['g24'],breadboard['a29']))
     project.add(Diode('1N4001', breadboard['d24'],breadboard['f24']))
     project.add(DiskCapacitor('1N5', breadboard['a13'],breadboard['a18']))
-    svg = project.element()
+
     write(svg, 'svg/dil.svg')
 
 test_dil()

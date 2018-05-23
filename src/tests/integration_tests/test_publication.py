@@ -2,23 +2,21 @@ from unittest import TestCase
 from hamcrest import assert_that, contains_string
 
 from breadboarder.author.book_maker import make_book
-from breadboarder.author.pubwriters import MockPubWriter
+from breadboarder.author.pubwriters import MockPublicationWriter
 from breadboarder.core.project import Note, Project
+from breadboarder.publishing.editor import Editor
 from breadboarder.publishing.figure_namer import DefaultFigureNamer
-from unit_tests.test_instruction_writer import MockEditor
 
 
 class BookMakerTest(TestCase):
     def test_publishes_text_and_images(self):
-        file_writer = MockPubWriter('manuscript','test')
-        namer = DefaultFigureNamer()
-        editor = MockEditor(file_writer, namer)
+        file_writer = MockPublicationWriter('manuscript', 'test')
         project = Project()
         project.add(
                  Note('Note 1'),
                  Note('Note 2'),
                  Note('Note 3'))
-        make_book(project, editor, file_writer)
+        make_book(project, file_writer, pictures=Editor.PicturePerStep)
         assert_that(file_writer['manuscript/test.md'], contains_string('Note 1\n'))
         assert_that(file_writer['manuscript/test.md'], contains_string('Note 2\n'))
         assert_that(file_writer['manuscript/test.md'], contains_string('Note 3\n'))

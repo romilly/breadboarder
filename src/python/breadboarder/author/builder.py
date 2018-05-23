@@ -1,5 +1,5 @@
 from breadboarder.author.illustrator import Illustrator
-from breadboarder.publishing.markdownformatter import MarkdownFormatter
+from breadboarder.publishing.formatters import MarkdownFormatter
 from breadboarder.publishing.figure_namer import DefaultFigureNamer
 from unit_tests.test_instruction_writer import InstructionWriter
 
