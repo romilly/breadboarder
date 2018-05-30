@@ -75,5 +75,5 @@ the [Shrimping.It website](http://start.shrimping.it/).
 ## Testing
 
 Most testing is now visual testing based on [appraise](https://github.com/AppraiseQA/appraise)
-- a node-based tool. The [roadmap](ROADMAP.md) includes plans to replace this by a Python evquivalent
-which would simplify automated testing using Travis.
+- a node-based tool. The [roadmap](ROADMAP.md) includes plans to replace this by a Python
+equivalent which would simplify automated testing using Travis.
