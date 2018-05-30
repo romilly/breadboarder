@@ -1,10 +1,11 @@
 # Breadboarder Roadmap
 
-There are not in priority order. Priorities need to be decided.
+These are not in priority order. Priorities need to be decided.
 
 **Feedback welcome!**
 
 
+1. Natural Language Input
 1. Replace *appraise* with Python-based image comparison (because *Travis*)
 1. Add more components
     1. Micro:bit prototyping kit(s)
@@ -17,6 +18,7 @@ There are not in priority order. Priorities need to be decided.
 1. Netlist export
 1. Kicad export
 1. Web-based editor
+1. Microbit (and other) simulators
 1. Javascript graphical front-end
 1. Link to TIB (The Intelligent Breadboard) for automatic wiring validation/test
 1. Link to Google Speech kit

@@ -307,7 +307,7 @@ def atMega328(port):
 
 def pcf8574(port):
     labels = ('A0', 'A1', 'A2', 'P0', 'P1', 'P2','P3','Vss','P4','P5','P6','P7','~INT','SCL','SDA','Vdd')
-    return DIL(16,'PCF8574',port, labels)
+    return DIL(16,'PCF8574', port, labels)
 
 
 class DIL(Component):

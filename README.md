@@ -39,7 +39,9 @@ generate markdown for the project.
                 LED('red',breadboard['g12'],breadboard['g17']))
         return project
     
-    BookMaker().publish(shrimp_kit(),'Making the shrimp', 'shrimping')
+    shrimp = shrimp_kit.shrimp_kit()
+    file_writer = FileBasedPublicationWriter('manuscript', 'test')
+    make_book(shrimp, file_writer, options=Editor.PictureAtEnd)
     
 
 # Output
@@ -141,3 +143,9 @@ Resistor R1: 10k 5% (Black Brown Yellow Gold), Resistor R2: 1k 5% (Black Brown O
 
 The Shrimp kit and relatives are described at and available from
 the [Shrimping.It website](http://start.shrimping.it/).
+
+## Testing
+
+Most testing is now visual testing based on [appraise](https://github.com/AppraiseQA/appraise)
+- a node-based tool. The [roadmap](ROADMAP.md) includes plans to replace this by a Python evquivalent
+which would simplify automated testing using Travis.

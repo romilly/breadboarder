@@ -1,7 +1,8 @@
 from breadboarder.core.port import SocketGroup
 from breadboarder.core.host import Host
-from breadboarder.svg.svg import Rectangle, Text, PITCH
-from breadboarder.svg.transform import Point
+from breadboarder.core.units import PITCH
+from svg.svg import Rectangle, Text
+from svg.transform import Point
 
 
 class CP2102(Host):
