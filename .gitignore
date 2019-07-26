@@ -144,3 +144,4 @@ fabric.properties
 /src/tests/unit_tests/.pytest_cache/
 .idea/
 
+/manuscript/
