@@ -16,6 +16,15 @@ generate markdown for the project.
 
 ## Current status
 
+**Aaagh!**
+
+While creating an APL version, along with Morten Kromberg of Dyalog,
+I tried to make parallel changes to the Python publishing code and left things
+in a frightful mess, with tests not working, and worse :)
+
+I will sort the mess out as soon as I can. Meanwhile, admire the example but don't
+try to run the code!
+
 ## Sample script and its output 
    
     def shrimp_kit():
@@ -75,5 +84,7 @@ the [Shrimping.It website](http://start.shrimping.it/).
 ## Testing
 
 Most testing is now visual testing based on [appraise](https://github.com/AppraiseQA/appraise)
-- a node-based tool. The [roadmap](ROADMAP.md) includes plans to replace this by a Python
+- a node-based tool.
+
+The [roadmap](ROADMAP.md) includes plans to replace this by a Python
 equivalent which would simplify automated testing using Travis.

@@ -30,4 +30,5 @@ def test_dil():
     file_writer = FileBasedPublicationWriter('manuscript', 'test')
     make_book(project, file_writer, options=Editor.PicturePerStep)
 
+
 test_dil()
