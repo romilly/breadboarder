@@ -1,7 +1,7 @@
 Checking visual appearance of breadboard with just one wire
 
 ~~~yaml example="wire" fixture="svg.js"
-filename: svg/bb-wire.svg
+filename: svg/wire.svg
 ~~~
 ## wire
 

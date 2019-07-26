@@ -4,7 +4,7 @@ The Shrimp kit and relatives are described at and available from
 the [Shrimping.It website](http://start.shrimping.it/). 
 
 ~~~yaml example="shrimp" fixture="svg.js"
-filename: svg/shrimp-kit.svg
+filename: svg/shrimp.svg
 ~~~
 
 
