@@ -8,6 +8,6 @@ filename: svg/two-hosts.svg
 
 ## two hosts
 
-![two hosts](twohosts.png)
+![two hosts](two-hosts.png)
 
 (generated: 2018-4-13 14:40:55)

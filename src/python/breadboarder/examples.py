@@ -27,6 +27,7 @@ def dil():
     project.add(DiskCapacitor('1N5', breadboard['a13'],breadboard['a18']))
     return project
 
+
 def two_hosts():
     project = Project()
     breadboard = Breadboard().move_to(Point(20, 20))
@@ -59,8 +60,20 @@ def shrimp():
 
 
 def wire():
-        project = Project()
-        breadboard = Breadboard().move_to(Point(20, 20))
-        project.add(breadboard)
-        project.add(Wire('red', breadboard['g1'], breadboard['TP1']))
-        return project
+    project = Project()
+    breadboard = Breadboard().move_to(Point(20, 20))
+    project.add(breadboard)
+    project.add(Wire('red', breadboard['g1'], breadboard['TP1']))
+    return project
+
+
+def two_hosts_wired():
+    project = Project()
+    breadboard = Breadboard().move_to(Point(20, 20))
+    project.add(breadboard)
+    cp = CP2102().rotate(-90., Point(40,400)).move_to(Point(40,400))
+    project.add(cp)
+    project.add(Wire('red',cp['5V'],breadboard['a1']))
+    return project
+
+
