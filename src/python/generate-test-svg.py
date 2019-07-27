@@ -1,5 +1,8 @@
 #! /usr/bin/env python3
 
+import sys
+# TODO: ugh! below, temporary fix until I put svg on PyPi
+sys.path.insert(0,'/home/romilly/git/active/svg/src')
 from breadboarder.examples import *
 from breadboarder.tests.helpers.svg_writer import write_svg
 
