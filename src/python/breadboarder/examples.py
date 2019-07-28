@@ -77,6 +77,7 @@ def two_hosts_wired():
     project.add(Wire('red',cp['5V'],breadboard['a1']))
     return project
 
+
 def network():
     project = Project()
     l1 = Layer(nodes=3, fill='red')
