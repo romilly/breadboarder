@@ -91,4 +91,13 @@ def network():
     project.add(network)
     return project
 
+def bar():
+    project = Project()
+    breadboard = Breadboard().move_to(Point(20, 20))
+    project.add(breadboard)
+    project.add(Wire('green', breadboard['g1'], breadboard['TP1']))
+    return project
+
+
+
 
