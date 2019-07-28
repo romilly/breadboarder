@@ -12,7 +12,7 @@ class Host(GroupedDrawable, Part):
 
     def __init__(self):
         GroupedDrawable.__init__(self)
-        self.ports = {}
+        self._ports = {}
         self.add_components()
 
     @abstractmethod
@@ -20,10 +20,16 @@ class Host(GroupedDrawable, Part):
         pass
 
     def add_port(self, port):
-        self.ports[port.portname] = port
+        self._ports[port.portname] = port
+
+    def port_names(self):
+        return self._ports.keys()
+
+    def ports(self):
+        return self._ports.values()
 
     def __getitem__(self, item):
-        return self.ports[item]
+        return self._ports[item]
 
     def describe_port_location(self, port_name):
         return self.id()+' '+self[port_name].description()

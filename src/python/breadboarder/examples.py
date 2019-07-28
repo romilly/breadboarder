@@ -1,3 +1,4 @@
+from breadboarder.anns.layer import Layer, Network
 from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.components import Wire, Button, Resistor, Diode, Crystal, DiskCapacitor, atMega328, pcf8574, LED
 from breadboarder.core.cp2102 import CP2102
@@ -74,6 +75,19 @@ def two_hosts_wired():
     cp = CP2102().rotate(-90., Point(40,400)).move_to(Point(40,400))
     project.add(cp)
     project.add(Wire('red',cp['5V'],breadboard['a1']))
+    return project
+
+def network():
+    project = Project()
+    l1 = Layer(nodes=3, fill='red')
+    l2 = Layer()
+    l2.move_to(Point(0, 50))
+    l3 = Layer()
+    l3.move_to(Point(0, 100))
+    l4 = Layer(nodes=2, fill='green')
+    l4.move_to(Point(0, 150))
+    network = Network(l1,l2,l3,l4)
+    project.add(network)
     return project
 
 

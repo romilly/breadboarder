@@ -9,6 +9,9 @@ from svg.svg import Point, GroupedDrawable, Rectangle, Line, Circle, Text, Dimpl
 
 
 class Button(Component):
+    def description(self):
+        return 'PCB mounting Button'
+
     def id_prefix(self):
         return 'B'
 
@@ -20,9 +23,7 @@ class Button(Component):
 
     def __init__(self, port):
         Component.__init__(self, [port])
-        width = PITCH * 2 + 3
-        height = PITCH * 3 - 6
-        rectangle = Rectangle(width, height)
+        rectangle = Rectangle(PITCH * 2 + 3, PITCH * 3 - 6)
         self.add(rectangle)
         self.add(Circle(rectangle.center()-Point(PITCH, PITCH), PITCH, fill='green'))
         self.move_to(port.location()  - Point(1.5, 1.5))
