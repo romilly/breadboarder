@@ -20,4 +20,11 @@ I'll set up a bash script that
 
 and then move the *ann*-related classes into this project for drawing networks. 
 
+## Wednesday 07 October 2020
+
+15 months have passed in the blink of an eye!
+
+I've now got tests working, and publication is producing promising results.
+
+Whatever I decide about the revised Arduino clone book, *breadboarder* is close to usability for real publishing projects. Yay!
 

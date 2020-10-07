@@ -7,4 +7,5 @@ def make_book(project, file_writer, figure_namer= None, options=None):
     figure_namer = figure_namer if figure_namer else DefaultFigureNamer()
     editor = Editor(file_writer, figure_namer, options)
     project.welcome(editor)
+    file_writer.close()
 

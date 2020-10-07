@@ -248,8 +248,24 @@
 <node TEXT="setup" ID="ID_1865279690" CREATED="1523458228684" MODIFIED="1523458231480"/>
 </node>
 <node TEXT="new-style builders" ID="ID_1856237134" CREATED="1523956892997" MODIFIED="1523956905889">
-<node TEXT="e2e test" ID="ID_582775513" CREATED="1523956907005" MODIFIED="1523956910542"/>
-<node TEXT="Instructions" ID="ID_1628394532" CREATED="1523956910893" MODIFIED="1523956960496"/>
+<node TEXT="e2e test" ID="ID_582775513" CREATED="1523956907005" MODIFIED="1564322730417">
+<icon BUILTIN="button_ok"/>
+</node>
+<node TEXT="Instructions" ID="ID_1628394532" CREATED="1523956910893" MODIFIED="1564329892229"><richcontent TYPE="DETAILS">
+
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      in a script :)
+    </p>
+  </body>
+</html>
+
+</richcontent>
+</node>
 </node>
 </node>
 <node TEXT="Review" POSITION="left" ID="Freemind_Link_1153466861" CREATED="1266488259116" MODIFIED="1266488895851" COLOR="#fb1802">

@@ -87,5 +87,5 @@ Resistor R1: 10k 5% (Black Brown Yellow Gold), Resistor R2: 1k 5% (Black Brown O
 1. Connect a LED LED1: () from BB1 socket g12 to BB1 socket g17
 
 
-![Making the shrimp](manuscript/images/shrimping.svg)
+![Making the shrimp](images/shrimping.svg)
 

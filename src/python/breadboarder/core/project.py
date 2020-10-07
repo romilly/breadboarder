@@ -44,6 +44,7 @@ class Part(Drawable, Step):
     def full_description(self):
         return self.description()
 
+
 SHOULD_HAVE_IMPLEMENTED = '%s - My subclass shold have implemented this method'
 
 
