@@ -284,7 +284,6 @@ class CapacitorBody(Body):
         return self.center() + self.body_offset
 
 
-
 class DiskCapacitor(TwoPinComponent):
     def __init__(self, capacitance, *ports):
         self.capacitance = capacitance
@@ -301,10 +300,12 @@ class DiskCapacitor(TwoPinComponent):
 
 # TODO: similar defs of extend, center. Move to Drawable, which would need width() and height()?
 
+
 def atMega328(port):
     labels = ('~RST','RXD','TXD','PD2','PD3','PD4','VCC','GND','XTAL1','XTAL2','PD5','PD6','PD7','PB0',
             'PB1','PB2','PB3','PB4','PB5','AVCC','AREF','GND','PC0','PC1','PC2','PC3','PC4','PC5')
     return DIL(28,'ATmega328', port, labels)
+
 
 def pcf8574(port):
     labels = ('A0', 'A1', 'A2', 'P0', 'P1', 'P2','P3','Vss','P4','P5','P6','P7','~INT','SCL','SDA','Vdd')
