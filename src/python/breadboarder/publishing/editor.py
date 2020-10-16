@@ -37,6 +37,7 @@ class Editor(ProjectVisitor):
         self.formatter.image(self.figure_namer.caption(), path)
         self.file_writer.write(self.illustrator.svg(), source_path)
         self.file_writer.convert_to_png(source_path, path)
+        self.formatter.new_page()
 
 
     def end(self):

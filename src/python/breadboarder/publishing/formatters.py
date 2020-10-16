@@ -20,8 +20,14 @@ class Formatter():
     def take(self, instruction):
         raise NotImplementedError()
 
+    @abstractmethod
+    def new_page(self):
+        raise NotImplementedError()
+
 
 class NullFormatter(Formatter):
+    def new_page(self):
+        pass
 
     def para(self, *lines):
         pass
@@ -60,14 +66,19 @@ class MarkdownFormatter(Formatter):
         self.newline(2)
 
     def take(self, step):
+        if step.is_stage():
+            return
         if step.is_new_page():
-            self.writer.write('\n{pagebreak}\n')
+            self.new_page()
             return
         if step.is_note():
             self.writer.write('\nI> %s\n' % step.instruction())
         else:
             self.writer.write('\n%d: %s\n' % (self.step_count, step.instruction()))
             self.step_count += 1
+
+    def new_page(self):
+        self.writer.write('\n{pagebreak}\n')
 
     def newline(self, count=1):
         for i in range(count):

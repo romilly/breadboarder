@@ -1,13 +1,11 @@
 import os
 import subprocess
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod, ABC
 from collections import defaultdict
 from io import StringIO
 
 
-class PublicationWriter():
-    __metaclass__ = ABCMeta
-
+class PublicationWriter(ABC):
     def __init__(self, root_path, title):
         self.root_path = root_path
         self.title = title
@@ -81,7 +79,6 @@ class MockPublicationWriter(PublicationWriter):
 
     def write(self, text, filename=None):
         self.store[self.find_path(filename)].write(text)
-
 
     def close(self):
         for path in self.paths():
