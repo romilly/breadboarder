@@ -1,4 +1,5 @@
 import os
+import subprocess
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from io import StringIO
@@ -33,6 +34,9 @@ class PublicationWriter():
             path = self.path_to_document()
         return path
 
+    def convert_to_png(self, source_path, path):
+        pass
+
 
 class FileBasedPublicationWriter(PublicationWriter):
     def __init__(self, root_path, title):
@@ -51,6 +55,11 @@ class FileBasedPublicationWriter(PublicationWriter):
             return
         with open(self.find_path(filename), 'w') as f:
             f.write(text)
+
+    def convert_to_png(self, source_path, path):
+        p = os.path.join('manuscript', path)
+        s = os.path.join('manuscript', source_path)
+        subprocess.run(['inkscape','-z','-e=%s' % p, s])
 
 
 class MockPublicationWriter(PublicationWriter):

@@ -7,6 +7,11 @@ class FigureNamer(ABC):
     def reset(self):
         pass
 
+
+    @abstractmethod
+    def source_path(self):
+        pass
+
     @abstractmethod
     def path(self):
         pass
@@ -36,6 +41,9 @@ class DefaultFigureNamer(FigureNamer):
     def reset(self):
         self.count = 0
 
-    def path(self):
+    def source_path(self):
         return 'resources/images/figure%d.svg' % self.count
+
+    def path(self):
+        return 'resources/images/figure%d.png' % self.count
 
