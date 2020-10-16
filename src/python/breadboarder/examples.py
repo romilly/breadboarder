@@ -1,7 +1,7 @@
 from breadboarder.anns.layer import Layer, Network
 from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.components import Wire, Button, Resistor, Diode, Crystal, DiskCapacitor, atMega328, pcf8574, LED
-from breadboarder.core.cp2102 import CP2102
+from breadboarder.core.cp2102 import OldCP2102
 from breadboarder.core.project import Project
 from svg.svg import Point
 
@@ -33,7 +33,7 @@ def two_hosts():
     project = Project()
     breadboard = Breadboard().move_to(Point(20, 20))
     project.add(breadboard)
-    cp = CP2102().rotate(-90, Point(40, 400)).move_to(Point(40,400))
+    cp = OldCP2102().rotate(-90, Point(40, 400)).move_to(Point(40, 400))
     project.add(cp)
     return project
 
@@ -42,7 +42,7 @@ def shrimp():
     project = Project()
     breadboard = Breadboard().move_to(Point(20, 20))
     project.add(breadboard)
-    cp = CP2102().rotate(-90., Point(40,400)).move_to(Point(40,400))
+    cp = OldCP2102().rotate(-90., Point(40, 400)).move_to(Point(40, 400))
     project.add(cp,
                 Wire('green',cp['GND'],breadboard['a10']),
                 Wire('red',cp['5V'],breadboard['a9']),
@@ -72,7 +72,7 @@ def two_hosts_wired():
     project = Project()
     breadboard = Breadboard().move_to(Point(20, 20))
     project.add(breadboard)
-    cp = CP2102().rotate(-90., Point(40,400)).move_to(Point(40,400))
+    cp = OldCP2102().rotate(-90., Point(40, 400)).move_to(Point(40, 400))
     project.add(cp)
     project.add(Wire('red',cp['5V'],breadboard['a1']))
     return project

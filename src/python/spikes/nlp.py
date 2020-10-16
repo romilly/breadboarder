@@ -1,7 +1,7 @@
 from reggie.core import *
 
 from breadboarder.core.breadboard import Breadboard
-from breadboarder.core.cp2102 import CP2102
+from breadboarder.core.cp2102 import OldCP2102
 from breadboarder.core.project import Project
 from svg.point import Point
 
@@ -40,7 +40,7 @@ step = one_of(placer, connection)
 
 def translate(steps):
     host_classes = {'Breadboad' : Breadboard,
-                    'CP2102': CP2102}
+                    'CP2102': OldCP2102}
     project = Project()
     hosts = {}
     for step in steps:
