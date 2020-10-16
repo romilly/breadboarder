@@ -11,7 +11,6 @@ class PublicationWriter():
         self.root_path = root_path
         self.title = title
 
-
     @abstractmethod
     def write(self, text, path):
         pass
@@ -54,8 +53,10 @@ class FileBasedPublicationWriter(PublicationWriter):
             f.write(text)
 
 
-
 class MockPublicationWriter(PublicationWriter):
+    def open(self):
+        pass
+
     def __init__(self, root_path, title):
         PublicationWriter.__init__(self, root_path, title)
         self.store = defaultdict(StringIO)

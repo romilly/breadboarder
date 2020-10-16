@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 import math
 
 from breadboarder.core.project import Component
@@ -71,11 +71,10 @@ class Wire(Component):
 
 
 # TODO: this is a mess; maybe some methods/properties belong in Body.
-class TwoPinComponent(Component):
+class TwoPinComponent(Component, ABC):
     def description(self):
         return '(%s)' % (self.text())
 
-    __metaclass__ = ABCMeta
 
 # TODO: remove svg_id
     def __init__(self, svg_id, body, ports):
@@ -122,9 +121,7 @@ class TwoPinComponent(Component):
                 self.connected_ports[1].describe_location())
 
 
-class Body(GroupedDrawable):
-    __metaclass__ = ABCMeta
-
+class Body(GroupedDrawable, ABC):
     def __init__(self):
         GroupedDrawable.__init__(self)
 
@@ -256,14 +253,19 @@ class LedBody(Body):
 
 
 class LED(TwoPinComponent):
+    def __init__(self, color, *ports):
+        self.color = color
+        TwoPinComponent.__init__(self, 'LED', LedBody(color=color), ports)
+
     def id_prefix(self):
         return 'LED'
 
     def part_type(self):
         return 'LED'
 
-    def __init__(self, color, *ports):
-        TwoPinComponent.__init__(self, 'LED', LedBody(color=color), ports)
+    def text(self):
+        return ('%s' % self.color)
+
 
 
 class CapacitorBody(Body):

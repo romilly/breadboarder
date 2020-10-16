@@ -1,7 +1,7 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
-class FigureNamer(object):
-    __metaclass__ = ABCMeta
+
+class FigureNamer(ABC):
 
     @abstractmethod
     def reset(self):
@@ -37,5 +37,5 @@ class DefaultFigureNamer(FigureNamer):
         self.count = 0
 
     def path(self):
-        return 'images/figure%d.svg' % self.count
+        return 'resources/images/figure%d.svg' % self.count
 

@@ -13,7 +13,7 @@ class Editor(ProjectVisitor):
 
     def __init__(self, file_writer, figure_namer=None, options=None):
         self.file_writer = file_writer
-        self.formatter = NullFormatter() if options ==  self.NoText else MarkdownFormatter(self.file_writer)
+        self.formatter = NullFormatter() if options == self.NoText else MarkdownFormatter(self.file_writer)
         self.figure_namer = figure_namer if figure_namer else DefaultFigureNamer()
         self.illustrator = Illustrator()
         self.options = options
@@ -22,7 +22,7 @@ class Editor(ProjectVisitor):
         self.file_writer.open()
 
     def take(self, step):
-        self.formatter.step(step.instruction())
+        self.formatter.take(step)
         self.illustrator.take(step)
         if self.options == self.PicturePerStep:
             self.add_picture()

@@ -13,6 +13,25 @@ class Step(object):
     def is_part(self):
         return False
 
+    def is_stage(self):
+        return False
+
+    def is_new_page(self):
+        return False
+
+    def is_note(self):
+        return False
+
+class Stage(Step):
+    def is_stage(self):
+        return True
+
+    def is_new_page(self):
+        return True
+
+    def instruction(self):
+        return ''
+
 
 class Part(Drawable, Step):
     __metaclass__ = ABCMeta
@@ -102,6 +121,9 @@ class Project():
 class Note(Step):
     def __init__(self, text):
         self.text = text
+
+    def is_note(self):
+        return True
 
     def instruction(self):
         return self.text

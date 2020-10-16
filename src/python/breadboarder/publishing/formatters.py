@@ -17,7 +17,7 @@ class Formatter():
         raise NotImplementedError()
 
     @abstractmethod
-    def step(self, instruction):
+    def take(self, instruction):
         raise NotImplementedError()
 
 
@@ -29,7 +29,7 @@ class NullFormatter(Formatter):
     def image(self, caption, location):
         pass
 
-    def step(self, instruction):
+    def take(self, instruction):
         pass
 
     def heading(self, text, level=1):
@@ -39,6 +39,7 @@ class NullFormatter(Formatter):
 class MarkdownFormatter(Formatter):
     def __init__(self, writer):
         self.writer = writer
+        self.step_count = 1
 
     def heading(self, text, level=1):
         self.newline(2)
@@ -58,8 +59,15 @@ class MarkdownFormatter(Formatter):
         self.writer.write('![%s](%s)' % (caption, location))
         self.newline(2)
 
-    def step(self, instruction):
-        self.writer.write('1. %s\n' % instruction)
+    def take(self, step):
+        if step.is_new_page():
+            self.writer.write('\n{pagebreak}\n')
+            return
+        if step.is_note():
+            self.writer.write('\nI> %s\n' % step.instruction())
+        else:
+            self.writer.write('\n%d: %s\n' % (self.step_count, step.instruction()))
+            self.step_count += 1
 
     def newline(self, count=1):
         for i in range(count):
