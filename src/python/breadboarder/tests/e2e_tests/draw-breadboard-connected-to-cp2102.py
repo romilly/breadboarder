@@ -1,7 +1,7 @@
 from breadboarder.author.illustrator import Illustrator
 from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.components import Wire
-from breadboarder.core.cp2102 import OldCP2102
+from breadboarder.core.cp2102 import CP2102
 from breadboarder.core.project import Project
 from svg.svg import Point, write
 
@@ -10,7 +10,7 @@ def draw_breadboard():
     project = Project()
     breadboard = Breadboard().move_to(Point(20, 20))
     project.add(breadboard)
-    cp = OldCP2102().rotate(-90., Point(40, 400)).move_to(Point(40, 400))
+    cp = CP2102().rotate(-90., Point(40, 400)).move_to(Point(40, 400))
     project.add(Wire('red',cp['5V'],breadboard['a1']))
     project.add(cp)
     illustrator = Illustrator()

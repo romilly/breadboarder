@@ -16,14 +16,10 @@ generate markdown for the project.
 
 ## Current status
 
-**Aaagh!**
+After a bit of a muddled refactoring, almost all the tests a\re running again.
 
-While creating an APL version, along with Morten Kromberg of Dyalog,
-I tried to make parallel changes to the Python publishing code and left things
-in a frightful mess, with tests not working, and worse :)
-
-I will sort the mess out as soon as I can. Meanwhile, admire the example but don't
-try to run the code!
+To pass the end to end test  breadboarder needs to convert svg to png and adapt the test accordingly. Change will 
+happen _real soon now_ (tm).
 
 ## Sample script and its output 
    

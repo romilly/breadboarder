@@ -61,26 +61,29 @@ class FileBasedPublicationWriter(PublicationWriter):
 
 
 class MockPublicationWriter(PublicationWriter):
+    def __init__(self, root_path, title):
+        PublicationWriter.__init__(self, root_path, title)
+        self.ios = defaultdict(StringIO)
+        self.contents = defaultdict(str)
+        self.closed = False
+
     def open(self):
         pass
 
-    def __init__(self, root_path, title):
-        PublicationWriter.__init__(self, root_path, title)
-        self.store = defaultdict(StringIO)
-
     def __getitem__(self, path):
-        return self.store[path].getvalue()
+        return self.contents[path]
 
     def paths(self):
-        return self.store.keys()
+        return self.ios.keys()
 
     def __contains__(self, path):
-        return path in self.store
+        return path in self.ios
 
     def write(self, text, filename=None):
-        self.store[self.find_path(filename)].write(text)
+        self.ios[self.find_path(filename)].write(text)
 
     def close(self):
         for path in self.paths():
-            self.store[path].close()
+            self.contents[path] = self.ios[path].getvalue()
+            self.ios[path].close()
 
