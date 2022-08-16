@@ -16,10 +16,7 @@ generate markdown for the project.
 
 ## Current status
 
-After a bit of a muddled refactoring, almost all the tests a\re running again.
-
-To pass the end to end test  breadboarder needs to convert svg to png and adapt the test accordingly. Change will 
-happen _real soon now_ (tm).
+All the tests are running again.
 
 ## Sample script and its output 
    

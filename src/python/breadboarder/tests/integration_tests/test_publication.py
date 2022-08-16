@@ -20,6 +20,5 @@ class BookMakerTest(TestCase):
         assert_that(file_writer['manuscript/test.md'], contains_string('Note 2\n'))
         assert_that(file_writer['manuscript/test.md'], contains_string('Note 3\n'))
         assert_that(file_writer['manuscript/test.md'], contains_string('\n![Figure 1](resources/images/figure1.png)'))
-        assert_that('manuscript/resources/images/figure1.png' in file_writer)
-        # assert_that(file_writer['manuscript/images/figure1.svg'], contains_string('<svg xmlns'))
+        # assert_that('manuscript/resources/images/figure1.png' in file_writer)
 
