@@ -24,7 +24,7 @@
   textarea { width:100%; min-height:420px; flex:1; font:13px/1.45 ui-monospace, Menlo, Consolas, monospace; padding:10px;
              border:1px solid var(--line); border-radius:6px; background:transparent; color:var(--fg); resize:vertical; white-space:pre; }
   #diagram { border:1px solid var(--line); border-radius:6px; background:#fff; overflow:auto; touch-action:manipulation; }
-  #diagram svg { display:block; width:100%; height:auto; cursor:crosshair; }
+  #diagram svg { display:block; width:100%; height:auto; cursor:crosshair; touch-action:none; user-select:none; }
   #hint { font-size:13px; color:var(--muted); min-height:1.4em; }
   #hint b { color:var(--fg); }
   #error { color:var(--err); font:12px/1.4 ui-monospace, monospace; white-space:pre-wrap; margin:0; }
@@ -54,8 +54,9 @@
         </select>
       </label>
       <button id="cancel" disabled>Cancel wire</button>
+      <button id="fit">Fit</button>
     </div>
-    <div id="hint">Click a socket or pin, then another, to add a wire.</div>
+    <div id="hint">Click a socket or pin, then another, to add a wire. Drag a part to move it.</div>
     <div id="diagram"></div>
   </section>
 </main>
@@ -68,8 +69,12 @@ const DEFAULT_CODE = __DEFAULT_CODE__;
 
 const $ = id => document.getElementById(id);
 const SNAP = 5;              // max distance (SVG units) from a port centre
-let pyRender = null;
+const DRAG_START = 4;        // screen pixels of movement before a press becomes a drag
+let pyRender = null, pyMove = null;
 let ports = [];              // [hostVar, portName, x, y]
+let parts = [];              // [{name, kind}] in drawing order
+let viewBox = null;          // kept steady between redraws; Fit resets it
+let press = null;            // pointer press in progress
 let first = null;            // first port of a wire in progress
 let history = [];            // previous code versions, for Undo
 
@@ -84,6 +89,7 @@ async function boot() {
     }
     py.runPython(GLUE);
     pyRender = py.globals.get('render');
+    pyMove = py.globals.get('move');
     $('run').disabled = false;
     $('status').textContent = 'Ready';
     run();
@@ -99,37 +105,102 @@ function run() {
     const result = JSON.parse(pyRender($('code').value));
     $('error').textContent = '';
     ports = result.ports;
+    parts = result.parts;
     showSvg(result.svg);
   } catch (e) {
     // keep the last good diagram; show the Python traceback's last lines
-    const lines = String(e.message || e).trim().split('\n');
-    $('error').textContent = lines.slice(-6).join('\n');
+    $('error').textContent = pythonError(e, 6);
   }
+}
+
+function pythonError(e, n) {
+  return String(e.message || e).trim().split('\n').slice(-n).join('\n');
 }
 
 function showSvg(text) {
   $('diagram').innerHTML = text;
   const svg = $('diagram').querySelector('svg');
-  // crop to the drawing (with a margin) so it scales up to fill the pane
+  // crop to the drawing (with a margin); grow but never shrink until Fit
   const box = svg.getBBox(), m = 10;
-  svg.setAttribute('viewBox', `${box.x - m} ${box.y - m} ${box.width + 2 * m} ${box.height + 2 * m}`);
+  const want = [box.x - m, box.y - m, box.x + box.width + m, box.y + box.height + m];
+  viewBox = viewBox ? [Math.min(viewBox[0], want[0]), Math.min(viewBox[1], want[1]),
+                       Math.max(viewBox[2], want[2]), Math.max(viewBox[3], want[3])] : want;
+  svg.setAttribute('viewBox', `${viewBox[0]} ${viewBox[1]} ${viewBox[2] - viewBox[0]} ${viewBox[3] - viewBox[1]}`);
   svg.removeAttribute('width'); svg.removeAttribute('height');
+  [...svg.children].forEach((g, i) => {
+    if (parts[i] && parts[i].kind === 'component') g.style.cursor = 'grab';
+  });
   const ns = 'http://www.w3.org/2000/svg';
   const overlay = document.createElementNS(ns, 'g');
+  overlay.id = 'overlay';
   overlay.innerHTML =
     '<circle id="hoverRing" r="4" fill="none" stroke="#0a7d55" stroke-width="1.5" visibility="hidden"/>' +
     '<circle id="firstRing" r="4.5" fill="rgba(10,125,85,.25)" stroke="#0a7d55" stroke-width="1.5" visibility="hidden"/>';
   svg.appendChild(overlay);
-  svg.addEventListener('mousemove', ev => showHover(nearestPort(svg, ev)));
-  svg.addEventListener('mouseleave', () => showHover(null));
-  svg.addEventListener('click', ev => pick(nearestPort(svg, ev)));
+  svg.addEventListener('pointerdown', ev => startPress(svg, ev));
+  svg.addEventListener('pointermove', ev => press ? movePress(svg, ev) : showHover(nearestPort(svg, ev)));
+  svg.addEventListener('pointerup', ev => endPress(svg, ev));
+  svg.addEventListener('pointercancel', () => cancelPress());
+  svg.addEventListener('pointerleave', () => { if (!press) showHover(null); });
   drawFirst();
 }
 
-function nearestPort(svg, ev) {
+function svgPoint(svg, ev) {
   const pt = svg.createSVGPoint();
   pt.x = ev.clientX; pt.y = ev.clientY;
-  const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+
+// A press on a part becomes a drag once it moves; otherwise it's a click on a port.
+function startPress(svg, ev) {
+  let g = ev.target;
+  while (g && g.parentNode !== svg) g = g.parentNode;
+  const index = g ? [...svg.children].indexOf(g) : -1;
+  press = { index, g, x: ev.clientX, y: ev.clientY, start: svgPoint(svg, ev), dragging: false,
+            transform: g ? (g.getAttribute('transform') || '') : '' };
+  svg.setPointerCapture(ev.pointerId);
+}
+
+function movePress(svg, ev) {
+  if (!press.dragging) {
+    if (press.index < 0 || press.index >= parts.length) return;
+    if (Math.hypot(ev.clientX - press.x, ev.clientY - press.y) < DRAG_START) return;
+    press.dragging = true;
+    press.g.style.cursor = 'grabbing';
+    showHover(null);
+  }
+  const p = svgPoint(svg, ev);
+  press.dx = p.x - press.start.x; press.dy = p.y - press.start.y;
+  press.g.setAttribute('transform', `translate(${press.dx} ${press.dy}) ${press.transform}`);
+  $('hint').innerHTML = `Moving <b>${parts[press.index].name}</b>`;
+}
+
+function endPress(svg, ev) {
+  if (!press) return;
+  const p = press; press = null;
+  if (!p.dragging) { pick(nearestPort(svg, ev)); return; }
+  try {
+    const code = pyMove($('code').value, p.index, p.dx, p.dy);
+    if (code === $('code').value) run();
+    else setCode(code);
+    setHint();
+  } catch (e) {
+    run();  // snap back (this resets the hint, so set the message afterwards)
+    $('hint').innerHTML = `<span style="color:var(--err)">Can't move there: ${escapeHtml(pythonError(e, 1).replace(/^ValueError: /, ''))}</span>`;
+  }
+}
+
+function cancelPress() {
+  if (press && press.dragging) run();
+  press = null;
+}
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+}
+
+function nearestPort(svg, ev) {
+  const p = svgPoint(svg, ev);
   let best = null, bestD = SNAP;
   for (const port of ports) {
     const d = Math.hypot(port[2] - p.x, port[3] - p.y);
@@ -156,7 +227,7 @@ function showHover(port) {
 function setHint() {
   $('hint').innerHTML = first
     ? `Wire starts at <b>${ref(first)}</b>. Click where it should end.`
-    : 'Click a socket or pin, then another, to add a wire.';
+    : 'Click a socket or pin, then another, to add a wire. Drag a part to move it.';
 }
 
 function drawFirst() {
@@ -194,6 +265,7 @@ $('undo').onclick = () => {
   $('undo').disabled = !history.length;
   run();
 };
+$('fit').onclick = () => { viewBox = null; run(); };
 $('cancel').onclick = () => { first = null; drawFirst(); };
 $('copy').onclick = async () => {
   try { await navigator.clipboard.writeText($('code').value); $('status').textContent = 'Code copied'; }
