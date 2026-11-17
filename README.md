@@ -88,7 +88,12 @@ using [Pyodide](https://pyodide.org). The Python DSL stays the source of truth:
 click a socket or pin, then another, and the editor appends a
 `project.add(Wire(...))` line to the code and redraws the diagram.
 
-Build the page (needs the [svg](https://github.com/romilly/svg) package importable):
+Build the page. It needs the [svg](https://github.com/romilly/svg) package,
+which you can install with
+
+    pip install git+https://github.com/romilly/svg
+
+Then:
 
     import sys; sys.path.insert(0, 'web')
     import build; build.build()
