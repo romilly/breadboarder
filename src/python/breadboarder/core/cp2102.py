@@ -1,7 +1,7 @@
 from breadboarder.core.port import SocketGroup
 from breadboarder.core.host import Host
 from breadboarder.core.units import PITCH
-from svg.svg import Rectangle, Text
+from svg.core import Rectangle, Text
 from svg.transform import Point
 
 

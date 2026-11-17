@@ -1,7 +1,7 @@
 import os
 
 from breadboarder.author.illustrator import Illustrator
-from svg.svg import write
+from svg.core import write
 
 
 def write_svg(project, svg_file):

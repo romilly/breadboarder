@@ -1,6 +1,7 @@
 from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.project import Project
-from breadboarder.svg.svg import Point, write
+from svg.core import write
+from svg.point import Point
 
 
 def draw_breadboard():

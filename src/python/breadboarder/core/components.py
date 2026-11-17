@@ -5,7 +5,8 @@ from breadboarder.core.project import Component
 from breadboarder.core.units import PITCH
 from breadboarder.helpers.color_codes import ColorCode
 from svg.path import Path, arc
-from svg.svg import Point, GroupedDrawable, Rectangle, Line, Circle, Text, Dimple
+from svg.core import GroupedDrawable, Rectangle, Line, Circle, Text, Dimple
+from svg.point import Point
 
 
 class Button(Component):

@@ -1,7 +1,7 @@
 from breadboarder.core.host import Host
 from breadboarder.core.port import Port
 from svg.point import Point
-from svg.svg import Circle, Line
+from svg.core import Circle, Line
 
 
 class Layer(Host):

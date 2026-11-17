@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 from breadboarder.core.project import Part
-from svg.svg import GroupedDrawable
+from svg.core import GroupedDrawable
 
 
 class Host(GroupedDrawable, Part):
