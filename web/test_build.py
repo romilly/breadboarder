@@ -42,4 +42,7 @@ def test_built_page_is_up_to_date():
     """Fails if web/breadboarder-editor.html needs rebuilding."""
     if not build.OUTPUT.exists():
         pytest.skip('page not built yet')
-    assert build.is_up_to_date(), 'The editor page is stale: run python web/build.py'
+    assert build.is_up_to_date(), (
+        'The editor page is stale: run python web/build.py. '
+        'If you just did, check that the build and the tests import the same '
+        'svg package (the tests used %s).' % build.SVG)
