@@ -91,7 +91,19 @@ Drag a part to move it: dragging the breadboard or another host rewrites its
 `move_to(Point(...))`; dragging a component or wire snaps it to new sockets and
 rewrites its port references (it's refused if an end would miss a socket).
 
-The editor's Python glue has its own tests: `pytest web`.
+The editor's own tests are in `web/`: `pytest web`. They include a check that
+`web/breadboarder-editor.html` is up to date. The page records a fingerprint
+of everything it was built from, and the test fails if any of those sources
+(breadboarder, svg, or the files in `web/`) has changed since. Rebuild with
+`python web/build.py`.
+
+The page header shows the breadboarder version and the first seven
+characters of that fingerprint.
+
+## Versioning
+
+breadboarder uses [semantic versioning](https://semver.org). The version is
+`__version__` in `src/python/breadboarder/__init__.py`.
 
 Build the page. It needs the [svg](https://github.com/romilly/svg) package,
 which you can install with
