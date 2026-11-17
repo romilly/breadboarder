@@ -87,6 +87,11 @@ equivalent which would simplify automated testing using Travis.
 using [Pyodide](https://pyodide.org). The Python DSL stays the source of truth:
 click a socket or pin, then another, and the editor appends a
 `project.add(Wire(...))` line to the code and redraws the diagram.
+Drag a part to move it: dragging the breadboard or another host rewrites its
+`move_to(Point(...))`; dragging a component or wire snaps it to new sockets and
+rewrites its port references (it's refused if an end would miss a socket).
+
+The editor's Python glue has its own tests: `pytest web`.
 
 Build the page. It needs the [svg](https://github.com/romilly/svg) package,
 which you can install with
