@@ -8,9 +8,16 @@ Breadboarder is a Python DSL for describing breadboard-based electronics project
 1. SVG diagrams of the circuit layout
 2. Step-by-step assembly instructions in markdown
 
-## Local Dependency
+## The svg Dependency
 
-This project depends on a local `svg` library at `~/git/active/svg` (not published to PyPI). In PyCharm, this is attached as a project dependency.
+This project depends on the `svg` package from https://github.com/romilly/svg (distribution name `romilly-svg`; not on PyPI). Install it into the venv:
+
+```bash
+pip install git+https://github.com/romilly/svg      # or, to edit svg alongside:
+pip install -e ~/git/active/svg
+```
+
+Don't add svg to `pytest.ini`'s `pythonpath`: the tests and `web/build.py` must import the same copy. Bump svg's version in its `pyproject.toml` with any change, or `pip install git+...` won't pick the change up.
 
 ## Commands
 
@@ -18,8 +25,14 @@ This project depends on a local `svg` library at `~/git/active/svg` (not publish
 # Activate virtual environment
 source venv/bin/activate
 
-# Run all tests (requires pytest.ini with pythonpath configured)
+# Run all tests (pytest.ini, which is local and untracked, adds src/python to the path)
 pytest
+
+# Browser editor tests (glue, build, and a check that the built page is up to date)
+pytest web
+
+# Rebuild the browser editor page after changing breadboarder, svg or web/
+python web/build.py
 
 # Run specific test file
 pytest src/python/breadboarder/tests/unit_tests/test_color_codes.py -v
@@ -28,7 +41,18 @@ pytest src/python/breadboarder/tests/unit_tests/test_color_codes.py -v
 pytest -k "test_name_pattern" -v
 ```
 
-The `pytest.ini` configures the Python path for both `breadboarder` and the `svg` dependency.
+## Browser Editor (`web/`)
+
+- **template.html**: the page. It loads Pyodide from a CDN and runs breadboarder in the browser.
+- **glue.py**: the Python side. `render(code)` runs DSL code that defines `project` and returns the SVG, port positions and parts. `move(code, index, dx, dy)` rewrites the code when a part is dragged; it finds each part's source text by wrapping calls with `ast`.
+- **build.py**: `build()` embeds the breadboarder and svg sources into `web/breadboarder-editor.html` (generated, git-ignored), along with a fingerprint of its sources; `is_up_to_date()` checks the fingerprint.
+- **default_project.py**: the project the page opens with.
+
+The DSL code is the source of truth: the editor only edits the code, then re-runs it.
+
+## Versioning
+
+Semantic versioning; the version is `__version__` in `src/python/breadboarder/__init__.py` and is shown in the editor's header. Bump it with each change.
 
 ## Architecture
 
@@ -67,7 +91,7 @@ The `pytest.ini` configures the Python path for both `breadboarder` and the `svg
 from breadboarder.core.project import Project
 from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.components import Wire, Resistor
-from svg.core import Point
+from svg.point import Point
 
 project = Project()
 breadboard = Breadboard().move_to(Point(20, 20))
