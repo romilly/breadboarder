@@ -1,7 +1,8 @@
 from breadboarder.core.host import Host
 from breadboarder.core.port import SocketGroup
 from breadboarder.core.units import PITCH
-from svg.svg import Rectangle, horizontal_line, Text, Point
+from svg.core import Rectangle, horizontal_line, Text
+from svg.point import Point
 
 
 # TODO: document Breadboard measurements in doc/BREADBOARD_LAYOUT.md

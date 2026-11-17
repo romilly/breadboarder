@@ -1,5 +1,5 @@
 from breadboarder.author.bom import BillOfMaterials
-from svg.svg import GroupedDrawable, Drawable
+from svg.core import GroupedDrawable, Drawable
 from abc import ABCMeta, abstractmethod
 
 

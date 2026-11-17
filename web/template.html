@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Breadboarder editor (walking skeleton)</title>
+<style>
+  :root { --bg:#fafaf7; --fg:#222; --muted:#666; --line:#ddd; --accent:#0a7d55; --err:#b00020; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#1b1b1b; --fg:#e8e8e8; --muted:#aaa; --line:#3a3a3a; --accent:#4cc38a; --err:#ff6b6b; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.4 system-ui, sans-serif; background:var(--bg); color:var(--fg); }
+  header { padding:10px 14px; border-bottom:1px solid var(--line); display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; }
+  header h1 { font-size:17px; margin:0; }
+  #status { color:var(--muted); font-size:13px; }
+  main { display:grid; grid-template-columns: minmax(300px, 2fr) 3fr; gap:12px; padding:12px; }
+  @media (max-width: 820px) { main { grid-template-columns: 1fr; } #diagramPane { order:-1; } }
+  .pane { display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:14px; }
+  button, select { font:inherit; font-size:14px; padding:5px 10px; border-radius:6px; border:1px solid var(--line); background:transparent; color:var(--fg); cursor:pointer; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  button:disabled { opacity:.5; cursor:default; }
+  textarea { width:100%; min-height:420px; flex:1; font:13px/1.45 ui-monospace, Menlo, Consolas, monospace; padding:10px;
+             border:1px solid var(--line); border-radius:6px; background:transparent; color:var(--fg); resize:vertical; white-space:pre; }
+  #diagram { border:1px solid var(--line); border-radius:6px; background:#fff; overflow:auto; touch-action:manipulation; }
+  #diagram svg { display:block; width:100%; height:auto; cursor:crosshair; }
+  #hint { font-size:13px; color:var(--muted); min-height:1.4em; }
+  #hint b { color:var(--fg); }
+  #error { color:var(--err); font:12px/1.4 ui-monospace, monospace; white-space:pre-wrap; margin:0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Breadboarder editor</h1>
+  <span id="status">Loading Python (Pyodide)…</span>
+</header>
+<main>
+  <section class="pane" id="codePane">
+    <div class="toolbar">
+      <button id="run" class="primary" disabled>Run</button>
+      <button id="undo" disabled>Undo</button>
+      <button id="copy">Copy code</button>
+    </div>
+    <textarea id="code" spellcheck="false"></textarea>
+    <pre id="error"></pre>
+  </section>
+  <section class="pane" id="diagramPane">
+    <div class="toolbar">
+      <label>Wire colour
+        <select id="colour">
+          <option>red</option><option>black</option><option>green</option><option>yellow</option>
+          <option>orange</option><option>blue</option><option>brown</option><option>white</option><option>lightgrey</option>
+        </select>
+      </label>
+      <button id="cancel" disabled>Cancel wire</button>
+    </div>
+    <div id="hint">Click a socket or pin, then another, to add a wire.</div>
+    <div id="diagram"></div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.js"></script>
+<script>
+const FILES = __FILES__;
+const GLUE = __GLUE__;
+const DEFAULT_CODE = __DEFAULT_CODE__;
+
+const $ = id => document.getElementById(id);
+const SNAP = 5;              // max distance (SVG units) from a port centre
+let pyRender = null;
+let ports = [];              // [hostVar, portName, x, y]
+let first = null;            // first port of a wire in progress
+let history = [];            // previous code versions, for Undo
+
+$('code').value = DEFAULT_CODE;
+
+async function boot() {
+  try {
+    const py = await loadPyodide();
+    for (const [path, text] of Object.entries(FILES)) {
+      py.FS.mkdirTree('/pkg/' + path.split('/').slice(0, -1).join('/'));
+      py.FS.writeFile('/pkg/' + path, text);
+    }
+    py.runPython(GLUE);
+    pyRender = py.globals.get('render');
+    $('run').disabled = false;
+    $('status').textContent = 'Ready';
+    run();
+  } catch (e) {
+    $('status').textContent = 'Could not load Python';
+    $('error').textContent = String(e);
+  }
+}
+
+function run() {
+  if (!pyRender) return;
+  try {
+    const result = JSON.parse(pyRender($('code').value));
+    $('error').textContent = '';
+    ports = result.ports;
+    showSvg(result.svg);
+  } catch (e) {
+    // keep the last good diagram; show the Python traceback's last lines
+    const lines = String(e.message || e).trim().split('\n');
+    $('error').textContent = lines.slice(-6).join('\n');
+  }
+}
+
+function showSvg(text) {
+  $('diagram').innerHTML = text;
+  const svg = $('diagram').querySelector('svg');
+  // crop to the drawing (with a margin) so it scales up to fill the pane
+  const box = svg.getBBox(), m = 10;
+  svg.setAttribute('viewBox', `${box.x - m} ${box.y - m} ${box.width + 2 * m} ${box.height + 2 * m}`);
+  svg.removeAttribute('width'); svg.removeAttribute('height');
+  const ns = 'http://www.w3.org/2000/svg';
+  const overlay = document.createElementNS(ns, 'g');
+  overlay.innerHTML =
+    '<circle id="hoverRing" r="4" fill="none" stroke="#0a7d55" stroke-width="1.5" visibility="hidden"/>' +
+    '<circle id="firstRing" r="4.5" fill="rgba(10,125,85,.25)" stroke="#0a7d55" stroke-width="1.5" visibility="hidden"/>';
+  svg.appendChild(overlay);
+  svg.addEventListener('mousemove', ev => showHover(nearestPort(svg, ev)));
+  svg.addEventListener('mouseleave', () => showHover(null));
+  svg.addEventListener('click', ev => pick(nearestPort(svg, ev)));
+  drawFirst();
+}
+
+function nearestPort(svg, ev) {
+  const pt = svg.createSVGPoint();
+  pt.x = ev.clientX; pt.y = ev.clientY;
+  const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+  let best = null, bestD = SNAP;
+  for (const port of ports) {
+    const d = Math.hypot(port[2] - p.x, port[3] - p.y);
+    if (d < bestD) { best = port; bestD = d; }
+  }
+  return best;
+}
+
+const ref = port => `${port[0]}['${port[1]}']`;
+
+function showHover(port) {
+  const ring = document.getElementById('hoverRing');
+  if (!ring) return;
+  if (port) {
+    ring.setAttribute('cx', port[2]); ring.setAttribute('cy', port[3]);
+    ring.setAttribute('visibility', 'visible');
+    $('hint').innerHTML = first ? `From <b>${ref(first)}</b> to <b>${ref(port)}</b>?` : `<b>${ref(port)}</b>`;
+  } else {
+    ring.setAttribute('visibility', 'hidden');
+    setHint();
+  }
+}
+
+function setHint() {
+  $('hint').innerHTML = first
+    ? `Wire starts at <b>${ref(first)}</b>. Click where it should end.`
+    : 'Click a socket or pin, then another, to add a wire.';
+}
+
+function drawFirst() {
+  const ring = document.getElementById('firstRing');
+  if (!ring) return;
+  if (first) {
+    ring.setAttribute('cx', first[2]); ring.setAttribute('cy', first[3]);
+    ring.setAttribute('visibility', 'visible');
+  } else ring.setAttribute('visibility', 'hidden');
+  $('cancel').disabled = !first;
+  setHint();
+}
+
+function pick(port) {
+  if (!port) return;
+  if (!first) { first = port; drawFirst(); return; }
+  if (port[0] === first[0] && port[1] === first[1]) { first = null; drawFirst(); return; }
+  const line = `project.add(Wire('${$('colour').value}', ${ref(first)}, ${ref(port)}))`;
+  first = null;
+  setCode($('code').value.replace(/\s*$/, '\n') + line + '\n');
+  drawFirst();
+}
+
+function setCode(text) {
+  history.push($('code').value);
+  $('undo').disabled = false;
+  $('code').value = text;
+  run();
+}
+
+$('run').onclick = run;
+$('undo').onclick = () => {
+  if (!history.length) return;
+  $('code').value = history.pop();
+  $('undo').disabled = !history.length;
+  run();
+};
+$('cancel').onclick = () => { first = null; drawFirst(); };
+$('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText($('code').value); $('status').textContent = 'Code copied'; }
+  catch { $('code').select(); $('status').textContent = 'Select-all done: copy with your keyboard'; }
+};
+$('code').addEventListener('keydown', ev => {
+  if ((ev.ctrlKey || ev.metaKey) && ev.key === 'Enter') { ev.preventDefault(); run(); }
+});
+
+boot();
+</script>
+</body>
+</html>

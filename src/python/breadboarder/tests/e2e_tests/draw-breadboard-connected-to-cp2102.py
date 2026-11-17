@@ -3,7 +3,8 @@ from breadboarder.core.breadboard import Breadboard
 from breadboarder.core.components import Wire
 from breadboarder.core.cp2102 import CP2102
 from breadboarder.core.project import Project
-from svg.svg import Point, write
+from svg.core import write
+from svg.point import Point
 
 
 def draw_breadboard():

@@ -1,6 +1,6 @@
 from hamcrest.core.base_matcher import BaseMatcher
 
-from svg.svg import Point
+from svg.point import Point
 
 
 class PointMatcher(BaseMatcher):

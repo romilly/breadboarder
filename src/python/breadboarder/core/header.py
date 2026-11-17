@@ -1,7 +1,7 @@
 from breadboarder.core.project import Component
 from breadboarder.core.units import PITCH
 from svg.point import Point
-from svg.svg import Rectangle, Text
+from svg.core import Rectangle, Text
 
 
 class Header(Component):

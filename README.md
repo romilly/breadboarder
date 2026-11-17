@@ -81,3 +81,16 @@ Most testing is now visual testing based on [appraise](https://github.com/Apprai
 
 The [roadmap](ROADMAP.md) includes plans to replace this by a Python
 equivalent which would simplify automated testing using Travis.
+# In-browser editor (walking skeleton)
+
+`web/` contains a single-page editor that runs breadboarder in the browser
+using [Pyodide](https://pyodide.org). The Python DSL stays the source of truth:
+click a socket or pin, then another, and the editor appends a
+`project.add(Wire(...))` line to the code and redraws the diagram.
+
+Build the page (needs the [svg](https://github.com/romilly/svg) package importable):
+
+    import sys; sys.path.insert(0, 'web')
+    import build; build.build()
+
+Then open `web/breadboarder-editor.html` in a browser.
