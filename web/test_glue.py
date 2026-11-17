@@ -35,8 +35,22 @@ def test_moving_a_host_rewrites_its_move_to():
 
 
 def test_moving_a_rotated_host_changes_only_move_to():
+    # after rotate(-90), move_to works in the rotated frame: +y there is +x on screen
     new = glue.move(CODE, 1, 5, 0)
-    assert "CP2102().rotate(-90., Point(40, 400)).move_to(Point(45, 400))" in new
+    assert "CP2102().rotate(-90., Point(40, 400)).move_to(Point(40, 405))" in new
+
+
+def port_positions(code, host):
+    ns, _ = glue._run(code)
+    return {name: (p.location().x, p.location().y) for name, p in ns[host]._ports.items()}
+
+
+@pytest.mark.parametrize('host, index', [('breadboard', 0), ('cp', 1)])
+def test_dragged_host_ports_move_by_the_drag(host, index):
+    before = port_positions(CODE, host)
+    after = port_positions(glue.move(CODE, index, 20, -10), host)
+    for name, (x, y) in before.items():
+        assert after[name] == pytest.approx((x + 20, y - 10))
 
 
 def test_moving_a_host_without_move_to_adds_one():

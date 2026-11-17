@@ -12,6 +12,8 @@ from breadboarder.author.illustrator import Illustrator
 from breadboarder.core.host import Host
 from breadboarder.core.project import Component, Part
 from breadboarder.core.units import PITCH
+from svg.point import Point
+from svg.transform import Translation
 
 PORT_REF = re.compile(r"""(\w+)\[(['"])(\w+)\2\]""")
 MOVE_TO = re.compile(r"move_to\(\s*Point\(\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\)\s*\)")
@@ -91,7 +93,8 @@ def move(code, index, dx, dy):
         raise ValueError('Cannot find the code that created this part')
     if isinstance(part, Host):
         start, end = max(spans[id(part)], key=lambda s: s[1] - s[0])  # whole chain
-        return _replace(code, start, end, lambda text: _move_host(text, dx, dy))
+        ex, ey = _move_to_change(part, dx, dy)
+        return _replace(code, start, end, lambda text: _move_host(text, ex, ey))
     if isinstance(part, Component):
         start, end = min(spans[id(part)], key=lambda s: s[1] - s[0])  # constructor call
         return _replace(code, start, end, lambda text: _move_component(text, ns, dx, dy))
@@ -107,6 +110,34 @@ def _replace(code, start, end, rewrite):
 def _fmt(value):
     value = round(value)
     return str(int(value))
+
+
+def _move_to_change(host, dx, dy):
+    """How much to change the host's last move_to so it moves (dx, dy) on screen.
+
+    Earlier transforms (e.g. a rotate) can turn the move_to's frame, so measure
+    the effect of unit changes and invert that 2x2 linear map."""
+    translations = [t for t in host.transformations if isinstance(t, Translation)]
+    added = not translations
+    if added:  # a new move_to would be appended last
+        host.transformations.append(Translation(Point(0, 0)))
+    last = host.transformations[-1] if added else translations[-1]
+    original = last.vector
+
+    def origin_after(ux, uy):
+        last.vector = original + Point(ux, uy)
+        return host.location_of(Point(0, 0))
+
+    try:
+        o, px, py = origin_after(0, 0), origin_after(1, 0), origin_after(0, 1)
+    finally:
+        last.vector = original
+        if added:
+            host.transformations.pop()
+    a, c = px.x - o.x, px.y - o.y   # screen effect of +1 in move_to x
+    b, d = py.x - o.x, py.y - o.y   # screen effect of +1 in move_to y
+    det = a * d - b * c
+    return (d * dx - b * dy) / det, (a * dy - c * dx) / det
 
 
 def _move_host(text, dx, dy):
