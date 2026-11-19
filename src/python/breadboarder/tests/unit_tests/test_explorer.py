@@ -1,9 +1,10 @@
 from unittest import TestCase
 
-from hamcrest import assert_that, close_to, equal_to, greater_than, has_items
+from hamcrest import (assert_that, close_to, equal_to, greater_than, greater_than_or_equal_to,
+                      has_items, less_than_or_equal_to)
 
 from breadboarder.core.components import Wire
-from breadboarder.core.explorer import Explorer
+from breadboarder.core.explorer import BOARD_HEIGHT, BOARD_WIDTH, Explorer
 from breadboarder.core.project import Project
 from breadboarder.core.units import PITCH
 from svg.point import Point
@@ -77,6 +78,21 @@ class ExplorerTests(TestCase):
         # on screen (y down), rotate(90) turns "down the board" into "to the left"
         self.check_offset('GP0', 'GP5', Point(-5 * PITCH, 0))
         self.check_offset('a1', 'a17', Point(0, 16 * PITCH))
+
+    def test_every_port_lies_on_the_board(self) -> None:
+        for port in self.explorer.ports():
+            location = port.location()
+            assert_that(location.x, greater_than_or_equal_to(0), port.portname)
+            assert_that(location.x, less_than_or_equal_to(BOARD_WIDTH), port.portname)
+            assert_that(location.y, greater_than_or_equal_to(0), port.portname)
+            assert_that(location.y, less_than_or_equal_to(BOARD_HEIGHT), port.portname)
+
+    def test_drawing_shows_the_labels_printed_on_the_board(self) -> None:
+        texts = list(self.explorer.element().itertext())
+        assert_that(texts, has_items('Explorer',
+                                     'GP0', 'GP1', 'GP2', 'GP3', 'GP4', 'GP5',
+                                     'ADC0', 'ADC1', 'ADC2', '3V3', 'GND',
+                                     '3.3V', 'ADC3', 'ADC4', 'ADC5'))
 
     def check_offset_from(self, start: Point, to_port: str, expected: Point) -> None:
         offset = self.explorer[to_port].location() - start
