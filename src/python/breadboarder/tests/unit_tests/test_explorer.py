@@ -67,7 +67,21 @@ class ExplorerTests(TestCase):
         assert_that(wire.instruction(),
                     equal_to('Connect a Red Jumper Wire (M-M) from EXP-1 socket 3V3 to EXP-1 socket a1'))
 
-    def check_offset(self, from_port: str, to_port: str, expected: Point) -> None:
-        offset = self.explorer[to_port].location() - self.explorer[from_port].location()
+    def test_ports_move_with_the_explorer(self) -> None:
+        before = self.explorer['a1'].location()
+        self.explorer.move_to(Point(100, 50))
+        self.check_offset_from(before, 'a1', Point(100, 50))
+
+    def test_ports_turn_with_the_explorer(self) -> None:
+        self.explorer.rotate(90)
+        # on screen (y down), rotate(90) turns "down the board" into "to the left"
+        self.check_offset('GP0', 'GP5', Point(-5 * PITCH, 0))
+        self.check_offset('a1', 'a17', Point(0, 16 * PITCH))
+
+    def check_offset_from(self, start: Point, to_port: str, expected: Point) -> None:
+        offset = self.explorer[to_port].location() - start
         assert_that(offset.x, close_to(expected.x, 1e-9))
         assert_that(offset.y, close_to(expected.y, 1e-9))
+
+    def check_offset(self, from_port: str, to_port: str, expected: Point) -> None:
+        self.check_offset_from(self.explorer[from_port].location(), to_port, expected)
