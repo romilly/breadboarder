@@ -43,6 +43,20 @@ class ExplorerTests(TestCase):
         gp0 = self.explorer['GP0'].location()
         assert_that(gp0.x - self.explorer['a17'].location().x, greater_than(PITCH))
 
+    def test_right_croc_clip_pads_run_down_the_right_edge_in_printed_order(self) -> None:
+        names = ['PAD_3V3', 'PAD_ADC3', 'PAD_GND', 'PAD_ADC4', 'PAD_ADC5']
+        pads = [self.explorer[name].location() for name in names]
+        right_of_gpio = greater_than(self.explorer['ADC0'].location().x)
+        for pad in pads:
+            assert_that(pad.x, close_to(pads[0].x, 1e-9))
+            assert_that(pad.x, right_of_gpio)
+        for upper, lower in zip(pads, pads[1:]):
+            assert_that(lower.y, greater_than(upper.y))
+
+    def test_left_croc_clip_pad_is_left_of_the_mini_breadboard(self) -> None:
+        assert_that(self.explorer['a1'].location().x,
+                    greater_than(self.explorer['PAD_GND_L'].location().x))
+
     def check_offset(self, from_port: str, to_port: str, expected: Point) -> None:
         offset = self.explorer[to_port].location() - self.explorer[from_port].location()
         assert_that(offset.x, close_to(expected.x, 1e-9))
