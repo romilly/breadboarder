@@ -92,3 +92,29 @@ def test_moving_off_the_board_is_refused():
 def test_tiny_component_move_leaves_code_unchanged():
     i = index_of('Resistor')
     assert glue.move(CODE, i, 2, 2) == CODE
+
+
+EXPLORER_CODE = """\
+from breadboarder.core.project import Project
+from breadboarder.core.explorer import Explorer
+from breadboarder.core.components import Wire, Resistor
+from svg.point import Point
+
+project = Project()
+explorer = Explorer().move_to(Point(60, 60))
+project.add(explorer,
+            Resistor('220R', '5%', explorer['a1'], explorer['a5']),
+            Wire('red', explorer['GP0'], explorer['e1']))
+"""
+
+
+def test_render_reports_explorer_ports():
+    ports = json.loads(glue.render(EXPLORER_CODE))['ports']
+    names = {port_name for host, port_name, x, y in ports if host == 'explorer'}
+    assert {'GP0', 'GND2', 'a1', 'j17', 'PAD_3V3', 'PAD_GND_L'} <= names
+
+
+def test_moving_a_component_on_the_explorer_snaps_to_its_sockets():
+    i = index_of('Resistor', EXPLORER_CODE)
+    new = glue.move(EXPLORER_CODE, i, PITCH, 0)
+    assert "Resistor('220R', '5%', explorer['a2'], explorer['a6'])" in new
