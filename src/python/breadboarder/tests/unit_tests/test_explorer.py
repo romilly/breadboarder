@@ -24,6 +24,10 @@ class ExplorerTests(TestCase):
         self.check_offset('GP0', 'ADC0', Point(PITCH, 0))
         self.check_offset('GP3', '3V3', Point(PITCH, 0))
 
+    def test_has_170_mini_breadboard_sockets_lettered_a_to_j(self) -> None:
+        expected = [row + str(column) for row in 'abcdefghij' for column in range(1, 18)]
+        assert_that(list(self.explorer.port_names()), has_items(*expected))
+
     def check_offset(self, from_port: str, to_port: str, expected: Point) -> None:
         offset = self.explorer[to_port].location() - self.explorer[from_port].location()
         assert_that(offset.x, close_to(expected.x, 1e-9))

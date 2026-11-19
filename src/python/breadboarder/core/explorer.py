@@ -5,6 +5,14 @@ from svg.point import Point
 
 GPIO_LEFT = ['GP0', 'GP1', 'GP2', 'GP3', 'GP4', 'GP5']
 GPIO_RIGHT = ['ADC0', 'ADC1', 'ADC2', '3V3', 'GND1', 'GND2']
+MINI_BB_TOP_ROWS = 'jihgf'
+MINI_BB_BOTTOM_ROWS = 'edcba'
+MINI_BB_COLUMNS = 17
+
+# Origins of the top-left socket of each feature, relative to the board.
+# Placeholders until the board layout is drawn.
+MINI_BB_ORIGIN = Point(0, 0)
+GPIO_ORIGIN = Point(0, 0)
 
 
 class Explorer(Host):
@@ -18,7 +26,15 @@ class Explorer(Host):
         return 'Pimoroni Explorer'
 
     def add_components(self) -> None:
-        gpio_origin = Point(0, 0)
+        self._add_mini_breadboard()
+        self._add_gpio_header()
+
+    def _add_mini_breadboard(self) -> None:
+        for half, rows in enumerate([MINI_BB_TOP_ROWS, MINI_BB_BOTTOM_ROWS]):
+            self.add(SocketGroup(MINI_BB_ORIGIN + Point(0, half * len(rows) * PITCH),
+                                 len(rows), MINI_BB_COLUMNS, rows, self))
+
+    def _add_gpio_header(self) -> None:
         for column, labels in enumerate([GPIO_LEFT, GPIO_RIGHT]):
-            self.add(SocketGroup(gpio_origin + Point(PITCH * column, 0),
+            self.add(SocketGroup(GPIO_ORIGIN + Point(PITCH * column, 0),
                                  len(labels), 1, labels, self, start_number=-1))
