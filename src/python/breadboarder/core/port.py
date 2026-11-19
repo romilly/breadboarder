@@ -6,11 +6,12 @@ from svg.core import GroupedDrawable, Rectangle
 
 class Port():
     # the socket or pin belonging to a host that a component can be connected to
-    def __init__(self, host, relative_location, portname, port_type='socket'):
+    def __init__(self, host, relative_location, portname, port_type='socket', label=None):
         self.host = host
         self.portname = portname
         self.relative_location = relative_location
         self.port_type = port_type
+        self.label = portname if label is None else label  # as printed on the host
 
     def location(self):
         return self.host.location_of(self.relative_location)
@@ -19,7 +20,7 @@ class Port():
         return self.host.describe_port_location(self.portname)
 
     def description(self):
-        return '%s %s' % (self.port_type, self.portname)
+        return '%s %s' % (self.port_type, self.label)
 
 
 class SocketGroup(GroupedDrawable):
@@ -32,8 +33,8 @@ class SocketGroup(GroupedDrawable):
         for i in range(cols):
             for j in range(rows):
                 socket = self.socket(fill).set_center(center.x + PITCH * i, center.y + PITCH * j)
-                label = alpha_labels[j] + self.numeric_label(i, start_number)
-                host.add_port(Port(host, socket.center(), label, port_type=port_type))
+                portname = alpha_labels[j] + self.numeric_label(i, start_number)
+                host.add_port(Port(host, socket.center(), portname, port_type=port_type))
                 self.add(socket)
 
     # TODO: use None, not -1, as flag
