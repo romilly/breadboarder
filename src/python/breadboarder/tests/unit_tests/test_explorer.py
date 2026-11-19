@@ -1,8 +1,10 @@
 from unittest import TestCase
 
-from hamcrest import assert_that, close_to, greater_than, has_items
+from hamcrest import assert_that, close_to, equal_to, greater_than, has_items
 
+from breadboarder.core.components import Wire
 from breadboarder.core.explorer import Explorer
+from breadboarder.core.project import Project
 from breadboarder.core.units import PITCH
 from svg.point import Point
 
@@ -56,6 +58,14 @@ class ExplorerTests(TestCase):
     def test_left_croc_clip_pad_is_left_of_the_mini_breadboard(self) -> None:
         assert_that(self.explorer['a1'].location().x,
                     greater_than(self.explorer['PAD_GND_L'].location().x))
+
+    def test_instructions_name_the_explorer_and_its_sockets(self) -> None:
+        wire = Wire('red', self.explorer['3V3'], self.explorer['a1'])
+        Project().add(self.explorer, wire)
+        assert_that(self.explorer.instruction(),
+                    equal_to('Take a Pimoroni Explorer (RP2350) (EXP-1)'))
+        assert_that(wire.instruction(),
+                    equal_to('Connect a Red Jumper Wire (M-M) from EXP-1 socket 3V3 to EXP-1 socket a1'))
 
     def check_offset(self, from_port: str, to_port: str, expected: Point) -> None:
         offset = self.explorer[to_port].location() - self.explorer[from_port].location()
