@@ -68,6 +68,14 @@ class ExplorerTests(TestCase):
         assert_that(wire.instruction(),
                     equal_to('Connect a Red Jumper Wire (M-M) from EXP-1 socket 3V3 to EXP-1 socket a1'))
 
+    def test_instructions_name_croc_clip_pads_by_their_printed_labels(self) -> None:
+        lead = Wire('red', self.explorer['PAD_3V3'], self.explorer['a1'])
+        Project().add(self.explorer, lead)
+        assert_that(lead.instruction(),
+                    equal_to('Connect a Red Croc-clip Lead (Clip-M) from EXP-1 pad 3.3V to EXP-1 socket a1'))
+        assert_that(self.explorer['PAD_GND_L'].describe_location(),
+                    equal_to('EXP-1 pad GND (left)'))
+
     def test_ports_move_with_the_explorer(self) -> None:
         before = self.explorer['a1'].location()
         self.explorer.move_to(Point(100, 50))

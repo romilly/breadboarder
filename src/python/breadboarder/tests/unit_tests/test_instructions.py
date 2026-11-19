@@ -2,7 +2,7 @@ from unittest import TestCase
 from hamcrest import assert_that, equal_to
 from svg.point import Point
 
-from breadboarder.core.components import Resistor, DiskCapacitor, Crystal
+from breadboarder.core.components import Resistor, DiskCapacitor, Crystal, Wire
 from breadboarder.core.host import Host
 from breadboarder.core.port import Port
 
@@ -48,6 +48,12 @@ class InstructionTests(TestCase):
         xtal = Crystal('16MHz', self.p1, self.p2)
         xtal.set_id('X1')
         self.check_instruction(xtal, 'Crystal X1: (16MHz)')
+
+    def test_wire_to_a_pad_is_a_croc_clip_lead_named_by_the_pad_label(self):
+        pad = Port(self.p1.host, Point(0, 0), 'PAD_X', port_type='pad', label='X')
+        self.p1.host.add_port(pad)
+        assert_that(Wire('red', pad, self.p2).instruction(),
+                    equal_to('Connect a Red Croc-clip Lead (Clip-M) from bb pad X to bb socket p2'))
 
     def check_instruction(self, component, desc):
         assert_that(component.instruction(),

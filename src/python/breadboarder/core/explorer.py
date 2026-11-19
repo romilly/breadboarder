@@ -1,8 +1,8 @@
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from xml.etree.ElementTree import Element, SubElement
 
 from breadboarder.core.host import Host
-from breadboarder.core.port import SocketGroup
+from breadboarder.core.port import Port, SocketGroup
 from breadboarder.core.units import PITCH
 from svg.core import Circle, Drawable, Rectangle, Text
 from svg.path import Path, arc, vector
@@ -184,9 +184,11 @@ class Explorer(Host):
         for index, (name, printed) in enumerate(zip(RIGHT_PADS, RIGHT_PADS_PRINTED)):
             self._add_pad(name, printed, RIGHT_PADS_ORIGIN + Point(0, index * RIGHT_PAD_SPACING),
                           edge_x=BOARD_WIDTH)
-        self._add_pad('PAD_GND_L', 'GND', LEFT_PAD_CENTER, edge_x=0)
+        self._add_pad('PAD_GND_L', 'GND', LEFT_PAD_CENTER, edge_x=0, label='GND (left)')
 
-    def _add_pad(self, name: str, printed: str, center: Point, edge_x: float) -> None:
+    def _add_pad(self, name: str, printed: str, center: Point, edge_x: float,
+                 label: Optional[str] = None) -> None:
+        """label names the pad in instructions; it defaults to the printed text."""
         # copper runs the full height of the ring out to the nearest board edge
         left = min(center.x, edge_x)
         self.add(Rectangle(abs(edge_x - center.x), 2 * PAD_RADIUS, stroke='gold', stroke_width=0,
@@ -195,4 +197,5 @@ class Explorer(Host):
         self.add(Circle(Point(0, 0), PAD_RADIUS / 2, fill='#222').move_center_to(center))
         self.add(Text(printed, center + Point(0, PAD_RADIUS + 6), color=LABEL_COLOR,
                       size=4, anchor='middle', font_weight='bold'))
-        self.add(SocketGroup(center, 1, 1, [name], self, start_number=-1, fill='none'))
+        self.add_port(Port(self, center, name, port_type='pad',
+                           label=printed if label is None else label))

@@ -58,6 +58,8 @@ class Wire(Component):
         return 'JW'
 
     def part_type(self):
+        if any(port.port_type == 'pad' for port in self.connected_ports):
+            return 'Croc-clip Lead'
         return 'Jumper Wire'
 
     def description(self):
@@ -68,7 +70,7 @@ class Wire(Component):
 
     def gender(self, port):
         # the type of the port determines the gender of that wnd of the wire
-        return {'pin': 'F', 'socket': 'M'}[port.port_type]
+        return {'pin': 'F', 'socket': 'M', 'pad': 'Clip'}[port.port_type]
 
 
 # TODO: this is a mess; maybe some methods/properties belong in Body.
