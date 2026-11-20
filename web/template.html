@@ -44,6 +44,7 @@
       <button id="run" class="primary" disabled>Run</button>
       <button id="undo" disabled>Undo</button>
       <button id="copy">Copy code</button>
+      <label>Example <select id="example"></select></label>
     </div>
     <textarea id="code" spellcheck="false"></textarea>
     <pre id="error"></pre>
@@ -68,7 +69,7 @@
 <script>
 const FILES = __FILES__;
 const GLUE = __GLUE__;
-const DEFAULT_CODE = __DEFAULT_CODE__;
+const EXAMPLES = __EXAMPLES__;  // [[title, code], ...]; the first opens by default
 
 const $ = id => document.getElementById(id);
 const SNAP = 5;              // max distance (SVG units) from a port centre
@@ -81,7 +82,8 @@ let press = null;            // pointer press in progress
 let first = null;            // first port of a wire in progress
 let history = [];            // previous code versions, for Undo
 
-$('code').value = DEFAULT_CODE;
+EXAMPLES.forEach(([title], i) => $('example').add(new Option(title, i)));
+$('code').value = EXAMPLES[0][1];
 
 async function boot() {
   try {
@@ -269,6 +271,11 @@ $('undo').onclick = () => {
   run();
 };
 $('fit').onclick = () => { viewBox = null; run(); };
+$('example').onchange = () => {
+  first = null; drawFirst();
+  viewBox = null;  // a different drawing: fit it afresh
+  setCode(EXAMPLES[$('example').value][1]);
+};
 $('cancel').onclick = () => { first = null; drawFirst(); };
 $('copy').onclick = async () => {
   try { await navigator.clipboard.writeText($('code').value); $('status').textContent = 'Code copied'; }
