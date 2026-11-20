@@ -123,3 +123,41 @@ def test_moving_a_component_on_the_explorer_snaps_to_its_sockets():
     i = index_of('Resistor', EXPLORER_CODE)
     new = glue.move(EXPLORER_CODE, i, PITCH, 0)
     assert "Resistor('220R', '5%', explorer['a2'], explorer['a6'])" in new
+
+
+def test_palette_lists_two_pin_parts_with_port_counts():
+    palette = json.loads(glue.palette())
+    kinds = {entry['kind']: entry for entry in palette}
+    assert kinds['Wire']['ports'] == 2
+    assert {'Wire', 'Resistor', 'LED', 'Diode', 'DiskCapacitor', 'Crystal'} <= set(kinds)
+    assert all(entry['label'] for entry in palette)
+
+
+def test_add_part_appends_a_project_add_line():
+    new = glue.add_part(CODE, 'Resistor', ["breadboard['a20']", "breadboard['a24']"])
+    assert new.rstrip().endswith("project.add(Resistor('10k', '5%', breadboard['a20'], breadboard['a24']))")
+
+
+def test_add_wire_uses_the_chosen_colour():
+    new = glue.add_part(CODE, 'Wire', ["breadboard['d9']", "breadboard['g11']"], colour='blue')
+    assert "project.add(Wire('blue', breadboard['d9'], breadboard['g11']))" in new
+
+
+def test_add_part_imports_its_class_when_needed():
+    assert 'Diode' not in CODE
+    new = glue.add_part(CODE, 'Diode', ["breadboard['a20']", "breadboard['a24']"])
+    assert 'from breadboarder.core.components import Diode\n' in new
+    # next to the existing import from the same module, not after svg's
+    assert new.index('import Diode') < new.index('from svg.point')
+    names = [p['name'] for p in json.loads(glue.render(new))['parts']]
+    assert names[-1] == 'Diode'
+
+
+def test_add_part_does_not_repeat_an_existing_import():
+    new = glue.add_part(CODE, 'LED', ["breadboard['a20']", "breadboard['a24']"])
+    assert new.count('import') == CODE.count('import')
+
+
+def test_add_part_with_the_wrong_number_of_ports_is_refused():
+    with pytest.raises(ValueError):
+        glue.add_part(CODE, 'Resistor', ["breadboard['a20']"])

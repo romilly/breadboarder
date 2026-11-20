@@ -23,6 +23,7 @@
   button, select { font:inherit; font-size:14px; padding:5px 10px; border-radius:6px; border:1px solid var(--line); background:transparent; color:var(--fg); cursor:pointer; }
   button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
   button:disabled { opacity:.5; cursor:default; }
+  #palette button[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:#fff; }
   textarea { width:100%; min-height:420px; flex:1; font:13px/1.45 ui-monospace, Menlo, Consolas, monospace; padding:10px;
              border:1px solid var(--line); border-radius:6px; background:transparent; color:var(--fg); resize:vertical; white-space:pre; }
   #diagram { border:1px solid var(--line); border-radius:6px; background:#fff; overflow:auto; touch-action:manipulation; }
@@ -50,17 +51,18 @@
     <pre id="error"></pre>
   </section>
   <section class="pane" id="diagramPane">
+    <div class="toolbar" id="palette"></div>
     <div class="toolbar">
-      <label>Wire colour
+      <label id="colourLabel">Wire colour
         <select id="colour">
           <option>red</option><option>black</option><option>green</option><option>yellow</option>
           <option>orange</option><option>blue</option><option>brown</option><option>white</option><option>lightgrey</option>
         </select>
       </label>
-      <button id="cancel" disabled>Cancel wire</button>
+      <button id="cancel" disabled>Cancel</button>
       <button id="fit">Fit</button>
     </div>
-    <div id="hint">Click a socket or pin, then another, to add a wire. Drag a part to move it.</div>
+    <div id="hint"></div>
     <div id="diagram"></div>
   </section>
 </main>
@@ -74,12 +76,14 @@ const EXAMPLES = __EXAMPLES__;  // [[title, code], ...]; the first opens by defa
 const $ = id => document.getElementById(id);
 const SNAP = 5;              // max distance (SVG units) from a port centre
 const DRAG_START = 4;        // screen pixels of movement before a press becomes a drag
-let pyRender = null, pyMove = null;
+let pyodide = null, pyRender = null, pyMove = null, pyAddPart = null;
+let palette = [];            // [{kind, label, ports}] from glue.palette()
+let kind = 'Wire';           // the palette entry in use
+let picked = [];             // ports clicked so far for the part being added
 let ports = [];              // [hostVar, portName, x, y]
 let parts = [];              // [{name, kind}] in drawing order
 let viewBox = null;          // kept steady between redraws; Fit resets it
 let press = null;            // pointer press in progress
-let first = null;            // first port of a wire in progress
 let history = [];            // previous code versions, for Undo
 
 EXAMPLES.forEach(([title], i) => $('example').add(new Option(title, i)));
@@ -95,6 +99,10 @@ async function boot() {
     py.runPython(GLUE);
     pyRender = py.globals.get('render');
     pyMove = py.globals.get('move');
+    pyAddPart = py.globals.get('add_part');
+    pyodide = py;
+    palette = JSON.parse(py.globals.get('palette')());
+    buildPalette();
     $('run').disabled = false;
     $('status').textContent = 'Ready';
     run();
@@ -140,14 +148,14 @@ function showSvg(text) {
   overlay.id = 'overlay';
   overlay.innerHTML =
     '<circle id="hoverRing" r="4" fill="none" stroke="#0a7d55" stroke-width="1.5" visibility="hidden"/>' +
-    '<circle id="firstRing" r="4.5" fill="rgba(10,125,85,.25)" stroke="#0a7d55" stroke-width="1.5" visibility="hidden"/>';
+    '<g id="pickedRings"></g>';
   svg.appendChild(overlay);
   svg.addEventListener('pointerdown', ev => startPress(svg, ev));
   svg.addEventListener('pointermove', ev => press ? movePress(svg, ev) : showHover(nearestPort(svg, ev)));
   svg.addEventListener('pointerup', ev => endPress(svg, ev));
   svg.addEventListener('pointercancel', () => cancelPress());
   svg.addEventListener('pointerleave', () => { if (!press) showHover(null); });
-  drawFirst();
+  drawPicked();
 }
 
 function svgPoint(svg, ev) {
@@ -222,38 +230,68 @@ function showHover(port) {
   if (port) {
     ring.setAttribute('cx', port[2]); ring.setAttribute('cy', port[3]);
     ring.setAttribute('visibility', 'visible');
-    $('hint').innerHTML = first ? `From <b>${ref(first)}</b> to <b>${ref(port)}</b>?` : `<b>${ref(port)}</b>`;
+    $('hint').innerHTML = picked.length
+      ? `${entry().label}: ${picked.map(p => `<b>${ref(p)}</b>`).join(', ')}, then <b>${ref(port)}</b>?`
+      : `<b>${ref(port)}</b>`;
   } else {
     ring.setAttribute('visibility', 'hidden');
     setHint();
   }
 }
 
+const entry = () => palette.find(e => e.kind === kind);
+const moreWords = n => n === 1 ? 'one more socket or pin' : `${n} more sockets or pins`;
+const portWords = n => n === 1 ? 'a socket or pin' : `${n === 2 ? 'two' : n} sockets or pins`;
+
 function setHint() {
-  $('hint').innerHTML = first
-    ? `Wire starts at <b>${ref(first)}</b>. Click where it should end.`
-    : 'Click a socket or pin, then another, to add a wire. Drag a part to move it.';
+  const e = entry();
+  if (!e) { $('hint').textContent = ''; return; }
+  $('hint').innerHTML = picked.length
+    ? `${e.label} starts at <b>${ref(picked[0])}</b>. Click ${moreWords(e.ports - picked.length)}.`
+    : `Click ${portWords(e.ports)} to add a ${e.label.toLowerCase()}. Drag a part to move it.`;
 }
 
-function drawFirst() {
-  const ring = document.getElementById('firstRing');
-  if (!ring) return;
-  if (first) {
-    ring.setAttribute('cx', first[2]); ring.setAttribute('cy', first[3]);
-    ring.setAttribute('visibility', 'visible');
-  } else ring.setAttribute('visibility', 'hidden');
-  $('cancel').disabled = !first;
+function buildPalette() {
+  $('palette').innerHTML = '';
+  for (const e of palette) {
+    const b = document.createElement('button');
+    b.textContent = e.label;
+    b.dataset.kind = e.kind;
+    b.onclick = () => { kind = e.kind; picked = []; showPalette(); drawPicked(); };
+    $('palette').appendChild(b);
+  }
+  showPalette();
+  setHint();
+}
+
+function showPalette() {
+  for (const b of $('palette').children) b.setAttribute('aria-pressed', String(b.dataset.kind === kind));
+  $('colourLabel').style.display = kind === 'Wire' ? '' : 'none';
+}
+
+function drawPicked() {
+  const g = document.getElementById('pickedRings');
+  if (g) g.innerHTML = picked.map(p =>
+    `<circle cx="${p[2]}" cy="${p[3]}" r="4.5" fill="rgba(10,125,85,.25)" stroke="#0a7d55" stroke-width="1.5"/>`).join('');
+  $('cancel').disabled = !picked.length;
   setHint();
 }
 
 function pick(port) {
-  if (!port) return;
-  if (!first) { first = port; drawFirst(); return; }
-  if (port[0] === first[0] && port[1] === first[1]) { first = null; drawFirst(); return; }
-  const line = `project.add(Wire('${$('colour').value}', ${ref(first)}, ${ref(port)}))`;
-  first = null;
-  setCode($('code').value.replace(/\s*$/, '\n') + line + '\n');
-  drawFirst();
+  if (!port || !entry()) return;
+  const i = picked.findIndex(p => p[0] === port[0] && p[1] === port[1]);
+  if (i >= 0) { picked.splice(i, 1); drawPicked(); return; }   // click again to unpick
+  picked.push(port);
+  if (picked.length < entry().ports) { drawPicked(); return; }
+  const refs = picked.map(ref);
+  picked = [];
+  try {
+    setCode(pyAddPart($('code').value, kind, pyodide.toPy(refs), $('colour').value));
+    drawPicked();
+  } catch (e) {
+    drawPicked();
+    $('hint').innerHTML = `<span style="color:var(--err)">${escapeHtml(pythonError(e, 1))}</span>`;
+  }
 }
 
 function setCode(text) {
@@ -272,11 +310,11 @@ $('undo').onclick = () => {
 };
 $('fit').onclick = () => { viewBox = null; run(); };
 $('example').onchange = () => {
-  first = null; drawFirst();
+  picked = []; drawPicked();
   viewBox = null;  // a different drawing: fit it afresh
   setCode(EXAMPLES[$('example').value][1]);
 };
-$('cancel').onclick = () => { first = null; drawFirst(); };
+$('cancel').onclick = () => { picked = []; drawPicked(); };
 $('copy').onclick = async () => {
   try { await navigator.clipboard.writeText($('code').value); $('status').textContent = 'Code copied'; }
   catch { $('code').select(); $('status').textContent = 'Select-all done: copy with your keyboard'; }

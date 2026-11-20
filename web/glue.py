@@ -189,3 +189,60 @@ def _move_component(text, ns, dx, dy):
         last = ref.end()
     pieces.append(text[last:])
     return ''.join(pieces)
+
+
+# The palette: parts the editor can add. `template` gets the port references
+# as {0}, {1}, ... and the wire colour as {colour}.
+COMPONENTS = 'breadboarder.core.components'
+PALETTE = [
+    {'kind': 'Wire', 'label': 'Wire', 'module': COMPONENTS,
+     'template': "Wire('{colour}', {0}, {1})", 'ports': 2},
+    {'kind': 'Resistor', 'label': 'Resistor', 'module': COMPONENTS,
+     'template': "Resistor('10k', '5%', {0}, {1})", 'ports': 2},
+    {'kind': 'LED', 'label': 'LED', 'module': COMPONENTS,
+     'template': "LED('red', {0}, {1})", 'ports': 2},
+    {'kind': 'Diode', 'label': 'Diode', 'module': COMPONENTS,
+     'template': "Diode('1N4148', {0}, {1})", 'ports': 2},
+    {'kind': 'DiskCapacitor', 'label': 'Capacitor', 'module': COMPONENTS,
+     'template': "DiskCapacitor('100n', {0}, {1})", 'ports': 2},
+    {'kind': 'Crystal', 'label': 'Crystal', 'module': COMPONENTS,
+     'template': "Crystal('16MHz', {0}, {1})", 'ports': 2},
+]
+
+
+def palette():
+    """The palette entries the page shows, as JSON."""
+    return json.dumps([{k: e[k] for k in ('kind', 'label', 'ports')} for e in PALETTE])
+
+
+def add_part(code, kind, refs, colour='red'):
+    """Return code with a project.add(...) line for a new part plugged into refs.
+
+    refs are port references as code, e.g. "breadboard['a3']"."""
+    entry = next((e for e in PALETTE if e['kind'] == kind), None)
+    if entry is None:
+        raise ValueError('Unknown part %s' % kind)
+    if len(refs) != entry['ports']:
+        raise ValueError('%s needs %d ports' % (entry['label'], entry['ports']))
+    code = _ensure_import(code, entry['module'], kind)
+    line = 'project.add(%s)' % entry['template'].format(*refs, colour=colour)
+    return code.rstrip() + '\n' + line + '\n'
+
+
+def _ensure_import(code, module, name):
+    """Add `from module import name` after the last top-level import, unless
+    the code already defines or imports name."""
+    tree = ast.parse(code)
+    for node in tree.body:
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            if any((alias.asname or alias.name) == name for alias in node.names):
+                return code
+        elif isinstance(node, ast.Assign):
+            if any(isinstance(t, ast.Name) and t.id == name for t in node.targets):
+                return code
+    imports = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
+    same_module = [n for n in imports if isinstance(n, ast.ImportFrom) and n.module == module]
+    after = (same_module or imports)[-1:]  # beside its module's import if there is one
+    lines = code.splitlines(keepends=True)
+    at = after[0].end_lineno if after else 0
+    return ''.join(lines[:at] + ['from %s import %s\n' % (module, name)] + lines[at:])
