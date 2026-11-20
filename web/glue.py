@@ -1,6 +1,7 @@
 """Python side of the browser editor: run DSL code, report parts and ports,
 and rewrite the code when a part is dragged."""
 import ast
+import importlib
 import json
 import re
 import sys
@@ -192,8 +193,25 @@ def _move_component(text, ns, dx, dy):
 
 
 # The palette: parts the editor can add. `template` gets the port references
-# as {0}, {1}, ... and the wire colour as {colour}.
+# as {0}, {1}, ... and the wire colour as {colour}. `name` (default: kind) is
+# the class or function to import. One-port parts have a `footprint`: where
+# their pins sit relative to that port, so we can check they all land on
+# sockets of the same host.
 COMPONENTS = 'breadboarder.core.components'
+HEADER = 'breadboarder.core.header'
+DIL_SPAN = 3 * PITCH - 3      # top row of pins to bottom row (see DIL.height)
+FOOTPRINT_TOLERANCE = 3.0
+
+
+def dil_footprint(pins):
+    per_side = pins // 2
+    return [(PITCH * i, 0) for i in range(per_side)] + [(PITCH * i, DIL_SPAN) for i in range(per_side)]
+
+
+def row_footprint(pins):
+    return [(PITCH * i, 0) for i in range(pins)]
+
+
 PALETTE = [
     {'kind': 'Wire', 'label': 'Wire', 'module': COMPONENTS,
      'template': "Wire('{colour}', {0}, {1})", 'ports': 2},
@@ -207,6 +225,12 @@ PALETTE = [
      'template': "DiskCapacitor('100n', {0}, {1})", 'ports': 2},
     {'kind': 'Crystal', 'label': 'Crystal', 'module': COMPONENTS,
      'template': "Crystal('16MHz', {0}, {1})", 'ports': 2},
+    {'kind': 'atMega328', 'label': 'ATmega328', 'module': COMPONENTS,
+     'template': "atMega328({0})", 'ports': 1, 'footprint': dil_footprint(28)},
+    {'kind': 'pcf8574', 'label': 'PCF8574', 'module': COMPONENTS,
+     'template': "pcf8574({0})", 'ports': 1, 'footprint': dil_footprint(16)},
+    {'kind': 'header6', 'name': 'header', 'label': '6-pin header', 'module': HEADER,
+     'template': "header(6, {0})", 'ports': 1, 'footprint': row_footprint(6)},
 ]
 
 
@@ -215,18 +239,61 @@ def palette():
     return json.dumps([{k: e[k] for k in ('kind', 'label', 'ports')} for e in PALETTE])
 
 
+def _entry(kind):
+    entry = next((e for e in PALETTE if e['kind'] == kind), None)
+    if entry is None:
+        raise ValueError('Unknown part %s' % kind)
+    return entry
+
+
 def add_part(code, kind, refs, colour='red'):
     """Return code with a project.add(...) line for a new part plugged into refs.
 
     refs are port references as code, e.g. "breadboard['a3']"."""
-    entry = next((e for e in PALETTE if e['kind'] == kind), None)
-    if entry is None:
-        raise ValueError('Unknown part %s' % kind)
+    entry = _entry(kind)
     if len(refs) != entry['ports']:
         raise ValueError('%s needs %d ports' % (entry['label'], entry['ports']))
-    code = _ensure_import(code, entry['module'], kind)
+    if 'footprint' in entry:
+        ns, _ = _run(code)
+        problem = _footprint_problem(ns, entry, refs[0])
+        if problem:
+            raise ValueError(problem)
+    code = _ensure_import(code, entry['module'], entry.get('name', kind))
     line = 'project.add(%s)' % entry['template'].format(*refs, colour=colour)
     return code.rstrip() + '\n' + line + '\n'
+
+
+def _port_from_ref(ns, ref):
+    m = PORT_REF.fullmatch(ref)
+    host = ns.get(m.group(1)) if m else None
+    if not isinstance(host, Host) or m.group(3) not in host._ports:
+        raise ValueError('Cannot understand %s' % ref)
+    return host, host[m.group(3)]
+
+
+def _footprint_problem(ns, entry, ref):
+    """None if every pin of a one-port part lands on a socket, else why not."""
+    host, port = _port_from_ref(ns, ref)
+    loc = port.location()
+    for dx, dy in entry['footprint']:
+        if _nearest_port(host, loc.x + dx, loc.y + dy, FOOTPRINT_TOLERANCE) is None:
+            return "The %s's pins would not all land on sockets there" % entry['label']
+    return None
+
+
+def preview(code, kind, ref):
+    """Draw a one-port part plugged into ref, without changing the code.
+
+    Returns JSON {svg, ok, message}: svg is the part's <g> element."""
+    from xml.etree.ElementTree import tostring
+    entry = _entry(kind)
+    ns, _ = _run(code)
+    name = entry.get('name', kind)
+    ns[name] = getattr(importlib.import_module(entry['module']), name)
+    part = eval(entry['template'].format(ref), ns)
+    problem = _footprint_problem(ns, entry, ref)
+    return json.dumps({'svg': tostring(part.element()).decode('utf-8'),
+                       'ok': problem is None, 'message': problem or ''})
 
 
 def _ensure_import(code, module, name):

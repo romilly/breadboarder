@@ -76,7 +76,8 @@ const EXAMPLES = __EXAMPLES__;  // [[title, code], ...]; the first opens by defa
 const $ = id => document.getElementById(id);
 const SNAP = 5;              // max distance (SVG units) from a port centre
 const DRAG_START = 4;        // screen pixels of movement before a press becomes a drag
-let pyodide = null, pyRender = null, pyMove = null, pyAddPart = null;
+let pyodide = null, pyRender = null, pyMove = null, pyAddPart = null, pyPreview = null;
+let previewRef = null;       // port reference the preview is drawn at
 let palette = [];            // [{kind, label, ports}] from glue.palette()
 let kind = 'Wire';           // the palette entry in use
 let picked = [];             // ports clicked so far for the part being added
@@ -100,6 +101,7 @@ async function boot() {
     pyRender = py.globals.get('render');
     pyMove = py.globals.get('move');
     pyAddPart = py.globals.get('add_part');
+    pyPreview = py.globals.get('preview');
     pyodide = py;
     palette = JSON.parse(py.globals.get('palette')());
     buildPalette();
@@ -148,8 +150,10 @@ function showSvg(text) {
   overlay.id = 'overlay';
   overlay.innerHTML =
     '<circle id="hoverRing" r="4" fill="none" stroke="#0a7d55" stroke-width="1.5" visibility="hidden"/>' +
+    '<g id="preview" opacity="0.55" pointer-events="none"></g>' +
     '<g id="pickedRings"></g>';
   svg.appendChild(overlay);
+  previewRef = null;  // the preview layer is new
   svg.addEventListener('pointerdown', ev => startPress(svg, ev));
   svg.addEventListener('pointermove', ev => press ? movePress(svg, ev) : showHover(nearestPort(svg, ev)));
   svg.addEventListener('pointerup', ev => endPress(svg, ev));
@@ -179,6 +183,7 @@ function movePress(svg, ev) {
     if (press.index < 0 || press.index >= parts.length) return;
     if (Math.hypot(ev.clientX - press.x, ev.clientY - press.y) < DRAG_START) return;
     press.dragging = true;
+    clearPreview();
     press.g.style.cursor = 'grabbing';
     showHover(null);
   }
@@ -227,6 +232,7 @@ const ref = port => `${port[0]}['${port[1]}']`;
 function showHover(port) {
   const ring = document.getElementById('hoverRing');
   if (!ring) return;
+  if (entry() && entry().ports === 1) { showPreview(port); return; }
   if (port) {
     ring.setAttribute('cx', port[2]); ring.setAttribute('cy', port[3]);
     ring.setAttribute('visibility', 'visible');
@@ -243,9 +249,38 @@ const entry = () => palette.find(e => e.kind === kind);
 const moreWords = n => n === 1 ? 'one more socket or pin' : `${n} more sockets or pins`;
 const portWords = n => n === 1 ? 'a socket or pin' : `${n === 2 ? 'two' : n} sockets or pins`;
 
+// Draw a one-port part as a ghost at the hovered port, red-outlined if it won't fit.
+function showPreview(port) {
+  const ring = document.getElementById('hoverRing');
+  const g = document.getElementById('preview');
+  if (!port) { ring.setAttribute('visibility', 'hidden'); clearPreview(); setHint(); return; }
+  ring.setAttribute('cx', port[2]); ring.setAttribute('cy', port[3]);
+  ring.setAttribute('visibility', 'visible');
+  if (ref(port) === previewRef) return;
+  previewRef = ref(port);
+  let result;
+  try { result = JSON.parse(pyPreview($('code').value, kind, previewRef)); }
+  catch (e) { clearPreview(); return; }
+  g.innerHTML = result.svg;
+  if (!result.ok) {
+    const b = g.getBBox(), m = 2;
+    g.insertAdjacentHTML('beforeend', `<rect x="${b.x - m}" y="${b.y - m}" width="${b.width + 2 * m}" height="${b.height + 2 * m}" fill="rgba(200,0,0,.2)" stroke="#c00" stroke-width="1.5"/>`);
+  }
+  $('hint').innerHTML = result.ok
+    ? `Click to put pin 1 of the ${entry().label} in <b>${previewRef}</b>.`
+    : `<span style="color:var(--err)">${escapeHtml(result.message)}</span>`;
+}
+
+function clearPreview() {
+  const g = document.getElementById('preview');
+  if (g) g.innerHTML = '';
+  previewRef = null;
+}
+
 function setHint() {
   const e = entry();
   if (!e) { $('hint').textContent = ''; return; }
+  if (e.ports === 1) { $('hint').innerHTML = `Click where pin 1 of the ${e.label} should go. Drag a part to move it.`; return; }
   $('hint').innerHTML = picked.length
     ? `${e.label} starts at <b>${ref(picked[0])}</b>. Click ${moreWords(e.ports - picked.length)}.`
     : `Click ${portWords(e.ports)} to add a ${e.label.toLowerCase()}. Drag a part to move it.`;
@@ -257,7 +292,7 @@ function buildPalette() {
     const b = document.createElement('button');
     b.textContent = e.label;
     b.dataset.kind = e.kind;
-    b.onclick = () => { kind = e.kind; picked = []; showPalette(); drawPicked(); };
+    b.onclick = () => { kind = e.kind; picked = []; clearPreview(); showPalette(); drawPicked(); };
     $('palette').appendChild(b);
   }
   showPalette();

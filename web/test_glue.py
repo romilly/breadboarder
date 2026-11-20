@@ -161,3 +161,45 @@ def test_add_part_does_not_repeat_an_existing_import():
 def test_add_part_with_the_wrong_number_of_ports_is_refused():
     with pytest.raises(ValueError):
         glue.add_part(CODE, 'Resistor', ["breadboard['a20']"])
+
+
+def test_palette_offers_one_port_parts():
+    kinds = {e['kind']: e for e in json.loads(glue.palette())}
+    assert kinds['atMega328']['ports'] == 1
+    assert kinds['pcf8574']['ports'] == 1
+    assert kinds['header6']['ports'] == 1
+
+
+def test_add_a_chip_straddling_the_centre():
+    new = glue.add_part(CODE, 'atMega328', ["breadboard['f10']"])
+    assert new.rstrip().endswith("project.add(atMega328(breadboard['f10']))")
+
+
+def test_chip_running_off_the_end_of_the_board_is_refused():
+    with pytest.raises(ValueError):
+        glue.add_part(CODE, 'atMega328', ["breadboard['f20']"])  # 14 pins per side from column 20
+
+
+def test_chip_not_straddling_the_centre_is_refused():
+    with pytest.raises(ValueError):
+        glue.add_part(CODE, 'atMega328', ["breadboard['a10']"])
+
+
+def test_header_uses_the_header_function_and_imports_it():
+    new = glue.add_part(CODE, 'header6', ["breadboard['a1']"])
+    assert 'from breadboarder.core.header import header\n' in new
+    assert new.rstrip().endswith("project.add(header(6, breadboard['a1']))")
+    assert json.loads(glue.render(new))['parts'][-1]['name'] == 'Header'
+
+
+def test_header_off_the_end_is_refused():
+    with pytest.raises(ValueError):
+        glue.add_part(CODE, 'header6', ["breadboard['a27']"])
+
+
+def test_preview_draws_the_part_and_says_whether_it_fits():
+    good = json.loads(glue.preview(CODE, 'pcf8574', "breadboard['f20']"))
+    assert good['ok'] and good['svg'].startswith('<g')
+    bad = json.loads(glue.preview(CODE, 'pcf8574', "breadboard['f25']"))
+    assert not bad['ok'] and bad['message']
+    assert bad['svg'].startswith('<g')
