@@ -78,6 +78,8 @@ const SNAP = 5;              // max distance (SVG units) from a port centre
 const DRAG_START = 4;        // screen pixels of movement before a press becomes a drag
 let pyodide = null, pyRender = null, pyMove = null, pyAddPart = null, pyPreview = null;
 let previewRef = null;       // port reference the preview is drawn at
+let pyAddHost = null, pyHostPreview = null;
+const hostGhosts = {};       // kind -> SVG of that host at the origin
 let palette = [];            // [{kind, label, ports}] from glue.palette()
 let kind = 'Wire';           // the palette entry in use
 let picked = [];             // ports clicked so far for the part being added
@@ -102,6 +104,8 @@ async function boot() {
     pyMove = py.globals.get('move');
     pyAddPart = py.globals.get('add_part');
     pyPreview = py.globals.get('preview');
+    pyAddHost = py.globals.get('add_host');
+    pyHostPreview = py.globals.get('host_preview');
     pyodide = py;
     palette = JSON.parse(py.globals.get('palette')());
     buildPalette();
@@ -155,10 +159,10 @@ function showSvg(text) {
   svg.appendChild(overlay);
   previewRef = null;  // the preview layer is new
   svg.addEventListener('pointerdown', ev => startPress(svg, ev));
-  svg.addEventListener('pointermove', ev => press ? movePress(svg, ev) : showHover(nearestPort(svg, ev)));
+  svg.addEventListener('pointermove', ev => press ? movePress(svg, ev) : hover(svg, ev));
   svg.addEventListener('pointerup', ev => endPress(svg, ev));
   svg.addEventListener('pointercancel', () => cancelPress());
-  svg.addEventListener('pointerleave', () => { if (!press) showHover(null); });
+  svg.addEventListener('pointerleave', () => { if (!press) { showHover(null); clearPreview(); setHint(); } });
   drawPicked();
 }
 
@@ -193,10 +197,40 @@ function movePress(svg, ev) {
   $('hint').innerHTML = `Moving <b>${parts[press.index].name}</b>`;
 }
 
+function hover(svg, ev) {
+  if (entry() && entry().host) showHostGhost(svgPoint(svg, ev));
+  else showHover(nearestPort(svg, ev));
+}
+
+// A host follows the pointer as a ghost; its origin goes where you click.
+function showHostGhost(p) {
+  const g = document.getElementById('preview');
+  if (!g) return;
+  if (!(kind in hostGhosts)) {
+    try { hostGhosts[kind] = JSON.parse(pyHostPreview(kind)).svg; }
+    catch (e) { hostGhosts[kind] = ''; }
+  }
+  g.innerHTML = `<g transform="translate(${p.x} ${p.y})">${hostGhosts[kind]}</g>`;
+  previewRef = null;
+}
+
+function placeHost(p) {
+  try {
+    setCode(pyAddHost($('code').value, kind, p.x, p.y));
+    kind = 'Wire'; showPalette(); clearPreview(); setHint();
+  } catch (e) {
+    $('hint').innerHTML = `<span style="color:var(--err)">${escapeHtml(pythonError(e, 1))}</span>`;
+  }
+}
+
 function endPress(svg, ev) {
   if (!press) return;
   const p = press; press = null;
-  if (!p.dragging) { pick(nearestPort(svg, ev)); return; }
+  if (!p.dragging) {
+    if (entry() && entry().host) placeHost(svgPoint(svg, ev));
+    else pick(nearestPort(svg, ev));
+    return;
+  }
   try {
     const code = pyMove($('code').value, p.index, p.dx, p.dy);
     if (code === $('code').value) run();
@@ -280,6 +314,7 @@ function clearPreview() {
 function setHint() {
   const e = entry();
   if (!e) { $('hint').textContent = ''; return; }
+  if (e.host) { $('hint').innerHTML = `Click where the ${e.label} should go. Drag a part to move it.`; return; }
   if (e.ports === 1) { $('hint').innerHTML = `Click where pin 1 of the ${e.label} should go. Drag a part to move it.`; return; }
   $('hint').innerHTML = picked.length
     ? `${e.label} starts at <b>${ref(picked[0])}</b>. Click ${moreWords(e.ports - picked.length)}.`
@@ -288,7 +323,14 @@ function setHint() {
 
 function buildPalette() {
   $('palette').innerHTML = '';
+  let hosts = false;
   for (const e of palette) {
+    if (e.host && !hosts) {   // a gap between parts and hosts
+      hosts = true;
+      const gap = document.createElement('span');
+      gap.style.width = '10px';
+      $('palette').appendChild(gap);
+    }
     const b = document.createElement('button');
     b.textContent = e.label;
     b.dataset.kind = e.kind;

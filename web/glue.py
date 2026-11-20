@@ -231,12 +231,22 @@ PALETTE = [
      'template': "pcf8574({0})", 'ports': 1, 'footprint': dil_footprint(16)},
     {'kind': 'header6', 'name': 'header', 'label': '6-pin header', 'module': HEADER,
      'template': "header(6, {0})", 'ports': 1, 'footprint': row_footprint(6)},
+    # Hosts: placed by clicking a point; `var` is the base of the variable name.
+    {'kind': 'Breadboard', 'label': 'Breadboard', 'module': 'breadboarder.core.breadboard',
+     'host': True, 'var': 'breadboard', 'ports': 0},
+    {'kind': 'CP2102', 'label': 'CP2102', 'module': 'breadboarder.core.cp2102',
+     'host': True, 'var': 'cp', 'ports': 0},
+    {'kind': 'FtdiFriend', 'label': 'FTDI Friend', 'module': 'breadboarder.core.ftdi_friend',
+     'host': True, 'var': 'ftdi', 'ports': 0},
+    {'kind': 'Explorer', 'label': 'Explorer', 'module': 'breadboarder.core.explorer',
+     'host': True, 'var': 'explorer', 'ports': 0},
 ]
 
 
 def palette():
     """The palette entries the page shows, as JSON."""
-    return json.dumps([{k: e[k] for k in ('kind', 'label', 'ports')} for e in PALETTE])
+    return json.dumps([{'kind': e['kind'], 'label': e['label'], 'ports': e['ports'],
+                        'host': e.get('host', False)} for e in PALETTE])
 
 
 def _entry(kind):
@@ -313,3 +323,27 @@ def _ensure_import(code, module, name):
     lines = code.splitlines(keepends=True)
     at = after[0].end_lineno if after else 0
     return ''.join(lines[:at] + ['from %s import %s\n' % (module, name)] + lines[at:])
+
+
+def add_host(code, kind, x, y):
+    """Return code with a new host, under a fresh variable name, placed at (x, y)."""
+    entry = _entry(kind)
+    if not entry.get('host'):
+        raise ValueError('%s is not placed by position' % entry['label'])
+    ns, _ = _run(code)
+    name, n = entry['var'], 1
+    while name in ns:
+        n += 1
+        name = '%s%d' % (entry['var'], n)
+    code = _ensure_import(code, entry['module'], kind)
+    code = _ensure_import(code, 'svg.point', 'Point')
+    lines = '%s = %s().move_to(Point(%s, %s))\nproject.add(%s)\n' % (name, kind, _fmt(x), _fmt(y), name)
+    return code.rstrip() + '\n' + lines
+
+
+def host_preview(kind):
+    """Draw a host at the origin, as JSON {svg}; the page moves it under the pointer."""
+    from xml.etree.ElementTree import tostring
+    entry = _entry(kind)
+    host = getattr(importlib.import_module(entry['module']), kind)()
+    return json.dumps({'svg': tostring(host.element()).decode('utf-8')})

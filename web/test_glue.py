@@ -203,3 +203,41 @@ def test_preview_draws_the_part_and_says_whether_it_fits():
     bad = json.loads(glue.preview(CODE, 'pcf8574', "breadboard['f25']"))
     assert not bad['ok'] and bad['message']
     assert bad['svg'].startswith('<g')
+
+
+def test_palette_offers_hosts():
+    hosts = {e['kind']: e for e in json.loads(glue.palette()) if e.get('host')}
+    assert {'Breadboard', 'CP2102', 'Explorer'} <= set(hosts)
+    assert all(e['ports'] == 0 for e in hosts.values())
+
+
+def test_add_host_gets_a_unique_name_and_is_placed_where_clicked():
+    new = glue.add_host(CODE, 'CP2102', 300.4, 49.6)
+    assert "cp2 = CP2102().move_to(Point(300, 50))\nproject.add(cp2)\n" in new
+    result = json.loads(glue.render(new))
+    assert result['parts'][-1]['name'] == 'CP2102'
+    assert any(port[0] == 'cp2' for port in result['ports'])
+
+
+def test_add_host_imports_its_class_and_point():
+    code = "from breadboarder.core.project import Project\n\nproject = Project()\n"
+    new = glue.add_host(code, 'Explorer', 20, 20)
+    assert 'from breadboarder.core.explorer import Explorer\n' in new
+    assert 'from svg.point import Point\n' in new
+    assert "explorer = Explorer().move_to(Point(20, 20))" in new
+    assert json.loads(glue.render(new))['parts'][0]['name'] == 'Explorer'
+
+
+def test_a_second_breadboard_is_called_breadboard2():
+    assert "breadboard2 = Breadboard()" in glue.add_host(CODE, 'Breadboard', 0, 600)
+
+
+def test_a_new_host_can_be_wired_and_dragged():
+    code = glue.add_host(CODE, 'CP2102', 400, 50)
+    code = glue.add_part(code, 'Wire', ["cp2['GND']", "breadboard['j30']"])
+    index = len(parts(code)) - 2   # the CP2102, just before the wire
+    assert "cp2 = CP2102().move_to(Point(410, 55))" in glue.move(code, index, 10, 5)
+
+
+def test_host_preview_draws_the_host_at_the_origin():
+    assert json.loads(glue.host_preview('CP2102'))['svg'].startswith('<g')
