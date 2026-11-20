@@ -20,7 +20,10 @@ WEB = pathlib.Path(__file__).resolve().parent
 BREADBOARDER = WEB.parent / 'src' / 'python' / 'breadboarder'
 SVG = pathlib.Path(svg.__file__).resolve().parent
 OUTPUT = WEB / 'breadboarder-editor.html'
-WEB_SOURCES = ('template.html', 'glue.py', 'default_project.py', 'build.py')
+# (title, file) for the page's Example menu; the first opens by default
+EXAMPLES = (('CP2102 and ATmega328', 'default_project.py'),
+            ('Pimoroni Explorer', 'explorer_project.py'))
+WEB_SOURCES = ('template.html', 'glue.py', 'build.py') + tuple(name for _, name in EXAMPLES)
 FINGERPRINT_TAG = re.compile(r'<meta name="breadboarder-build" content="([0-9a-f]+)">')
 
 
@@ -68,7 +71,8 @@ def build(output=OUTPUT):
                 .replace('__BUILD__', full[:7])
                 .replace('__FILES__', as_js(packages()))
                 .replace('__GLUE__', as_js((WEB / 'glue.py').read_text()))
-                .replace('__DEFAULT_CODE__', as_js((WEB / 'default_project.py').read_text())))
+                .replace('__EXAMPLES__', as_js([[title, (WEB / name).read_text()]
+                                                for title, name in EXAMPLES])))
     output = pathlib.Path(output)
     output.write_text(html)
     return output

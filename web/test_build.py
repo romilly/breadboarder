@@ -22,6 +22,13 @@ def test_page_shows_version_and_fingerprint(tmp_path):
     assert build.fingerprint()[:7] in page
 
 
+def test_page_offers_each_example(tmp_path):
+    page = build.build(tmp_path / 'editor.html').read_text()
+    for title, filename in build.EXAMPLES:
+        assert title in page
+        assert build.as_js((build.WEB / filename).read_text()) in page
+
+
 def test_fresh_build_is_up_to_date(tmp_path):
     output = build.build(tmp_path / 'editor.html')
     assert build.is_up_to_date(output)

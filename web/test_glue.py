@@ -94,6 +94,11 @@ def test_tiny_component_move_leaves_code_unchanged():
     assert glue.move(CODE, i, 2, 2) == CODE
 
 
+def test_explorer_example_draws_an_explorer():
+    example = (WEB / 'explorer_project.py').read_text()
+    assert parts(example)[0]['name'] == 'Explorer'
+
+
 EXPLORER_CODE = """\
 from breadboarder.core.project import Project
 from breadboarder.core.explorer import Explorer

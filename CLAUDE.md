@@ -46,9 +46,9 @@ pytest -k "test_name_pattern" -v
 - **template.html**: the page. It loads Pyodide from a CDN and runs breadboarder in the browser.
 - **glue.py**: the Python side. `render(code)` runs DSL code that defines `project` and returns the SVG, port positions and parts. `move(code, index, dx, dy)` rewrites the code when a part is dragged; it finds each part's source text by wrapping calls with `ast`.
 - **build.py**: `build()` embeds the breadboarder and svg sources into `web/breadboarder-editor.html` (generated, git-ignored), along with a fingerprint of its sources; `is_up_to_date()` checks the fingerprint.
-- **default_project.py**: the project the page opens with.
+- **default_project.py**, **explorer_project.py**: example projects, offered in the page's Example menu. `EXAMPLES` in `build.py` lists them as (title, file); the first opens by default. To add one, add a file and an entry there.
 
-The DSL code is the source of truth: the editor only edits the code, then re-runs it.
+The DSL code is the source of truth: the editor only edits the code, then re-runs it. The page runs the code on Run or Ctrl+Enter, after a drag or a new wire, and when an example is picked; not on typing.
 
 ## Versioning
 
