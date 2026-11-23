@@ -233,6 +233,8 @@ PALETTE = [
      'template': "header(6, {0})", 'ports': 1, 'footprint': row_footprint(6)},
     {'kind': 'Potentiometer', 'label': 'Potentiometer', 'module': COMPONENTS,
      'template': "Potentiometer('10k', {0})", 'ports': 1, 'footprint': row_footprint(3)},
+    {'kind': 'RgbLed', 'label': 'RGB LED', 'module': COMPONENTS,
+     'template': "RgbLed({0})", 'ports': 1, 'footprint': row_footprint(4)},
     # Hosts: placed by clicking a point; `var` is the base of the variable name.
     {'kind': 'Breadboard', 'label': 'Breadboard', 'module': 'breadboarder.core.breadboard',
      'host': True, 'var': 'breadboard', 'ports': 0},

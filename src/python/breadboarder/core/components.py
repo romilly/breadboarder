@@ -403,3 +403,45 @@ class Potentiometer(Component):
         self.add(Text(self.value, wiper - Point(0, 15.5), color='white', anchor='middle', size=3))
         for i in range(self.PINS):
             self.add(Circle(Point(0, 0), 1.5, fill='silver', stroke='#333').move_center_to(Point(PITCH * i, 0)))
+
+
+class RgbLed(Component):
+    """A 5mm common-cathode RGB LED, legs in a row 0.1" apart: R, GND (long leg), G, B."""
+    LEGS = (('R', 'red'), ('GND', '#222'), ('G', 'green'), ('B', 'blue'))
+    DOME_RADIUS = 8.9  # 5mm
+
+    def __init__(self, port):
+        Component.__init__(self, [port])
+        self.add_parts()
+        self.move_to(port.location())
+
+    def instruction(self):
+        return ('Insert the %s (%s) with pin 1 (R) in %s and pin 2 (GND, the long leg) in %s'
+                % (self.description(), self.id(), self.connected_ports[0].describe_location(),
+                   self.pin_port(2).describe_location()))
+
+    def pin_port(self, pin):
+        """The host port that leg `pin` (1-4) goes into: the one `pin - 1` pitches along the row."""
+        first = self.connected_ports[0]
+        want = first.relative_location + Point(PITCH * (pin - 1), 0)
+        for port in first.host.ports():
+            offset = port.relative_location - want
+            if abs(offset.x) < 0.5 and abs(offset.y) < 0.5:
+                return port
+        raise ValueError('There is no socket for pin %d of the RGB LED' % pin)
+
+    def description(self):
+        return 'Common-cathode %s' % self.part_type()
+
+    def id_prefix(self):
+        return 'RGB'
+
+    def part_type(self):
+        return 'RGB LED'
+
+    def add_parts(self):
+        center = Point(PITCH * (len(self.LEGS) - 1) / 2, 0)
+        self.add(Circle(Point(0, 0), self.DOME_RADIUS, fill='#f4f4f4', stroke='#aaa', opacity='0.9')
+                 .move_center_to(center))
+        for i, (_, color) in enumerate(self.LEGS):
+            self.add(Circle(Point(0, 0), 1.8, fill=color, stroke='#333').move_center_to(Point(PITCH * i, 0)))
