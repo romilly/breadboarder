@@ -366,3 +366,40 @@ class DIL(Component):
     def extent(self):
         return Point(self.width(), self.height())
 
+
+
+class Potentiometer(Component):
+    """A trimmer potentiometer with three pins in a row, 0.1" apart: end, wiper, end."""
+    PINS = 3
+    BODY_SIZE = 24
+
+    def __init__(self, value, port):
+        Component.__init__(self, [port])
+        self.value = value
+        self.add_parts()
+        self.move_to(port.location())
+
+    def instruction(self):
+        return 'Insert the %s (%s) with pin 1 in %s' % (self.description(), self.id(),
+                                                         self.connected_ports[0].describe_location())
+
+    def description(self):
+        return '%s %s' % (self.value, self.part_type())
+
+    def id_prefix(self):
+        return 'VR'
+
+    def part_type(self):
+        return 'Potentiometer'
+
+    def add_parts(self):
+        # pins run along the bottom edge of the body, as on a 3386-style trimmer
+        wiper = Point(PITCH * (self.PINS - 1) / 2, 0)
+        self.add(Rectangle(self.BODY_SIZE, self.BODY_SIZE, fill='#2a5db0', stroke='#1b3f7a', rounded=True)
+                 .move_to(wiper - Point(self.BODY_SIZE / 2, self.BODY_SIZE - 4)))
+        rotor = wiper - Point(0, 8)
+        self.add(Circle(Point(0, 0), 6, fill='white', stroke='#999').move_center_to(rotor))
+        self.add(Rectangle(9, 2, fill='#555', stroke='#555').set_center(rotor.x, rotor.y))
+        self.add(Text(self.value, wiper - Point(0, 15.5), color='white', anchor='middle', size=3))
+        for i in range(self.PINS):
+            self.add(Circle(Point(0, 0), 1.5, fill='silver', stroke='#333').move_center_to(Point(PITCH * i, 0)))

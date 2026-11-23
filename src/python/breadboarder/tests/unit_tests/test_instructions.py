@@ -2,7 +2,8 @@ from unittest import TestCase
 from hamcrest import assert_that, equal_to
 from svg.point import Point
 
-from breadboarder.core.components import Resistor, DiskCapacitor, Crystal, Wire
+from breadboarder.core.components import Resistor, DiskCapacitor, Crystal, Potentiometer, Wire
+from breadboarder.core.project import Project
 from breadboarder.core.host import Host
 from breadboarder.core.port import Port
 
@@ -54,6 +55,12 @@ class InstructionTests(TestCase):
         self.p1.host.add_port(pad)
         assert_that(Wire('red', pad, self.p2).instruction(),
                     equal_to('Connect a Red Croc-clip Lead (Clip-M) from bb pad X to bb socket p2'))
+
+    def test_potentiometer_is_inserted_by_pin_1(self):
+        pot = Potentiometer('10k', self.p1)
+        Project().add(pot)
+        assert_that(pot.instruction(),
+                    equal_to('Insert the 10k Potentiometer (VR1) with pin 1 in bb socket p1'))
 
     def check_instruction(self, component, desc):
         assert_that(component.instruction(),

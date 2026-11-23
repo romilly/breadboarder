@@ -197,6 +197,17 @@ def test_header_off_the_end_is_refused():
         glue.add_part(CODE, 'header6', ["breadboard['a27']"])
 
 
+def test_add_a_potentiometer_at_the_end_of_a_row():
+    new = glue.add_part(CODE, 'Potentiometer', ["breadboard['a28']"])  # pins in a28, a29, a30
+    assert new.rstrip().endswith("project.add(Potentiometer('10k', breadboard['a28']))")
+    assert json.loads(glue.render(new))['parts'][-1]['name'] == 'Potentiometer'
+
+
+def test_potentiometer_off_the_end_is_refused():
+    with pytest.raises(ValueError, match='would not all land on sockets'):
+        glue.add_part(CODE, 'Potentiometer', ["breadboard['a29']"])
+
+
 def test_preview_draws_the_part_and_says_whether_it_fits():
     good = json.loads(glue.preview(CODE, 'pcf8574', "breadboard['f20']"))
     assert good['ok'] and good['svg'].startswith('<g')
