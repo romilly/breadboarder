@@ -407,6 +407,42 @@ class Potentiometer(Component):
             self.add(Circle(Point(0, 0), 1.5, fill='silver', stroke='#333').move_center_to(Point(PITCH * i, 0)))
 
 
+class RotaryPotentiometer(Potentiometer):
+    """A panel-style rotary potentiometer with a knob, like the one in Pimoroni's Explorer Starter Kit,
+    seen from the front: a metal body on a green base, with its three pins in a row along the bottom.
+    Its mounting tangs stick out at the sides, so on a breadboard it goes along the top or bottom row."""
+    BODY_WIDTH = 38
+    BODY_HEIGHT = 36
+    BASE_HEIGHT = 5
+    KNOB_RADIUS = 11
+    GREEN = '#2fa36b'
+
+    def part_type(self):
+        return 'Rotary potentiometer'
+
+    def add_parts(self):
+        wiper_x = PITCH * (self.PINS - 1) / 2
+        left = wiper_x - self.BODY_WIDTH / 2
+        top = -(self.BASE_HEIGHT + self.BODY_HEIGHT)
+        # the mounting tangs, peeping out at the sides
+        for x in (left - 3, left + self.BODY_WIDTH):
+            self.add(Rectangle(3, 9, fill='#a8a8a8', stroke='#777').move_to(Point(x, top + 14)))
+        self.add(Rectangle(self.BODY_WIDTH - 4, self.BASE_HEIGHT + 2, fill=self.GREEN, stroke='#1f7a4d')
+                 .move_to(Point(left + 2, -self.BASE_HEIGHT - 1)))
+        self.add(Rectangle(self.BODY_WIDTH, self.BODY_HEIGHT, fill='#dcdcdc', stroke='#8a8a8a', rounded=True)
+                 .move_to(Point(left, top)))
+        self.add(Circle(Point(0, 0), 2.2, fill=self.GREEN, stroke='none')
+                 .move_center_to(Point(left + 5, top + 5)))
+        self.add(Circle(Point(0, 0), 2.2, fill=self.GREEN, stroke='none')
+                 .move_center_to(Point(left + self.BODY_WIDTH - 5, top + self.BODY_HEIGHT - 5)))
+        knob = Point(wiper_x, top + self.BODY_HEIGHT / 2)
+        self.add(Circle(Point(0, 0), self.KNOB_RADIUS + 2, fill='#b0b0b0', stroke='#888').move_center_to(knob))
+        self.add(Circle(Point(0, 0), self.KNOB_RADIUS, fill='#151515', stroke='#000').move_center_to(knob))
+        self.add(Circle(Point(0, 0), 3.5, fill='#3a3a3a', stroke='none').move_center_to(knob - Point(4, 4)))
+        for i in range(self.PINS):
+            self.add(Circle(Point(0, 0), 1.5, fill='silver', stroke='#333').move_center_to(Point(PITCH * i, 0)))
+
+
 class RgbLed(Component):
     """A 5mm common-cathode RGB LED, legs in a row 0.1" apart: R, GND (long leg), G, B."""
     LEGS = (('R', 'red'), ('GND', '#222'), ('G', 'green'), ('B', 'blue'))
