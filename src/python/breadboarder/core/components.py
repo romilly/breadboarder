@@ -54,13 +54,15 @@ class Wire(Component):
         self.color = color
         self.add(Line(start.location(), end.location(), color, 3, 'round'))
 
+    def is_croc_clip_lead(self):
+        return any(port.port_type == 'pad' for port in self.connected_ports)
+
+    # The bill of materials numbers each part type separately, so each type needs its own prefix
     def id_prefix(self):
-        return 'JW'
+        return 'CL' if self.is_croc_clip_lead() else 'JW'
 
     def part_type(self):
-        if any(port.port_type == 'pad' for port in self.connected_ports):
-            return 'Croc-clip Lead'
-        return 'Jumper Wire'
+        return 'Croc-clip Lead' if self.is_croc_clip_lead() else 'Jumper Wire'
 
     def description(self):
         return '%s %s (%s)' % (title_case(self.color), self.part_type(), self.genders())

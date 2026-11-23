@@ -76,6 +76,12 @@ class ExplorerTests(TestCase):
         assert_that(self.explorer['PAD_GND_L'].describe_location(),
                     equal_to('EXP-1 pad GND (left)'))
 
+    def test_jumper_wires_and_croc_clip_leads_have_distinct_ids(self) -> None:
+        jumper = Wire('yellow', self.explorer['GP0'], self.explorer['e10'])
+        lead = Wire('red', self.explorer['PAD_3V3'], self.explorer['j1'])
+        Project().add(self.explorer, jumper, lead)
+        assert_that([jumper.id(), lead.id()], equal_to(['JW1', 'CL1']))
+
     def test_ports_move_with_the_explorer(self) -> None:
         before = self.explorer['a1'].location()
         self.explorer.move_to(Point(100, 50))
