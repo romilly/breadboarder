@@ -64,6 +64,7 @@ Semantic versioning; the version is `__version__` in `src/python/breadboarder/__
 - **breadboard.py**: The `Breadboard` class with socket groups and power rails.
 - **components.py**: Electronic components (`Wire`, `Resistor`, `LED`, `DIL`, etc.) that connect between ports.
 - **port.py**: `Socket` and `Pin` classes representing connection points on hosts.
+- **pico.py**: `Pico`, `PicoW`, `Pico2`, `Pico2W`: boards with soldered headers, plugged into a breadboard by pin 1 (`Pico(breadboard['c5'])`, USB end left, pins 21-40 five rows on). `pico['GP15']` or `pico[20]` is the socket that pin sits in; `pico['GND']` is pin 38, `pico['AGND']` pin 33.
 
 ### Author/Publishing (`src/python/breadboarder/author/`, `publishing/`)
 

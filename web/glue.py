@@ -212,6 +212,17 @@ def row_footprint(pins):
     return [(PITCH * i, 0) for i in range(pins)]
 
 
+def pico_footprint():
+    """Pins 1-20 along pin 1's row, pins 40-21 along the row five letters on."""
+    from breadboarder.core.breadboard import Breadboard
+    board = Breadboard()
+    span = board['h1'].location().y - board['c1'].location().y
+    return row_footprint(20) + [(x, span) for x, _ in row_footprint(20)]
+
+
+PICO = 'breadboarder.core.pico'
+
+
 PALETTE = [
     {'kind': 'Wire', 'label': 'Wire', 'module': COMPONENTS,
      'template': "Wire('{colour}', {0}, {1})", 'ports': 2},
@@ -237,6 +248,14 @@ PALETTE = [
      'template': "RotaryPotentiometer('10k', {0})", 'ports': 1, 'footprint': row_footprint(3)},
     {'kind': 'RgbLed', 'label': 'RGB LED', 'module': COMPONENTS,
      'template': "RgbLed({0})", 'ports': 1, 'footprint': row_footprint(4)},
+    {'kind': 'Pico', 'label': 'Pico', 'module': PICO,
+     'template': "Pico({0})", 'ports': 1, 'footprint': pico_footprint()},
+    {'kind': 'PicoW', 'label': 'Pico W', 'module': PICO,
+     'template': "PicoW({0})", 'ports': 1, 'footprint': pico_footprint()},
+    {'kind': 'Pico2', 'label': 'Pico 2', 'module': PICO,
+     'template': "Pico2({0})", 'ports': 1, 'footprint': pico_footprint()},
+    {'kind': 'Pico2W', 'label': 'Pico 2 W', 'module': PICO,
+     'template': "Pico2W({0})", 'ports': 1, 'footprint': pico_footprint()},
     # Hosts: placed by clicking a point; `var` is the base of the variable name.
     {'kind': 'Breadboard', 'label': 'Breadboard', 'module': 'breadboarder.core.breadboard',
      'host': True, 'var': 'breadboard', 'ports': 0},

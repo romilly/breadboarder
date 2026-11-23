@@ -274,3 +274,17 @@ def test_a_new_host_can_be_wired_and_dragged():
 
 def test_host_preview_draws_the_host_at_the_origin():
     assert json.loads(glue.host_preview('CP2102'))['svg'].startswith('<g')
+
+
+@pytest.mark.parametrize('kind', ['Pico', 'PicoW', 'Pico2', 'Pico2W'])
+def test_add_a_pico_straddling_the_centre(kind):
+    new = glue.add_part(CODE, kind, ["breadboard['c8']"])
+    assert "from breadboarder.core.pico import %s" % kind in new
+    assert new.rstrip().endswith("project.add(%s(breadboard['c8']))" % kind)
+    assert parts(new)[-1]['name'] == kind
+
+
+def test_a_pico_must_fit_on_the_breadboard():
+    with pytest.raises(ValueError):
+        glue.add_part(CODE, 'Pico', ["breadboard['c15']"])
+    assert json.loads(glue.preview(CODE, 'Pico2W', "breadboard['c8']"))['ok']
