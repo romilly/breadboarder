@@ -208,6 +208,17 @@ def test_potentiometer_off_the_end_is_refused():
         glue.add_part(CODE, 'Potentiometer', ["breadboard['a29']"])
 
 
+def test_add_a_rotary_potentiometer_at_the_end_of_a_row():
+    new = glue.add_part(CODE, 'RotaryPotentiometer', ["breadboard['a28']"])  # pins in a28, a29, a30
+    assert new.rstrip().endswith("project.add(RotaryPotentiometer('10k', breadboard['a28']))")
+    assert json.loads(glue.render(new))['parts'][-1]['name'] == 'RotaryPotentiometer'
+
+
+def test_rotary_potentiometer_off_the_end_is_refused():
+    with pytest.raises(ValueError, match='would not all land on sockets'):
+        glue.add_part(CODE, 'RotaryPotentiometer', ["breadboard['a29']"])
+
+
 def test_add_an_rgb_led_at_the_end_of_a_row():
     new = glue.add_part(CODE, 'RgbLed', ["breadboard['a27']"])  # legs in a27-a30
     assert new.rstrip().endswith("project.add(RgbLed(breadboard['a27']))")

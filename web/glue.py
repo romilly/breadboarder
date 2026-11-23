@@ -231,8 +231,10 @@ PALETTE = [
      'template': "pcf8574({0})", 'ports': 1, 'footprint': dil_footprint(16)},
     {'kind': 'header6', 'name': 'header', 'label': '6-pin header', 'module': HEADER,
      'template': "header(6, {0})", 'ports': 1, 'footprint': row_footprint(6)},
-    {'kind': 'Potentiometer', 'label': 'Potentiometer', 'module': COMPONENTS,
+    {'kind': 'Potentiometer', 'label': 'Trimmer pot', 'module': COMPONENTS,
      'template': "Potentiometer('10k', {0})", 'ports': 1, 'footprint': row_footprint(3)},
+    {'kind': 'RotaryPotentiometer', 'label': 'Rotary pot', 'module': COMPONENTS,
+     'template': "RotaryPotentiometer('10k', {0})", 'ports': 1, 'footprint': row_footprint(3)},
     {'kind': 'RgbLed', 'label': 'RGB LED', 'module': COMPONENTS,
      'template': "RgbLed({0})", 'ports': 1, 'footprint': row_footprint(4)},
     # Hosts: placed by clicking a point; `var` is the base of the variable name.
